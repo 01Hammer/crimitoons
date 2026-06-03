@@ -1,0 +1,1340 @@
+/* ==========================================================================
+   CRIMITOONS: SISTEMA DE PESTAÑAS INDEPENDIENTES (MÁXIMA EXPANSIÓN 1600px)
+   ========================================================================= */
+
+/* --- 🪐 CONTENEDOR EXCLUSIVO PARA LA PESTAÑA COMUNIDAD --- */
+.crimi-layout-comunidad-modulo {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  gap: 50px;
+  padding: 24px 40px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.crimi-layout-comunidad-modulo .crimi-columna-principal {
+  max-width: 1350px; /* 🌟 Sincronizado a 1350px para que ambas pestañas midan lo mismo */
+  margin: 0 auto;
+  display: flex;
+  gap: 60px;
+  padding: 30px 40px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.crimi-layout-comunidad-modulo .crimi-columna-lateral-ancha {
+  width: 380px;
+  flex-shrink: 0;
+}
+
+.crimi-seccion-titulo {
+  font-size: 1.3rem;
+  color: #3d262b;
+  font-weight: 800;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ==========================================================================
+   VISTA HOME
+   ========================================================================== */
+.crimi-layout-home-modulo {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 2 partes para la izquierda, 1 para la derecha */
+  gap: 30px;
+  width: 100%;
+  align-items: start;
+}
+
+/* Responsivo para tablets/móviles: se vuelve una sola columna */
+@media (max-width: 992px) {
+  .crimi-layout-home-modulo {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+}
+
+.home-seccion-bloque {
+  width: 100%;
+}
+
+/* ==========================================================================
+   COLUMNA IZQUIERDA: GÉNEROS PRINCIPALES
+   ========================================================================== */
+.home-generos-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.crimi-tag-genero {
+  background-color: #fcefe9; /* Un tono cálido muy suave, puedes cambiarlo por tu color base */
+  color: #3d262b;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(61, 38, 43, 0.08);
+  transition: all 0.2s ease;
+}
+
+.crimi-tag-genero:hover {
+  background-color: #3d262b;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   COLUMNA IZQUIERDA: CARRUSEL DE PERSONAJES (Horizontal)
+   ========================================================================== */
+.home-personajes-carrusel-wrapper {
+  position: relative;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.home-personajes-lista {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto; /* Habilita el scroll horizontal */
+  scroll-behavior: smooth;
+  padding: 5px 5px 15px 5px; /* Padding abajo para que la sombra respire */
+  
+  /* Ocultar barra de scroll en Firefox */
+  scrollbar-width: none; 
+}
+
+/* Ocultar barra de scroll en Chrome, Safari y Edge */
+.home-personajes-lista::-webkit-scrollbar {
+  display: none;
+}
+
+.home-personajes-item {
+  flex: 0 0 140px; /* Evita que las tarjetas se encojan, tamaño fijo de ancho */
+  background-color: #ffffff;
+  border-radius: 14px;
+  border: 2px solid rgba(61, 38, 43, 0.12);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 10px rgba(61, 38, 43, 0.02);
+  transition: all 0.25s ease;
+}
+
+.home-personajes-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(61, 38, 43, 0.06);
+  border-color: rgba(61, 38, 43, 0.25);
+}
+
+.home-personaje-foto-wrapper {
+  width: 100%;
+  height: 150px;
+  background-color: #f7f5f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.home-personaje-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-personaje-placeholder {
+  font-size: 2.2rem;
+}
+
+.home-personaje-info {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: center;
+}
+
+.home-personaje-info strong {
+  font-size: 0.85rem;
+  color: #3d262b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Si el nombre es muy largo, pone tres puntitos */
+}
+
+.home-personaje-info span {
+  font-size: 0.75rem;
+  color: #8c7a7d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   COLUMNA IZQUIERDA: REEL DE AMIGOS (Sistema de Contornos por Estado)
+   ========================================================================== */
+.home-amigos-actividad-container {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  padding: 20px;
+  border: 2px dashed rgba(61, 38, 43, 0.1); /* Toque minimalista */
+  margin-top: 15px;
+}
+
+.home-amigos-subtexto {
+  font-size: 0.85rem;
+  color: #8c7a7d;
+  margin-bottom: 15px;
+}
+
+.home-amigos-avatar-reel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.home-amigo-avatar-item {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  padding: 2px; /* Espacio de aire entre el contorno de color y la foto */
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  
+  /* Contorno base por defecto (si no tiene estado) */
+  border: 3px solid #cbd5e1; 
+}
+
+.home-amigo-avatar-item:hover {
+  transform: scale(1.1);
+}
+
+/* 🟢 ESTADO: PENDIENTE (Verde) */
+.home-amigo-avatar-item.status-pendiente {
+  border-color: #22c55e; /* Verde esmeralda brillante */
+}
+
+/* 🔵 ESTADO: TERMINADA (Azul) */
+.home-amigo-avatar-item.status-visto {
+  border-color: #3b82f6; /* Azul eléctrico */
+}
+
+/* 🔴 ESTADO: DROPEADA (Rojo) */
+.home-amigo-avatar-item.status-dropeado {
+  border-color: #ef4444; /* Rojo coral */
+}
+
+.home-amigo-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Estilos de los Avatares Placeholder (con letras de iniciales) */
+.home-amigo-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #ffffff;
+}
+
+/* Colores divertidos personalizados para las iniciales basados en tus hermanos */
+.text-musical { background-gradient: linear-gradient(135deg, #a855f7, #6366f1); background-color: #6366f1; } /* Nilson - Notas musicales */
+.text-taxi { background-color: #eab308; color: #1e1b4b !important; } /* Yesid - Amarillo Taxi */
+
+/* ==========================================================================
+   COLUMNA DERECHA: INFORMACIÓN CLAVE Y NANOGÉNEROS
+   ========================================================================== */
+.caja-lateral-datos {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 2px solid rgba(61, 38, 43, 0.15);
+  padding: 22px;
+  box-shadow: 0 5px 15px rgba(61, 38, 43, 0.02);
+}
+
+.caja-info-clave-solida {
+  background-color: #ffffff;
+}
+
+.caja-lateral-titulo-home {
+  font-size: 1rem;
+  color: #3d262b;
+  margin-bottom: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid rgba(61, 38, 43, 0.05);
+  padding-bottom: 10px;
+}
+
+.info-clave-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.info-clave-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-clave-etiqueta {
+  font-size: 0.75rem;
+  color: #8c7a7d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-clave-valor {
+  font-size: 0.95rem;
+  color: #3d262b;
+  font-weight: 600;
+}
+
+.info-clave-valor small {
+  color: #8c7a7d;
+  font-weight: 400;
+}
+
+/* Rating destacado */
+.item-destacado-rating {
+  background-color: #fdf6f0;
+  padding: 12px;
+  border-radius: 10px;
+  border-left: 4px solid #3d262b;
+}
+
+.info-clave-valor-rating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.info-clave-valor-rating strong {
+  font-size: 1.6rem;
+  color: #3d262b;
+  font-weight: 800;
+}
+
+.crimi-estrellas {
+  color: #f59e0b; /* Color oro para las estrellas */
+  font-size: 0.85rem;
+  display: flex;
+  gap: 2px;
+}
+
+/* --- BLOQUE DE NANOGÉNEROS --- */
+.home-nanogeneros-grilla {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.crimi-tag-nano {
+  background-color: #f8f6f6;
+  color: #5c4d50;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid rgba(61, 38, 43, 0.05);
+  cursor: help; /* Indica que al pasar el mouse hay un tooltip con los votos */
+  transition: all 0.2s ease;
+}
+
+.crimi-tag-nano:hover {
+  background-color: #3d262b;
+  color: #ffffff;
+  border-color: #3d262b;
+}
+
+/* ==========================================================================
+   PESTAÑA: EPISODIOS - DISEÑO PERSONALIZADO Y DICTADO
+   ========================================================================= */
+
+/* Contenedor general que expande la vista respetando el ancho cómodo del Home */
+.crimi-modulo-episodios {
+  max-width: 1550px;
+  margin: 0 auto;
+  padding: 30px 40px;
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* 📑 BARRA SUPERIOR DE CONTROL (Ahora transparente, actúa como contenedor flotante) */
+.episodios-control-barra {
+  background-color: transparent;
+  padding: 10px 0;
+  display: flex;
+  /* 1. Cambia 'space-between' por 'center' */
+  justify-content: center;
+  align-items: center;
+  box-shadow: none;
+  /* 2. Añade un espacio de separación entre ambos bloques */
+  gap: 730px;
+}
+
+/* Contenedor del alineamiento original */
+.episodios-selector-caja {
+  display: flex;
+  align-items: center;
+}
+
+/* Contenedor Principal del Menú Adaptado */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  width: 220px; /* Ajustado sutilmente para el flujo de la barra */
+  z-index: 100; /* Asegura que la lista flote por encima de las tarjetas de episodios */
+}
+
+/* Botón Principal (Forma Cilíndrica / Píldora que diseñaste) */
+.dropdown-button {
+  background-color: #3d262b;
+  color: #ffffff;
+  padding: 12px 24px;
+  font-size: 17px;
+  font-weight: 900; /* Manteniendo la fuerza de tu fuente original */
+  letter-spacing: 0.5px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(61, 38, 43, 0.15);
+  transition: all 0.3s ease;
+}
+
+/* Cambio de color al pasar sobre el botón */
+.dropdown-button:hover {
+  background-color: #b25e38;
+}
+
+/* Icono de Flecha */
+.arrow {
+  border: solid #ffffff;
+  border-width: 0 2.5px 2.5px 0;
+  display: inline-block;
+  padding: 3.5px;
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+}
+
+/* Lista Desplegable flotante (Opciones) */
+.dropdown-content {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  top: 115%;
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid rgba(61, 38, 43, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(61, 38, 43, 0.12);
+  padding: 6px 0;
+  margin: 0;
+  list-style: none;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Elementos de la Lista (Forma Cilíndrica en Hover adaptada) */
+.dropdown-content li a {
+  color: #3d262b;
+  padding: 10px 20px;
+  text-decoration: none;
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 4px 8px;
+  border-radius: 50px;
+  transition: all 0.2s ease;
+}
+
+/* Efecto Hover dinámico con desplazamiento sutil */
+.dropdown-content li a:hover,
+.dropdown-content li a.activa {
+  background-color: rgba(178, 94, 56, 0.1);
+  color: #b25e38;
+  padding-left: 26px;
+}
+
+/* ESTADOS ACTIVOS INTERCACHADOS POR JS */
+/* Muestra el menú */
+.dropdown.open .dropdown-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Rota la flecha hacia arriba */
+.dropdown.open .dropdown-button .arrow {
+  transform: rotate(-135deg);
+}
+
+/* Bloque de la derecha: Contador y Checkbox juntos */
+.episodios-familia-derecha {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  color: #2b2625; /* 🌟 Letra visible en el fondo */
+}
+
+.episodios-contador-total {
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.contenedor-check-rapido {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+
+  /* Estilos del estado inicial solicitados */
+  background: transparent;
+  border: 2px solid #b25e38;
+  border-radius: 30px;
+  color: #b25e38;
+
+  /* Tipografía solicitada */
+  font-weight: 700;
+  font-size: 1.01rem;
+
+  /* Presentación */
+  padding: 14px 16px; /* Ajustado sutilmente para equilibrar visualmente con el icono */
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.contenedor-check-rapido:hover {
+  border-color: #b25e38;
+  transform: translateY(0.1px);
+  box-shadow: 20px 20px 20px 20px #B25E38(0, 0%, 100%, 0.4);
+}
+
+/* Ocultamos el input feo por defecto */
+.check-custom-input {
+  display: none;
+}
+
+/* MODIFICADO: Ahora oculta por completo el ojito / icono */
+.check-visual-box {
+  display: none;
+}
+
+/* 🌟 MAGIA PURA EN CSS: Cuando el input oculto está marcado (:checked), 
+   cambiamos el fondo y las letras de todo el botón contenedor */
+/* MODIFICADO: Se removió la línea que apuntaba a .check-visual-box */
+.crimi-modulo-episodios .check-custom-input:checked ~ .texto-marcar-todos {
+  color: #ffffff;
+}
+
+.crimi-modulo-episodios:has(.check-custom-input:checked)
+  .contenedor-check-rapido {
+  background-color: #b25e38;
+  border-color: #ffff;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   CRIMITOONS: REJILLA DE EPISODIOS EN 2 COLUMNAS (CSS GRID)
+   ========================================================================= */
+
+/* 🎞️ FLUJO DE TARJETAS EN REJILLA */
+.episodios-flujo-contenedor {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 🌟 Divide el espacio exactamente en dos columnas iguales */
+  gap: 16px; /* Mantiene tu separación limpia de 16px en horizontal y vertical */
+  width: 100%;
+}
+
+/* Tarjeta limpia adaptada para dos columnas */
+.episodio-fila-tarjeta {
+  background-color: #ffffff;
+  border: 1px solid rgba(61, 38, 43, 0.08);
+  border-radius: 14px;
+  padding: 16px 20px; /* 🌟 Ajustamos levemente el padding para que respire mejor al ser más angosta */
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(61, 38, 43, 0.02);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  width: 100%; /* Forzamos a que llene su mitad del grid */
+  min-width: 0; /* Evita que el contenedor se rompa con textos muy largos */
+}
+
+.episodio-fila-tarjeta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(61, 38, 43, 0.06);
+}
+
+/* Caja de la Imagen Miniatura */
+.episodio-miniatura-caja {
+  flex-shrink: 0;
+  margin-right: 18px; /* Reducido un pelín de 24px a 18px para optimizar el espacio horizontal */
+}
+
+.episodio-img {
+  width: 150px; /* 🌟 Ajustado levemente a 150px para dar más pista de despegue al texto */
+  height: 84px; /* Mantiene la proporción 16:9 limpia */
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+/* 🏢 BLOQUE DE TEXTOS ORDENADO POR JERARQUÍA */
+.episodio-datos-caja {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 0; /* 🌟 Crucial: Permite que el truncado de texto (...) funcione en flexbox */
+}
+
+/* 1. Nombre del capítulo (Se mantiene grande pero controlado) */
+.episodio-titulo-texto {
+  font-size: 1.15rem; /* 🌟 Bajó un pelín de 1.25rem para que quepan títulos largos en la columna */
+  color: #2b2625;
+  font-weight: 800;
+  margin: 0;
+
+  /* ✂️ Si el título es muy largo, mete tres puntos (...) automáticamente sin romper la tarjeta */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 2. Formato: capitulo 1 (Debajo del título) */
+.episodio-identificador {
+  font-size: 0.9rem;
+  color: #3d262b;
+  font-weight: 700;
+  order: 2;
+}
+
+/* 3. La fecha de estreno */
+.episodio-fecha-estreno {
+  font-size: 0.85rem;
+  color: #2b2625;
+  opacity: 0.6;
+  font-weight: 600;
+  order: 3;
+}
+
+/* 🛠️ BOTONERA DE ACCIONES LEJOS HACIA LA DERECHA */
+.episodio-acciones-barra {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Compactado levemente de 20px a 16px para evitar colisiones */
+  margin-left: auto;
+}
+
+/* 🌟 BOTONES DE PUROS ICONOS SIN CÍRCULO DE FONDO */
+.btn-episodio-accion {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: transform 0.2s ease;
+}
+
+.btn-episodio-accion i {
+  font-size: 1.35rem; /* Adaptado al nuevo tamaño compacto */
+  color: #3d262b;
+  display: inline-block;
+  transition: color 0.2s ease;
+}
+
+/* Interacciones individuales al pasar el mouse */
+.btn-episodio-accion:hover {
+  transform: scale(1.15);
+}
+
+.btn-episodio-accion.accion-favorito:hover i {
+  color: #b25e38;
+}
+
+.btn-episodio-accion.accion-visto:hover i {
+  color: #2a6f97;
+}
+/* ==========================================================================
+   PESTAÑA: COMUNIDAD - COMPONENTES
+   ========================================================================= */
+
+/* Bloque para escribir reseñas (Efecto flotante transparente) */
+.crimi-publicar-box-flotante {
+  display: flex;
+  gap: 16px;
+  background: transparent;
+  border: none;
+  padding: 8px 0 24px 0;
+  border-bottom: 2px solid rgba(61, 38, 43, 0.08);
+  margin-bottom: 16px;
+}
+
+.crimi-publicar-avatar-anon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #2b2625;
+  color: #f7f3e3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.crimi-publicar-formulario {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.crimi-publicar-input {
+  width: 100%;
+  background-color: #ffffff;
+  border: 2px solid rgba(61, 38, 43, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #3d262b;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.crimi-publicar-input:focus {
+  border-color: #b25e38;
+}
+
+.crimi-boton-publicar {
+  background-color: #b25e38;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.crimi-boton-publicar:hover {
+  background-color: #2b2625;
+}
+
+/* Flujo de Comentarios e Identidad */
+.muro-comentarios-flujo {
+  display: flex;
+  flex-direction: column;
+}
+
+.muro-comentario-sin-caja {
+  display: flex;
+  gap: 16px;
+  padding: 24px 4px;
+  border-bottom: 1px solid rgba(61, 38, 43, 0.12);
+}
+
+.muro-comentario-sin-caja:last-child {
+  border-bottom: none;
+}
+
+.muro-comentario-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.muro-comentario-avatar.purple-bg {
+  background-color: #6c5ce7;
+}
+.muro-comentario-avatar.terracotta-bg {
+  background-color: #b25e38;
+}
+
+.muro-comentario-cuerpo {
+  flex-grow: 1;
+}
+
+.muro-comentario-usuario-badge {
+  background-color: #3d262b; /* Fondo oscuro original para los nombres */
+  color: #f7f3e3;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  display: inline-block;
+}
+
+.muro-comentario-fecha {
+  font-size: 0.82rem;
+  opacity: 0.5;
+  margin-left: 10px;
+  font-weight: 600;
+}
+
+.muro-comentario-texto {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #3d262b;
+  margin: 12px 0 0 0;
+  font-weight: 500;
+}
+
+/* --- 📊 Activity Log Expandido --- */
+.caja-lateral-datos.caja-actividad-espaciosa {
+  background-color: #ffffff;
+  border: 2px solid rgba(61, 38, 43, 0.12);
+  border-radius: 16px;
+  padding: 28px !important;
+  box-shadow: 0 4px 0 rgba(61, 38, 43, 0.03);
+}
+
+.widget-comunidad-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgba(61, 38, 43, 0.08);
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+
+.actividad-feed-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.actividad-item-tarjeta {
+  background-color: #ffffff;
+  border: 1px solid rgba(61, 38, 43, 0.06);
+  border-radius: 12px;
+  padding: 18px 22px;
+  box-shadow: 0 4px 12px rgba(61, 38, 43, 0.02);
+  font-size: 0.95rem;
+  color: #3d262b;
+}
+
+.actividad-item-tarjeta.terminado {
+  border-left: 4px solid #107c41;
+}
+.actividad-item-tarjeta.terminado span {
+  color: #107c41;
+  font-weight: 800;
+}
+
+.actividad-item-tarjeta.viendo {
+  border-left: 4px solid #e67e22;
+}
+.actividad-item-tarjeta.viendo span {
+  color: #e67e22;
+  font-weight: 800;
+}
+
+.actividad-item-tarjeta.pausado {
+  border-left: 4px solid #0078d4;
+}
+.actividad-item-tarjeta.pausado span {
+  color: #0078d4;
+  font-weight: 800;
+}
+
+.actividad-item-tiempo {
+  display: block;
+  font-size: 0.78rem;
+  opacity: 0.5;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* --- 🎛️ Toggle Switch con Deslizamiento Real --- */
+.crimi-switch-contenedor {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.crimi-switch-contenedor input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.crimi-switch-slider {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 22px;
+  background-color: rgba(61, 38, 43, 0.18);
+  border-radius: 34px;
+  transition: background-color 0.3s ease;
+}
+
+.crimi-switch-slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.crimi-switch-contenedor input:checked + .crimi-switch-slider {
+  background-color: #b25e38;
+}
+.crimi-switch-contenedor input:checked + .crimi-switch-slider::before {
+  transform: translateX(20px);
+}
+.crimi-switch-texto {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #3d262b;
+  opacity: 0.6;
+  letter-spacing: 0.5px;
+}
+.crimi-switch-contenedor input:checked ~ .crimi-switch-texto {
+  opacity: 1;
+  color: #b25e38;
+}
+
+/* ==========================================================================
+   PESTAÑA: FICHA TÉCNICA (DISTRIBUCIÓN 65% - 35%)
+   ========================================================================= */
+
+.crimi-modulo-ficha {
+  display: flex;
+  gap: 40px; /* Separación interna entre tus dos columnas (65-35) */
+  width: 100%;
+  max-width: 1450px; /* Ajusta este número al valor exacto que use tu vista de episodios */
+  margin: 0 auto; /* Esto lo centra perfectamente en la pantalla */
+  padding: 24px 0; /* Mismo aire vertical; dejamos el horizontal en 0 si el padre ya tiene padding */
+  box-sizing: border-box;
+  align-items: flex-start;
+}
+
+/* --- COLUMNA IZQUIERDA: TARJETAS FLOTANTES (65%) --- */
+.ficha-columna-izquierda {
+  flex: 0 0 65%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ficha-seccion-grupo {
+  width: 100%;
+}
+
+.ficha-subtitulo {
+  background-color: #3d262b;
+  width: max-content; /* Se adapta automáticamente al largo del texto */
+  padding: 8px 24px 8px 12px; /* Espacio interno para que las letras respiren */
+  border-radius: 18px 50px 50px 18px; /* Izquierda sutil, derecha cilíndrica */
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  display: inline-flex; /* Permite que el ancho se ajuste al contenido junto con flex */
+  align-items: center;
+  gap: 8px;
+  opacity: 0.9;
+}
+
+.staff-horizontal-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: 100%;
+}
+
+/* --- CONTENEDOR DE LA GRILLA (SE ACOMODAN HACIA LA DERECHA) --- */
+.staff-grilla-vertical {
+  display: grid;
+  /* Subimos el tamaño mínimo de 140px a 165px para que respiren */
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 22px;
+  margin-bottom: 26px;
+  width: 100%;
+}
+
+/* --- TARJETA VERTICAL MEJORADA --- */
+.staff-card-vertical {
+  background-color: #ffffff;
+  border-radius: 14px;
+  /* 🌟 Añadimos un borde marrón oscuro sutil pero definido para dar contraste */
+  border: 2px solid rgba(61, 38, 43, 0.15);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 5px 12px rgba(61, 38, 43, 0.03);
+  transition: all 0.25s ease;
+}
+
+/* Efecto hover interactivo */
+.staff-card-vertical:hover {
+  transform: translateY(-5px);
+  /* El borde se intensifica con el color terracota al pasar el mouse */
+  border-color: #c85a17;
+  box-shadow: 0 8px 20px rgba(200, 90, 23, 0.1);
+}
+
+/* --- CONTENEDOR DE LA FOTO (Muuucho más grande, tipo retrato póster) --- */
+.staff-card-foto-wrapper {
+  width: 100%;
+  height: 210px; /* Subimos de 170px a 210px para dar impacto visual */
+  background-color: rgba(61, 38, 43, 0.04);
+  position: relative;
+  border-bottom: 1px solid rgba(61, 38, 43, 0.08);
+  border-top-left-radius: 12px; /* Ajusta al radio que tengan tus tarjetas */
+  border-top-right-radius: 12px;
+}
+
+.staff-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.staff-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3d262b;
+  opacity: 0.25;
+  font-size: 2.5rem;
+}
+
+/* --- BLOQUE DE TEXTO (Fuentes más grandes y legibles) --- */
+.staff-card-info {
+  padding: 14px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #ffffff;
+}
+
+/* Nombre del Actor */
+.staff-card-nombre {
+  color: #2b2625;
+  font-size: 0.95rem; /* Fuente más grande */
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* Subtítulos de Rol o Personaje */
+.staff-card-rol,
+.staff-card-personaje {
+  font-size: 0.85rem; /* Fuente más grande para el personaje interpretado */
+  margin: 0;
+  line-height: 1.2;
+}
+
+.staff-card-rol {
+  color: #c85a17; /* Tu color terracota/naranja insignia */
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Énfasis terracota/naranja para el personaje */
+.staff-card-personaje {
+  font-weight: 700;
+  color: #c85a17; /* Tu color insignia de Crimitoons */
+}
+
+/* =========================================================================
+   🛸 MINI TARJETA FLOTANTE (ESTILO ARCANE POPUP) Y CORRECCIÓN DE COLOR
+   ========================================================================= */
+
+/* Forzar que el rol recupere su identidad visual terracota */
+.staff-card-rol {
+  color: #b25e38 !important; /* Reemplaza por tu hex terracota exacto si difiere */
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.staff-rol-contenedor {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* Badge indicador dinámico (+1, +2...) */
+.badge-multi-rol {
+  background-color: #b25e38;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  display: inline-block;
+}
+
+/* 🍫 Ventana flotante Arcane (Oculta por defecto) */
+/* =========================================================================
+   🛸 VENTANA FLOTANTE INTEGRADA EN LA TARJETA (ESTILO ARCANE MEJORADO)
+   ========================================================================= */
+
+/* 1. Forzar que la tarjeta sea el punto de anclaje absoluto */
+.staff-card-vertical {
+  position: relative !important;
+  overflow: visible !important;
+  /* Mantiene los estilos que ya tenías establecidos (background, border, etc.) */
+}
+
+/* El rol mantiene su color terracota limpio de base */
+.staff-card-rol {
+  color: #b25e38 !important;
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+/* 🍫 Ventana flotante: Remodelada, más grande y sin cabecera */
+.arcane-popup-roles {
+  visibility: hidden;
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 110%; /* Lo subimos un poco más para que flote con aire elegante sobre la tarjeta */
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background-color: #3d2327; /* Chocolate oscuro Arcane */
+  border-radius: 12px;
+  padding: 12px 16px;
+  width: 190px; /* Un ancho cómodo para que no se corten los textos */
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5); /* Sombra para resaltar sobre el fondo */
+  z-index: 9999; /* Máxima prioridad de capa para que no quede detrás de otra tarjeta */
+  pointer-events: none;
+
+  /* Animación suave de transición */
+  transition:
+    opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.2s;
+}
+
+/* 📐 Indicador triangular inferior centrado respecto a la tarjeta */
+.arcane-popup-roles::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #3d2327 transparent transparent transparent;
+}
+
+.arcane-popup-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Separación limpia entre los roles listados */
+}
+
+/* Textos de los roles: Más grandes, legibles y nítidos */
+.arcane-popup-item {
+  color: #ffffff;
+  font-size: 0.88rem; /* Escalado perfecto para lectura sin romper proporciones */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  line-height: 1.3;
+}
+
+.arcane-popup-item i {
+  color: #b25e38; /* Viñeta terracota */
+  font-size: 0.48rem;
+  flex-shrink: 0; /* Evita que el punto se deforme si el texto llega a ocupar dos líneas */
+}
+
+/* 🔥 NUEVO DISPARADOR GLOBAL: La magia ocurre al rozar CUALQUIER punto de la tarjeta */
+.staff-card-vertical:hover .arcane-popup-roles {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+
+/* =========================================================================
+   🎛️ BOTÓN "VER MÁS" ESTILO ARCANE
+   ========================================================================= */
+.arcane-btn-ver-mas {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 24px auto 0 auto; /* Centrado perfecto debajo de la grilla */
+  background-color: transparent;
+  color: #b25e38; /* Tu color terracota insignia */
+  border: 2px solid #b25e38;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arcane-btn-ver-mas i {
+  font-size: 0.75rem;
+  transition: transform 0.25s ease;
+}
+
+/* Efecto hover premium */
+.arcane-btn-ver-mas:hover {
+  background-color: #b25e38;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(178, 94, 56, 0.3);
+}
+
+/* Rotación del ícono cuando esté expandido */
+.arcane-btn-ver-mas[data-expandido="true"] i {
+  transform: rotate(180deg);
+}
+
+/* --- COLUMNA DERECHA: RECUADRO DE INFORMACIÓN (35%) --- */
+.ficha-columna-derecha {
+  flex: 0 0 32%;
+  position: sticky;
+  top: 90px; /* Se queda fijo si la página es muy larga */
+  margin-top: 10px;
+}
+
+.ficha-tarjeta-info-detallada {
+  background-color: #ffffff;
+  border-radius: 16px; /* Bordes muy redondeados */
+  border: 2px solid rgba(61, 38, 43, 0.08);
+  padding: 32px 28px; /* Súper aireado para que respire el contenido */
+  box-shadow: 0 4px 20px rgba(61, 38, 43, 0.02);
+}
+
+.info-detallada-titulo {
+  color: #3d262b;
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  border-bottom: 2px solid rgba(61, 38, 43, 0.06);
+  padding-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-detallada-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Mucho espacio vertical entre líneas para evitar amontonamiento */
+}
+
+.info-linea-item {
+  display: flex;
+  flex-direction: column; /* Diseño apilado (Etiqueta arriba, valor abajo) para máxima legibilidad */
+  gap: 4px;
+}
+
+.info-linea-etiqueta {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #3d262b;
+  opacity: 0.55;
+  font-weight: 700;
+}
+
+.info-linea-valor {
+  font-size: 1rem;
+  color: #2b2625;
+  font-weight: 600;
+}
+
+.info-linea-valor.valor-destacado {
+  color: #b25e38; /* Color de realce para el estudio */
+  font-weight: 700;
+}
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+  .crimi-modulo-ficha {
+    flex-direction: column;
+    gap: 30px;
+  }
+  .ficha-columna-izquierda,
+  .ficha-columna-derecha {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  .ficha-tarjeta-info-detallada {
+    position: static;
+  }
+}

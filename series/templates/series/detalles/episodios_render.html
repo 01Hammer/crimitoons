@@ -1,0 +1,47 @@
+{% for ep in episodios %}
+<div class="episodio-fila-tarjeta">
+  <div class="episodio-miniatura-caja">
+    {% if ep.still_path %}
+    <img
+      src="https://image.tmdb.org/t/p/w300{{ ep.still_path }}"
+      alt="Miniatura de {{ ep.name }}"
+      class="episodio-img"
+    />
+    {% else %}
+    <img
+      src="https://via.placeholder.com/180x101"
+      alt="Sin miniatura"
+      class="episodio-img"
+    />
+    {% endif %}
+  </div>
+
+  <div class="episodio-datos-caja">
+    <div class="episodio-identificador">
+      S{% if ep.season_number < 10 %}0{% endif %}{{ ep.season_number }}E{% if ep.episode_number < 10 %}0{% endif %}{{ ep.episode_number }}
+    </div>
+    <h4 class="episodio-titulo-texto" title="{{ ep.name }}">
+      {{ ep.name }}
+    </h4>
+    <span class="episodio-fecha-estreno"
+      >Estreno: {{ ep.air_date|default:"S/D" }}</span
+    >
+  </div>
+
+  <div class="episodio-acciones-barra">
+    <button type="button" class="btn-episodio-accion accion-favorito" title="Añadir a favoritos">
+      <i class="fa-regular fa-heart"></i>
+    </button>
+    <button type="button" class="btn-episodio-accion accion-visto" title="Marcar como visto">
+      <i class="fa-regular fa-eye"></i>
+    </button>
+    <button type="button" class="btn-episodio-accion accion-opciones" title="Más opciones">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+    </button>
+  </div>
+</div>
+{% empty %}
+<p style="grid-column: span 2; padding: 40px; text-align: center; color: #3d262b; font-weight: 600; opacity: 0.7;">
+  No se encontraron episodios para esta temporada.
+</p>
+{% endfor %}

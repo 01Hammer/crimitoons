@@ -1,0 +1,14 @@
+# Python basura
+__pycache__/
+*.py[cod]
+*$py.class
+venc/
+env/
+.venv/
+
+# IDEs y editores
+.vscode/
+.idea/
+
+# Base de datos local (por si acaso)
+*.sqlite3

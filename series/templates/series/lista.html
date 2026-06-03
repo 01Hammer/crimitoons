@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Colección de Series</title>
+    <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'series/index.css' %}?v=1009">
+    <link rel="stylesheet" href="{% static 'series/perfil.css' %}">
+</head>
+<body>
+
+    {% include 'series/includes/barra_navegacion.html' %}
+
+    <div class="cabecera-principal">
+        <h1><a href="{% url 'index_invitado' %}" style="color: #00b0f0;">Mis Series Vistas</a></h1>
+        <a href="{% url 'crear_serie' %}" class="btn-anadir">+ Añadir nueva serie</a>
+    </div>
+    
+    <hr class="linea-separadora">
+
+    <div class="contenedor-series">
+        {% for serie in series %}
+            <div class="tarjeta-serie">
+                
+                <div class="poster-zona">
+                    {% if serie.poster_path %}
+                        <img src="https://image.tmdb.org/t/p/w200{{ serie.poster_path }}" alt="Póster de {{ serie.titulo }}" class="poster-img">
+                    {% endif %}
+                </div>
+                
+                <div class="info-zona">
+                    <h2 class="titulo-serie">
+                        {{ serie.titulo }} 
+                        <span class="enlace-detalle"><a href="#">Ver más</a></span>
+                        <span class="enlace-eliminar"><a href="{% url 'eliminar_serie' serie.id %}">❌ Eliminar</a></span>
+                    </h2>
+                    
+                    <div class="metadatos">
+                        <span class="badge-calificacion">⭐ {{ serie.calificacion|floatformat:1 }}/10</span>
+                        <span class="badge-fecha">📅 {{ serie.fecha_estreno }}</span>
+                        <span class="badge-capitulos">📺 {{ serie.total_capitulos }} caps</span>
+                    </div>
+                    
+                    <p class="generos-texto"><strong>Géneros:</strong> {{ serie.generos }}</p>
+                    <p class="sinopsis-texto">{{ serie.sinopsis }}</p>
+                </div>
+                
+            </div>
+        {% empty %}
+            <p>No tienes series registradas todavía.</p>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

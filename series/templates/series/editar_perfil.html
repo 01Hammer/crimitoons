@@ -1,0 +1,98 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Perfil - CRIMITOONS</title>
+    <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'series/auth.css' %}">
+    <link rel="stylesheet" href="{% static 'series/index.css' %}?v=1009">
+    <style>
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: block;
+        }
+        .preview-banner {
+            max-width: 100%;
+            max-height: 150px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: block;
+        }
+        .form-group.large-textarea textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'series/includes/barra_navegacion.html' %}
+
+    <div class="contenedor-auth">
+        <div class="formulario-container">
+            <div class="formulario-box">
+                <h1>Editar Mi Perfil</h1>
+                <p>Personaliza tu foto de perfil, banner y biografía</p>
+
+                {% if form.non_field_errors %}
+                    <div class="errores">
+                        {% for error in form.non_field_errors %}
+                            <p class="error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="auth-form">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="{{ form.foto_perfil.id_for_label }}">Foto de Perfil</label>
+                        {% if perfil.foto_perfil %}
+                            <div>
+                                <img src="{{ perfil.foto_perfil.url }}" alt="Foto de Perfil" class="preview-image">
+                                <p><small>Foto actual</small></p>
+                            </div>
+                        {% endif %}
+                        {{ form.foto_perfil }}
+                        {% if form.foto_perfil.errors %}
+                            <span class="error">{{ form.foto_perfil.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.banner.id_for_label }}">Banner</label>
+                        {% if perfil.banner %}
+                            <div>
+                                <img src="{{ perfil.banner.url }}" alt="Banner" class="preview-banner">
+                                <p><small>Banner actual</small></p>
+                            </div>
+                        {% endif %}
+                        {{ form.banner }}
+                        {% if form.banner.errors %}
+                            <span class="error">{{ form.banner.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group large-textarea">
+                        <label for="{{ form.bio.id_for_label }}">Biografía</label>
+                        {{ form.bio }}
+                        {% if form.bio.errors %}
+                            <span class="error">{{ form.bio.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="boton-enviar">Guardar Cambios</button>
+                </form>
+
+                <p class="enlace-login">
+                    <a href="{% url 'ver_perfil' request.user.username %}">Volver a mi perfil</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

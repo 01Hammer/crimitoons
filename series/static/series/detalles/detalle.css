@@ -1,0 +1,219 @@
+/* ==========================================================================
+   CRIMITOONS: CUERPO GENERAL Y FONDO
+   ========================================================================= */
+body.page-with-banner {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #F7F3E3; /* El color crema de fondo oficial */
+    color: #3D262B;
+}
+
+.serie-cuerpo-crema {
+    background-color: #F7F3E3;
+    min-height: 100vh;
+    position: relative;
+    width: 100%;
+}
+
+/* ==========================================================================
+   CRIMITOONS: HERO BANNER (SUPERIOR)
+   ========================================================================= */
+.serie-hero-contenedor {
+    width: 100%;
+    height: 508px;
+    position: relative;
+    overflow: hidden;
+    background-color: #2B2625;
+}
+
+.serie-banner-fondo {
+    width: 100%;
+    height: 100%;
+}
+
+.banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.banner-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #3D262B 0%, #2B2625 100%);
+}
+
+/* ==========================================================================
+   CRIMITOONS: BLOQUE DE INFORMACIÓN PRINCIPAL (PORTADA Y TEXTOS)
+   ========================================================================= */
+.serie-contenido-wrapper {
+    max-width: 1350px; /* Expandido para simetría global */
+    margin: 0 auto;    /* 🌟 Clave para mantener todo centrado y no pegado a la izquierda */
+    padding: 0 40px;
+    display: flex;
+    gap: 40px;
+    box-sizing: border-box;
+}
+
+/* Portada flotante que muerde el banner */
+.serie-portada-wrapper {
+    width: 240px;
+    height: 340px;
+    flex-shrink: 0;
+    position: relative;
+    margin-top: -160px;
+    margin-left: 20px; /* Sube la portada para meterse en el banner */
+    z-index: 10;
+}
+
+.portada-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 4px solid #F7F3E3;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.portada-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #3D262B;
+    border-radius: 16px;
+    border: 4px solid #F7F3E3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Textos al lado de la portada */
+.serie-info-textos {
+    flex: 1;
+    padding-top: 11px;
+}
+
+.serie-titulo {
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #2B2625;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.serie-sinopsis-bloque {
+    margin-bottom: 14px;
+    max-width: 800px;
+}
+
+.serie-sinopsis-texto {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #3D262B;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Botón Guardar */
+.serie-acciones {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-guardar-serie {
+    background-color: #B25E38;
+    color: #F7F3E3;
+    border: 2px solid rgba(61, 38, 43, 0.15);
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 0 rgba(61, 38, 43, 0.05);
+}
+
+.btn-guardar-serie:hover {
+background-color: #B25E38; /* Un terracota un pelín más oscuro y elegante */
+    transform: translateY(-3px); /* 🌟 El efecto de subida (salto de 3 pixeles) */
+    box-shadow: 0 8px 15px rgba(178, 94, 56, 0.4); /* La sombra se expande al subir */
+}
+
+/* ==========================================================================
+   CRIMITOONS: MENÚ NAVEGACIÓN INTERNO (TABS BUTTONS)
+   ========================================================================= */
+.serie-menu-secciones {
+    width: 100%;
+    border-bottom: 2px solid rgba(61, 38, 43, 0.08);
+    margin-top: 28px;
+    background-color: #F7F3E3;
+}
+
+.menu-secciones-wrapper {
+    max-width: 1600px;
+    margin: 0 auto;    /* 🌟 Clave para mantener la botonera centrada */
+    padding: 0 40px;
+    display: flex;
+    justify-content: center;
+    gap: 35px;
+    box-sizing: border-box;
+}
+
+/* Oculta la barra de scroll estorbona en navegadores modernos mientras mantiene el movimiento */
+.menu-secciones-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-enlace {
+    background: none;
+    border: none;
+    padding: 16px 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #3D262B;
+    opacity: 0.6;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.tab-enlace:hover {
+    opacity: 1;
+}
+
+.tab-enlace.active {
+    opacity: 1;
+    color: #B25E38; /* El color terracota de énfasis */
+}
+
+/* Línea indicadora debajo del botón activo */
+.tab-enlace.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #B25E38;
+    border-radius: 3px 3px 0 0;
+}
+
+/* ==========================================================================
+   CONTROL DE VISIBILIDAD DE PESTAÑAS (OCULTAR LAS QUE NO ESTÁN ACTIVAS)
+   ========================================================================= */
+
+/* Por defecto, ocultamos absolutamente todas las pantallas de contenido */
+.tab-pantalla-bloque {
+    display: none !important;
+}
+
+/* Únicamente cuando la pestaña tiene la clase 'active', la hacemos visible */
+.tab-pantalla-bloque.active {
+    display: block !important;
+}

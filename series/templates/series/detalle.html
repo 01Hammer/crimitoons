@@ -1,0 +1,120 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ serie.titulo }} - CRIMITOONS</title>
+    <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=9999" />
+    <link rel="stylesheet" href="{% static 'series/detalles/detalle.css' %}?v=10001" />
+    <link rel="stylesheet" href="{% static 'series/detalles/pestañas.css' %}?v=10001" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  </head>
+
+  </head>
+
+<body class="page-with-banner">
+
+    {% include 'series/includes/barra_navegacion.html' %}
+
+    <header class="serie-hero-contenedor">
+        {% if serie.backdrop_path %}
+            <img src="https://image.tmdb.org/t/p/original{{ serie.backdrop_path }}" alt="Banner de {{ serie.titulo }}" class="banner-img">
+        {% else %}
+            <div class="banner-placeholder"></div>
+        {% endif %}
+    </header>
+
+    <main class="serie-cuerpo-crema">
+      
+      <div class="serie-contenido-wrapper">
+        <div class="serie-portada-wrapper">
+          {% if serie.poster_path %}
+            <img src="https://image.tmdb.org/t/p/w500{{ serie.poster_path }}" alt="Portada {{ serie.titulo }}" class="portada-img" />
+          {% else %}
+            <div class="portada-placeholder">🎬</div>
+          {% endif %}
+        </div>
+
+        <div class="serie-info-textos">
+          <h1 class="serie-titulo">{{ serie.titulo }}</h1>
+          
+          <div class="serie-sinopsis-bloque">
+            <p class="serie-sinopsis-texto">
+              {% if serie.sinopsis %}
+                {{ serie.sinopsis }}
+              {% else %}
+                No hay una sinopsis disponible en este momento.
+              {% endif %}
+            </p>
+          </div>
+
+          <div class="serie-acciones">
+            <button class="btn-guardar-serie">
+              <i class="fa-regular fa-bookmark"></i> Guardar serie
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- El resto de tus pestañas se queda exactamente igual hacia abajo... --> 
+
+      <div class="serie-menu-secciones">
+        <div class="menu-secciones-wrapper">
+          <button class="tab-enlace active" data-tab="home">Home</button>
+          <button class="tab-enlace" data-tab="episodios">Episodios</button>
+          <button class="tab-enlace" data-tab="comunidad">Comunidad</button>
+          <button class="tab-enlace" data-tab="ficha">Ficha</button>
+          <button class="tab-enlace" data-tab="estadisticas">Estadísticas</button>
+        </div>
+      </div>
+
+      <div class="serie-tab-contenido-dinamico">
+        
+        <div id="tab-home" class="tab-pantalla-bloque active">
+          {% include 'series/detalles/home.html' %}
+        </div>
+
+        <div id="tab-episodios" class="tab-pantalla-bloque">
+          {% include 'series/detalles/episodios.html' %}
+        </div>
+
+        <div id="tab-comunidad" class="tab-pantalla-bloque">
+          {% include 'series/detalles/comunidad.html' %}
+        </div>
+
+        <div id="tab-ficha" class="tab-pantalla-bloque">
+          {% include 'series/detalles/ficha.html' %}
+        </div>
+
+        <div id="tab-estadisticas" class="tab-pantalla-bloque">
+          {% include 'series/detalles/estadisticas.html' %}
+        </div>
+
+      </div>
+
+    </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const pestañas = document.querySelectorAll('.tab-enlace');
+        const bloquesContenido = document.querySelectorAll('.tab-pantalla-bloque');
+
+        pestañas.forEach(tab => {
+          tab.addEventListener('click', function() {
+            pestañas.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            bloquesContenido.forEach(bloque => bloque.classList.remove('active'));
+
+            const targetTabId = 'tab-' + this.getAttribute('data-tab');
+            const targetBloque = document.getElementById(targetTabId);
+            if (targetBloque) {
+              targetBloque.classList.add('active');
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

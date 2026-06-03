@@ -1,0 +1,142 @@
+<div class="crimi-modulo-ficha">
+  
+  <div class="ficha-columna-izquierda">
+    
+    <section class="ficha-seccion-grupo">
+      <h3 class="ficha-subtitulo"><i class="fa-solid fa-microphone"></i> Actores de Voz</h3>
+      
+      <div class="staff-grilla-vertical" id="grilla-actores">
+        {% for actor in actores %}
+          <div class="staff-card-vertical">
+            <div class="staff-card-foto-wrapper">
+              {% if actor.foto_path %}
+                <img src="https://image.tmdb.org/t/p/w185{{ actor.foto_path }}" alt="{{ actor.nombre }}" class="staff-card-img" loading="lazy">
+              {% else %}
+                <div class="staff-card-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+              {% endif %}
+            </div> 
+            <div class="staff-card-info">
+              <h4 class="staff-card-nombre">{{ actor.nombre }}</h4>
+              <p class="staff-card-personaje">{{ actor.personaje }}</p>
+            </div>
+          </div> 
+        {% empty %}
+          <p class="ficha-sin-datos">No hay actores registrados para esta serie.</p>
+        {% endfor %}
+      </div> 
+
+      {% if actores|length > 5 %}
+        <button id="btn-ver-mas-actores" class="arcane-btn-ver-mas" data-expandido="false">
+          Ver más <i class="fa-solid fa-chevron-down"></i>
+        </button>   
+      {% endif %}      
+    </section>
+
+    <section class="ficha-seccion-grupo">
+      <h3 class="ficha-subtitulo"><i class="fa-solid fa-clapperboard"></i> Staff Técnico</h3>
+      
+      <div class="staff-grilla-vertical" id="grilla-staff">
+        {% for miembro in staff %}
+          <div class="staff-card-vertical">
+            <div class="staff-card-foto-wrapper">
+              {% if miembro.foto_path %}
+                <img src="https://image.tmdb.org/t/p/w185{{ miembro.foto_path }}" alt="{{ miembro.nombre }}" class="staff-card-img" loading="lazy">
+              {% else %}
+                <div class="staff-card-placeholder"><i class="fa-solid fa-user"></i></div>
+              {% endif %}
+            </div> <div class="staff-card-info">
+              <h4 class="staff-card-nombre">{{ miembro.nombre }}</h4>
+              <p class="staff-card-rol">{{ miembro.rol }}</p> </div>
+          </div> {% empty %}
+          <p class="ficha-sin-datos">No hay staff técnico registrado para esta serie.</p>
+        {% endfor %}
+      </div> {% if staff|length > 5 %}
+        <button id="btn-ver-mas-staff" class="arcane-btn-ver-mas" data-expandido="false">
+          Ver más <i class="fa-solid fa-chevron-down"></i>
+        </button>
+      {% endif %}
+    </section>
+
+  </div> <div class="ficha-columna-derecha">
+    <div class="ficha-tarjeta-info-detallada">
+      <h3 class="info-detallada-titulo"><i class="fa-solid fa-circle-info"></i> Detalles de Producción</h3>
+      
+      <div class="info-detallada-cuerpo">
+        <div class="info-linea-item">
+          <span class="info-linea-etiqueta">Estudio de Animación</span>
+          <span class="info-linea-valor valor-destacado">{{ detalles_produccion.estudio }}</span>
+        </div>
+
+        <div class="info-linea-item">
+          <span class="info-linea-etiqueta">País de Origen</span>
+          <span class="info-linea-valor">{{ detalles_produccion.pais }}</span>
+        </div>
+
+        <div class="info-linea-item">
+          <span class="info-linea-etiqueta">Técnica Principal</span>
+          <span class="info-linea-valor">{{ detalles_produccion.tecnica }}</span>
+        </div>
+
+        <div class="info-linea-item">
+          <span class="info-linea-etiqueta">Público Objetivo</span>
+          <span class="info-linea-valor">{{ detalles_produccion.publico }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div> ```
+
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 🖐️ CONFIGURACIÓN: Cambia a 5 elementos visibles de entrada
+    const LIMITE_VISIBLE = 5;
+
+    function configurarVerMas(idBoton, selectorTarjetas) {
+        const boton = document.getElementById(idBoton);
+        if (!boton) return; // Si el botón no existe en la página, cancela pacíficamente
+
+        // Buscamos todas las tarjetas que correspondan (del staff o de actores)
+        // Usamos el nodo padre del botón para buscar solo dentro de su sección correspondiente
+        const contenedorSeccion = boton.parentElement;
+        const tarjetas = contenedorSeccion.querySelectorAll(selectorTarjetas);
+
+        // ✂️ Ocultar inicialmente las tarjetas que pasen del límite
+        for (let i = LIMITE_VISIBLE; i < tarjetas.length; i++) {
+            tarjetas[i].style.display = "none";
+        }
+
+        // 🔄 Escuchador del click
+        boton.addEventListener("click", function() {
+            const estaExpandido = boton.getAttribute("data-expandido") === "true";
+
+            if (estaExpandido) {
+                // 🙈 Volver a ocultar las tarjetas excedentes
+                for (let i = LIMITE_VISIBLE; i < tarjetas.length; i++) {
+                    tarjetas[i].style.display = "none";
+                }
+                boton.innerHTML = 'Ver más <i class="fa-solid fa-chevron-down"></i>';
+                boton.setAttribute("data-expandido", "false");
+
+                // 🚀 Detalle Pro: Hace un scroll suave hacia el inicio de la sección para no dejar al usuario perdido abajo
+                contenedorSeccion.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else {
+                // 👁️ Mostrar absolutamente todas las tarjetas
+                for (let i = LIMITE_VISIBLE; i < tarjetas.length; i++) {
+                    tarjetas[i].style.display = ""; // Vuelve a su comportamiento CSS original (flex/grid/block)
+                }
+                boton.innerHTML = 'Ver menos <i class="fa-solid fa-chevron-down"></i>';
+                boton.setAttribute("data-expandido", "true");
+            }
+        });
+    }
+
+    // 🔥 Activamos el sistema para la sección de Staff técnico
+    configurarVerMas("btn-ver-mas-actores", ".staff-card-vertical");
+    configurarVerMas("btn-ver-mas-staff", ".staff-card-vertical");
+
+    // 🎭 Si en el futuro quieres activar Reparto/Actores, solo descomenta la línea de abajo:
+    // configurarVerMas("btn-ver-mas-actores", ".actor-card-vertical");
+});
+</script>
+</div>

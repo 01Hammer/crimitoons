@@ -1,0 +1,186 @@
+<div class="crimi-modulo-episodios">
+  <div class="episodios-control-barra">
+    <div class="episodios-selector-caja">
+      <div class="episodios-selector-caja">
+        <div class="dropdown" id="temporada-dropdown">
+          <button
+            type="button"
+            class="dropdown-button"
+            id="dropdown-boton-actual"
+          >
+            <span class="texto-boton-temporada"
+              >Temporada {{ temporada_actual }}</span
+            >
+            <span class="arrow"></span>
+          </button>
+
+          <ul class="dropdown-content">
+            {% for num in rango_temporadas %}
+            <li>
+              <a
+                href="#"
+                class="opcion-temporada {% if num == temporada_actual %}activa{% endif %}"
+                data-value="{{ num }}"
+              >
+                Temporada {{ num }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="episodios-familia-derecha">
+      <span class="episodios-contador-total"
+        >{{ total_episodios }} episodios</span
+      >
+
+      <label
+        class="contenedor-check-rapido"
+        title="Marcar toda esta temporada como vista"
+      >
+        <span class="texto-marcar-todos">Marcar todos</span>
+        <input
+          type="checkbox"
+          id="check-temporada-todos"
+          class="check-custom-input"
+        />
+        <span class="check-visual-box"><i class="fa-regular fa-eye"></i></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="episodios-flujo-contenedor">
+    {% for ep in episodios %}
+    <div class="episodio-fila-tarjeta">
+      <div class="episodio-miniatura-caja">
+        {% if ep.still_path %}
+        <img
+          src="https://image.tmdb.org/t/p/w300{{ ep.still_path }}"
+          alt="Miniatura de {{ ep.name }}"
+          class="episodio-img"
+        />
+        {% else %}
+        <img
+          src="https://via.placeholder.com/180x101"
+          alt="Sin miniatura"
+          class="episodio-img"
+        />
+        {% endif %}
+      </div>
+
+      <div class="episodio-datos-caja">
+        <div class="episodio-identificador">
+          S{% if ep.season_number < 10 %}0{% endif %}{{ ep.season_number }}E{% if ep.episode_number < 10 %}0{% endif %}{{ ep.episode_number }}
+        </div>  
+        <h4 class="episodio-titulo-texto" title="{{ ep.name }}">
+          {{ ep.name }}
+        </h4>
+        <span class="episodio-fecha-estreno"
+          >Estreno: {{ ep.air_date|default:"S/D" }}</span
+        >
+      </div>
+
+      <div class="episodio-acciones-barra">
+        <button
+          type="button"
+          class="btn-episodio-accion accion-favorito"
+          title="Añadir a favoritos"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn-episodio-accion accion-visto"
+          title="Marcar como visto"
+        >
+          <i class="fa-regular fa-eye"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn-episodio-accion accion-opciones"
+          title="Más opciones"
+        >
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+      </div>
+    </div>
+    {% empty %}
+    <p
+      style="
+        grid-column: span 2;
+        padding: 40px;
+        text-align: center;
+        color: #3d262b;
+        font-weight: 600;
+        opacity: 0.7;
+      "
+    >
+      No se encontraron episodios para esta temporada.
+    </p>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const dropdown = document.getElementById('temporada-dropdown');
+    const button = document.getElementById('dropdown-boton-actual');
+    const textoBoton = dropdown.querySelector('.texto-boton-temporada');
+    const opciones = dropdown.querySelectorAll('.opcion-temporada');
+    
+    const contenedorTarjetas = document.querySelector(".episodios-flujo-contenedor");
+    const contadorEpisodios = document.querySelector(".episodios-contador-total");
+
+    // 1. Lógica de apertura y cierre del menú cilíndrico
+    button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        dropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!dropdown.contains(event.target)) {
+            dropdown.classList.remove('open');
+        }
+    });
+
+    // 2. Intercepción del click en las temporadas + Motor Fetch Asíncrono
+    opciones.forEach(opcion => {
+      opcion.addEventListener('click', function(event) {
+        event.preventDefault(); // Evita que la página salte por el '#'
+        
+        const temporadaSeleccionada = this.getAttribute('data-value');
+        
+        // Actualizamos visualmente el botón principal y las clases activas
+        textoBoton.textContent = `Temporada ${temporadaSeleccionada}`;
+        opciones.forEach(o => o.classList.remove('activa'));
+        this.classList.add('activa');
+        
+        // Cerramos el menú
+        dropdown.classList.remove('open');
+
+        // Efecto visual de carga lenta (bajar opacidad)
+        contenedorTarjetas.style.opacity = "0.5";
+
+        // URL maestra anti-caché
+        const urlConsulta = `${window.location.pathname}?temporada=${temporadaSeleccionada}&format=json&_=${Date.now()}`;
+
+        // Petición AJAX limpia
+        fetch(urlConsulta)
+          .then((response) => response.json())
+          .then((data) => {
+            contenedorTarjetas.innerHTML = data.html;
+            contadorEpisodios.textContent = `${data.total_episodios} episodios`;
+            contenedorTarjetas.style.opacity = "1";
+          })
+          .catch((error) => {
+            console.error("Error cargando la temporada de forma fluida:", error);
+            contenedorTarjetas.style.opacity = "1";
+          });
+      });
+    });
+  });
+</script>

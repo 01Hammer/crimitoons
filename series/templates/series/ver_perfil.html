@@ -1,0 +1,205 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil de {{ usuario.username }} - CRIMITOONS</title>
+    <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1" />
+    <link rel="stylesheet" href="{% static 'series/index.css' %}?v=1009" />
+    <style>
+      .perfil-banner {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      .perfil-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .perfil-header {
+        position: relative;
+        margin-top: -80px;
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+      .perfil-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 5px solid white;
+        object-fit: cover;
+        background: #e0e0e0;
+      }
+      .perfil-info {
+        flex: 1;
+        padding-bottom: 20px;
+      }
+      .perfil-info h1 {
+        margin: 0;
+        font-size: 32px;
+      }
+      .perfil-info p {
+        margin: 10px 0 0 0;
+        color: #888;
+        font-size: 14px;
+      }
+      .perfil-bio {
+        margin-top: 15px;
+        max-width: 600px;
+        line-height: 1.6;
+      }
+      .botones-perfil {
+        display: flex;
+        gap: 10px;
+        margin-left: auto;
+      }
+      .boton-editar,
+      .boton-logout {
+        padding: 10px 20px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .boton-editar:hover,
+      .boton-logout:hover {
+        background: #764ba2;
+      }
+      .series-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+      }
+      .serie-card {
+        text-align: center;
+      }
+      .serie-poster {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #e0e0e0;
+      }
+      .serie-titulo {
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .seccion-vacia {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+      }
+    </style>
+  </head>
+  <body class="page-with-banner">
+    {% include 'series/includes/barra_navegacion.html' %}
+
+    <div class="perfil-container">
+      <!-- Banner -->
+      {% if perfil.banner %}
+      <img src="{{ perfil.banner.url }}" alt="Banner" class="perfil-banner" />
+      {% else %}
+      <div
+        class="perfil-banner"
+        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      ></div>
+      {% endif %}
+
+      <!-- Header del Perfil -->
+      <div class="perfil-header">
+        <!-- Avatar -->
+        {% if perfil.foto_perfil %}
+        <img
+          src="{{ perfil.foto_perfil.url }}"
+          alt="Avatar"
+          class="perfil-avatar"
+        />
+        {% else %}
+        <div
+          class="perfil-avatar"
+          style="
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+          "
+        >
+          👤
+        </div>
+        {% endif %}
+
+        <!-- Información -->
+        <div class="perfil-info">
+          <h1>{{ usuario.username }}</h1>
+          <p>
+            Se unió hace {{ usuario.date_joined|date:"d \\d\\e N \\d\\e Y" }}
+          </p>
+          {% if perfil.bio %}
+          <p class="perfil-bio">{{ perfil.bio }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Botones -->
+        {% if es_propietario %}
+        <div class="botones-perfil">
+          <a href="{% url 'editar_perfil' %}" class="boton-editar"
+            >Editar Perfil</a
+          >
+          <a href="{% url 'cerrar_sesion' %}" class="boton-logout"
+            >Cerrar Sesión</a
+          >
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Series del Usuario -->
+      <h2>Mis Series</h2>
+      {% if series %}
+      <div class="series-grid">
+        {% for serie in series %}
+        <div class="serie-card">
+          {% if serie.poster_path %}
+          <img
+            src="https://image.tmdb.org/t/p/w200{{ serie.poster_path }}"
+            alt="{{ serie.titulo }}"
+            class="serie-poster"
+          />
+          {% else %}
+          <div
+            class="serie-poster"
+            style="
+              background: #e0e0e0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            Sin Imagen
+          </div>
+          {% endif %}
+          <p class="serie-titulo">{{ serie.titulo }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="seccion-vacia">
+        <p>No hay series agregadas aún</p>
+        {% if es_propietario %}
+        <p><a href="{% url 'crear_serie' %}">Agrega tu primera serie</a></p>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </body>
+</html>

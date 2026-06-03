@@ -1,0 +1,377 @@
+/* Barra de navegación global (misma en todas las páginas) */
+
+.nav-barra-wrapper {
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.barra-navegacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: calc(100% + 80px);
+  margin: 0 -40px 0;
+  padding: 10px 5px;
+  min-height: 84px;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  background: #f7f3e3;
+  border-top: none;
+  box-sizing: border-box;
+  z-index: 5;
+}
+
+.nav-logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-logo a {
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-logo-img {
+  max-width: 240px;
+  max-height: 56px;
+  height: auto;
+  display: block;
+}
+
+.nav-enlaces {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-enlaces a {
+  font-weight: 700;
+  color: #6e655f;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.enlace-explorar,
+.enlace-comunidad {
+  font-size: 1.1rem;
+  padding: 14px 22px;
+  border-radius: 18px;
+  background: rgba(178, 94, 56, 0.1);
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.enlace-explorar:hover,
+.enlace-comunidad:hover {
+  transform: translateY(-1px);
+  background: rgba(178, 94, 56, 0.16);
+}
+
+.nav-enlaces a:hover,
+.enlace-explorar,
+.enlace-comunidad {
+  color: #b25e38 !important;
+}
+
+.enlace-comunidad {
+  color: #b25e38;
+}
+
+.nav-auth-zona {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 150px;
+  justify-content: flex-end;
+}
+
+.nav-icon.notificaciones {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px; /* Espacio para que la burbuja se vea redonda */
+  border-radius: 50%; /* Hace el fondo circular */
+  transition:
+    background-color 200ms ease,
+    transform 150ms ease;
+  text-decoration: none;
+  position: relative; /* Importante para que el badge numérico no se mueva de su lugar */
+}
+
+/* El efecto burbuja al pasar el mouse */
+.nav-icon.notificaciones:hover {
+  background-color: #e6e1ce; /* Tu color crema oscurecido */
+  transform: scale(1.05);
+}
+
+/* Controlamos el tamaño exacto del nuevo SVG */
+.campana-svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.nav-enlaces a.nav-boton-login {
+  background: #3d262b !important;
+  color: #f7f3e3 !important;
+  padding: 10px 22px;
+  border-radius: 18px;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.nav-enlaces a.nav-boton-login:hover {
+  background: #3d262b !important;
+  color: #f7f3e3 !important;
+}
+
+.enlace-registro {
+  font-weight: 700;
+  color: #6e655f;
+}
+
+.nav-icon {
+  position: relative;
+  font-size: 20px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: #6e655f;
+}
+
+.nav-icon:hover {
+  background: rgba(178, 94, 56, 0.06);
+  color: #b25e38;
+}
+
+.nav-icon .badge {
+  display: inline-block;
+  min-width: 14px;
+  padding: 0 4px;
+  background: transparent;
+  color: #b25e38;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 999px;
+  margin-right: 6px;
+  vertical-align: middle;
+  transform: translateY(-1px);
+}
+
+.profile-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 10px;
+}
+
+.profile-thumb {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3d262b;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+}
+
+.profile-thumb.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #efe9d4;
+  color: #3d262b;
+  font-size: 24px;
+}
+
+/* ==========================================================================
+   CRIMITOONS: DROPDOWN DE PERFIL (Control 100% por Clicks, Cero Hovers)
+   ========================================================================== */
+
+/* 1. Estado base del menú: Completamente oculto e intangible */
+.dropdown-menu {
+  position: absolute !important;
+  right: 0 !important;
+  top: calc(100% + 8px) !important;
+  background: #ffffff !important;
+  border: 1px solid #e6e1ce !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(43, 38, 37, 0.08) !important;
+  min-width: 180px !important;
+  overflow: hidden !important;
+  z-index: 200000 !important; /* Alto para que flote por encima de banners */
+
+  /* Ocultamiento inicial seguro */
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transform: translateY(-6px) !important;
+  pointer-events: none !important; /* Evita interactuar mientras esté oculto */
+
+  /* Transición suave */
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease,
+    visibility 150ms ease !important;
+}
+
+/* 2. ESTADO ACTIVO: Se dispara ÚNICAMENTE cuando JS inyecta la clase .active */
+.dropdown-menu.active {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important; /* ¡VITAL! Permite al mouse hacer click en los enlaces */
+}
+
+/* 3. Estilos de los enlaces internos */
+.dropdown-menu a {
+  display: block !important;
+  padding: 12px 14px !important;
+  color: #2b2625 !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+}
+
+.dropdown-menu a:hover {
+  background: #f7f3e3 !important;
+  color: #b25e38 !important;
+}
+
+/* 4. Forzar cursor de manito en la foto de perfil */
+.profile-dropdown {
+  cursor: pointer !important;
+}
+
+/* 5. ELIMINACIÓN RADICAL DE HOVERS EN EL PADRE (Evita activaciones accidentales) */
+.profile-dropdown:hover .dropdown-menu,
+.profile-dropdown:focus-within .dropdown-menu {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+/* 6. RE-PERMISO PARA EL ESTADO ACTIVO: Si está activo, el hover del padre no lo destruye */
+.profile-dropdown .dropdown-menu.active {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+a.profile-dropdown.nav-acceso-sesion {
+  text-decoration: none;
+}
+
+a.profile-dropdown.nav-acceso-sesion:hover {
+  background: rgba(178, 94, 56, 0.03);
+}
+
+@media (max-width: 768px) {
+  .barra-navegacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    margin: 0;
+
+    padding: 10px 36px;
+    min-height: 84px;
+
+    background: #f7f3e3;
+
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+
+    box-sizing: border-box;
+  }
+
+  .nav-enlaces {
+    gap: 10px;
+  }
+
+  .enlace-explorar,
+  .enlace-comunidad {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  .nav-auth-zona {
+    min-width: auto;
+    gap: 10px;
+  }
+
+  .nav-logo-img {
+    max-width: 160px;
+  }
+}
+
+/* --- Vistas con banner (.page-with-banner): solo animación; aspecto = .nav-barra-wrapper base --- */
+
+/* ======================================================
+   VISTAS DETALLE: navbar oculto + avatar flotante
+   ====================================================== */
+
+body.page-with-banner .nav-barra-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  max-width: none;
+  margin: 0;
+
+  z-index: 100000;
+
+  transform: translateY(-100%);
+  transition: transform 0.35s ease;
+}
+
+body.page-with-banner .nav-barra-wrapper.nav-active {
+  transform: translateY(0);
+}
+
+/* La barra ocupa todo el ancho */
+body.page-with-banner .barra-navegacion {
+  width: 100%;
+  margin: 0;
+  padding: 10px 36px;
+
+  border-radius: 0;
+
+  background: #f7f3e3;
+}
+
+/* Avatar flotante visible cuando la barra está cerrada */
+body.page-with-banner .profile-thumb-exterior-anchor {
+  position: fixed;
+  top: 16px;
+  right: 40px;
+
+  z-index: 100001;
+
+  display: inline-flex;
+
+  opacity: 1;
+  transform: scale(1);
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* Se esconde cuando aparece el navbar */
+body.page-with-banner
+  .nav-barra-wrapper.nav-active
+  ~ .profile-thumb-exterior-anchor {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}

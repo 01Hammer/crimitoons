@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados para: {{ busqueda }}</title>
+    <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'series/index.css' %}?v=1009">
+</head>
+<body>
+
+    {% include 'series/includes/barra_navegacion.html' %}
+
+    <main class="contenedor-landing-ancho">
+        <h2 class="titulo-vitrina">Resultados para de búsqueda: "{{ busqueda }}"</h2>
+
+        {% if resultados %}
+            <div class="grid-series-horizontal">
+                {% for serie in resultados %}
+                    <div class="mini-tarjeta">
+                        {% if serie.poster_path %}
+                            <img src="https://image.tmdb.org/t/p/w300{{ serie.poster_path }}" alt="{{ serie.name }}" class="mini-poster">
+                        {% else %}
+                            <div class="mini-poster" style="background-color: #14171c; display: flex; align-items: center; justify-content: center; color: #9ab0c1;">Sin póster</div>
+                        {% endif %}
+                        <div class="mini-info">
+                            <h3>{{ serie.name }}</h3>
+                            <span>Lanzamiento: {{ serie.first_air_date|slice:":4" }}</span> </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: #9ab0c1; font-size: 1.1rem; margin-top: 20px;">No se encontraron series de animación que coincidan con tu búsqueda. Recuerda que este espacio es exclusivo para series animadas.</p>
+        {% endif %}
+    </main>
+
+</body>
+</html>

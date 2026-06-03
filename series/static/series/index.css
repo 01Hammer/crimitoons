@@ -1,0 +1,335 @@
+/* ==========================================================================
+   1. BASE BEIGE MARACUYÁ Y CONFIGURACIÓN GENERAL
+   ========================================================================== */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    background-color: #F7F3E3;
+    color: #2B2625;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0 0 100px 0;
+}
+
+a {
+    color: #B25E38;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+a:hover { color: #E6A15C; }
+
+.contenedor-landing-ancho {
+    max-width: 1440px;
+    margin: 0 auto;;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   2. HERO (navegación en navbar.css)
+   ========================================================================== */
+.hero-marquesina-fluida {
+    text-align: center;
+    padding: 35px 20px 40px 20px;
+    background-color: #EFE9D4;
+    border-bottom: 3px solid #DDD5BE;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.contenido-marquesina h1 { font-size: 2.6rem; margin: 12px 0 8px 0; font-weight: 900; color: #2B2625; }
+.texto-resaltado { color: #B25E38; }
+.contenido-marquesina p { color: #6E655F; font-size: 1.1rem; margin: 0 auto 25px auto; max-width: 600px; font-weight: 500; }
+
+.caja-buscador-global { display: flex; max-width: 500px; margin: 0 auto; gap: 8px; }
+.caja-buscador-global input { flex: 1; padding: 14px 18px; border-radius: 8px; border: 2px solid #DDD5BE; background-color: #FFFFFF; color: #2B2625; font-size: 1rem; outline: none; }
+.caja-buscador-global input:focus { border-color: #B25E38; }
+.caja-buscador-global button { background-color: #3D262B; color: #F7F3E3; border: none; padding: 0 26px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+.caja-buscador-global button:hover { background-color: #3D262B; }
+
+/* ==========================================================================
+   3. ARQUITECTURA ASIMÉTRICA
+   ========================================================================== */
+.panel-dos-columnas-asimetrico { display: flex; justify-content: space-between; gap: 40px; width: 100%; }
+.columna-izquierda-visual { flex: 62; max-width: 62%; }
+.columna-derecha-social { flex: 38; max-width: 38%; display: flex; flex-direction: column; gap: 30px; }
+
+/* ==========================================================================
+   4. VITRINAS Y PANEL DE DETALLES LATERAL (DERECHO)
+   ========================================================================== */
+.vitrina-contenedor {
+    position: relative;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.vitrina-header { margin-bottom: 18px; }
+
+.titulo-vitrina-enlace {
+    font-size: 1.4rem;
+    color: #2B2625;
+    font-weight: 900;
+    border-left: 5px solid #B25E38; 
+    padding-left: 12px;
+    margin: 0;
+}
+
+.carousel-wrapper {
+    width: 100%;
+    padding: 12px 0;
+    margin: -12px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.grid-cuatro-series { 
+    display: flex; 
+    gap: 20px; 
+    width: 100%; 
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* TARJETA */
+.mini-tarjeta-compacta {
+    width: 100%;
+    flex: 0 0 calc(25% - 15px); 
+    box-sizing: border-box;
+    background-color: #FFFFFF; 
+    border: 1px solid #E6E1CE;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(61, 38, 43, 0.05);
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* Efecto Zoom */
+.mini-tarjeta-compacta:hover {
+    transform: translateY(-6px);
+    border-color: #B25E38; 
+    box-shadow: 0 12px 24px rgba(178, 94, 56, 0.12); 
+}
+
+.mini-tarjeta-compacta a {
+    width: 100%;
+    display: block;
+    text-decoration: none;
+}
+
+.mini-tarjeta-compacta a img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 2 / 3;   
+    object-fit: cover;      
+    display: block;
+    background-color: #2B2625;
+}
+
+/* ZONA INFO */
+.mini-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background-color: #FFFFFF;
+}
+
+.mini-info h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2B2625; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+}
+
+.mini-tarjeta-compacta:hover .mini-info h3 {
+    color: #B25E38;
+}
+
+.nota-simple {
+    font-size: 0.82rem;
+    color: #B25E38; 
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   Ventana flotante al pasar el mouse
+   ========================================================================== */
+.popover-emergente-tarjeta {
+    position: absolute; 
+    z-index: 9999;       
+    width: 280px;
+    background-color: #3D262B; 
+    color: #FFF;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    pointer-events: none; 
+    transition: opacity 0.15s ease;
+}
+
+.preview-tag-nota {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #E6A15C; 
+    letter-spacing: 0.05em;
+}
+
+.preview-contenido-real h4 {
+    margin: 8px 0;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #F7F3E3; 
+    line-height: 1.2;
+}
+
+.preview-meta-datos {
+    display: flex;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #B25E38; 
+    margin-bottom: 10px;
+}
+
+.preview-generos {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #DDD5BE;
+    line-height: 1.5;
+}
+
+/* Utilidad para alternar estados */
+.oculto-total {
+    display: none !important;
+    pointer-events: none !important;
+}
+
+/* ==========================================================================
+   BOTONES DEL CARRUSEL (CORREGIDO MILIMÉTRICO)
+   ========================================================================== */
+
+/* Posiciones fijas sobre el contenedor global */
+.btn-izq { left: 12px; }
+.btn-der { right: 12px; }
+
+/* El botón es transparente por defecto, pero sigue recibiendo eventos en su propia área */
+.btn-carousel {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    background-color: #FFFFFF;
+    color: #3D262B;
+    border: 1px solid rgba(61, 38, 43, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    z-index: 25;
+    opacity: 0;
+    pointer-events: auto;
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), 
+                opacity 0.2s ease;
+}
+
+/* REGLA DEFINITIVA: El botón solo es visible y activo cuando el puntero toca exactamente sus píxeles */
+.btn-carousel:hover {
+    opacity: 1 !important;
+    transform: translateY(-50%) scale(1.08);
+}
+
+/* Si tu JS añade la clase .oculto-total al llegar a los límites de las listas */
+.btn-carousel.oculto-total {
+    display: none !important;
+    pointer-events: none !important;
+}
+
+/* ==========================================================================
+   5. BARRA SOCIAL (REDISEÑADA A BLANCO HUESO PREMIUM)
+   ========================================================================== */
+.widget-comunidad {
+    background-color: #FFFFFF; 
+    border: 1px solid #E6E1CE;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 12px 30px rgba(43, 38, 37, 0.06); 
+    box-sizing: border-box;
+}
+.encabezado-widget-limpio { margin-bottom: 16px; border-bottom: 2px solid #E6E1CE; padding-bottom: 10px; }
+.titulo-widget-enlace { font-size: 1.15rem; font-weight: 800; color: #2B2625; }
+.titulo-widget-enlace:hover { color: #B25E38; }
+
+.lista-foros-mini, .feed-actividad-mini { display: flex; flex-direction: column; gap: 16px; }
+.item-foro { padding-bottom: 14px; border-bottom: 1px dashed #E6E1CE; }
+.item-foro:last-child { border-bottom: none; padding-bottom: 0; }
+
+.categoria-foro { font-size: 0.7rem; background-color: #3D262B; color: #F7F3E3; padding: 3px 10px; border-radius: 6px; font-weight: bold; } 
+.item-foro h4 { margin: 8px 0 4px 0; font-size: 0.92rem; line-height: 1.4; color: #2B2625; font-weight: 700; }
+.item-foro:hover h4 { color: #B25E38; }
+.item-foro p { margin: 0; font-size: 0.78rem; color: #6E655F; }
+
+.item-actividad { display: flex; gap: 14px; align-items: flex-start; }
+.avatar-falso { width: 36px; height: 36px; background-color: #EFE9D4; color: #3D262B; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; border: 1px solid #DDD5BE; }
+.avatar-falso.dev { background-color: #3D262B; color: #F7F3E3; }
+
+.info-actividad { display: flex; flex-direction: column; gap: 3px; }
+.info-actividad p { margin: 0; font-size: 0.88rem; color: #2B2625; line-height: 1.3; }
+.serie-mencionada, .badge-nota { color: #B25E38; font-weight: 700; }
+.tiempo-actividad { font-size: 0.72rem; color: #6E655F; }
+.extracto-comentario { font-style: italic; color: #534C48; font-size: 0.8rem; background-color: #F7F3E3; padding: 10px 14px; border-radius: 6px; margin: 6px 0; border-left: 3px solid #B25E38; }
+
+/* ==========================================================================
+   6. TARJETA EXCLUSIVA PREMIUM
+   ========================================================================== */
+.premium-card-enlace-bloque {
+    display: block;
+    width: 100%;
+    text-decoration: none !important;
+    color: inherit !important;
+    margin-bottom: 3rem;
+    transition: transform 0.2s ease;
+}
+.premium-card-enlace-bloque:hover {
+    transform: translateY(-5px);
+}
+
+.premium-card-container {
+    background-color: #FFFFFF;
+    overflow: hidden;
+    width: 100%;
+    border-radius: 23px;
+}
+
+.premium-card-flex { display: flex; flex-direction: column; height: auto; }
+.premium-card-image-box { width: 100%; position: relative; height: 14rem; overflow: hidden; background-color: #EFE9D4; }
+
+.premium-card-img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    object-position: center 20%; 
+}
+
+.premium-card-content { width: 100%; padding: 2rem; display: flex; flex-direction: column; justify-content: center; box-sizing: border-box; }
+.premium-card-tag { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #B25E38; }
+.premium-card-title { font-size: 1.8rem; font-weight: 900; color: #2B2625; margin: 0.6rem 0; }
+.premium-card-description { font-size: 0.9rem; color: #534C48; line-height: 1.7; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+.premium-card-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: 0.85rem; font-weight: 700; }
+.item-episodes { color: #6E655F; }
+.item-style { color: #2E5A44; }
+
+/* VISTA DESKTOP */
+@media (min-width: 768px) {
+    .premium-card-flex { flex-direction: row; height: 20rem; } 
+    .premium-card-image-box { width: 45%; height: 100%; }
+    .premium-card-content { width: 55%; height: 100%; }
+}

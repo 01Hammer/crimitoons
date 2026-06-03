@@ -1,0 +1,58 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión - CRIMITOONS</title>
+    <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'series/auth.css' %}">
+    <link rel="stylesheet" href="{% static 'series/index.css' %}?v=1009">
+</head>
+<body>
+    {% include 'series/includes/barra_navegacion.html' %}
+
+    <div class="contenedor-auth">
+        <div class="formulario-container">
+            <div class="formulario-box">
+                <h1>Iniciar Sesión</h1>
+                <p>Accede a tu cuenta y continúa disfrutando</p>
+
+                {% if form.non_field_errors %}
+                    <div class="errores">
+                        {% for error in form.non_field_errors %}
+                            <p class="error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}">Usuario o Correo</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <span class="error">{{ form.username.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.password.id_for_label }}">Contraseña</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <span class="error">{{ form.password.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="boton-enviar">Iniciar Sesión</button>
+                </form>
+
+                <p class="enlace-login">
+                    ¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

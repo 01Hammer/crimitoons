@@ -1,0 +1,99 @@
+<div class="crimi-layout-comunidad-modulo">
+  
+  <div class="crimi-columna-principal">
+    <h3 class="crimi-seccion-titulo">
+      <i class="fa-regular fa-comments"></i> Reseñas de la Comunidad
+    </h3>
+
+    <div class="crimi-publicar-box-flotante">
+      <div class="crimi-publicar-avatar-anon">
+        <i class="fa-solid fa-user-ninja"></i>
+      </div>
+      <form class="crimi-publicar-formulario" method="POST">
+        {% csrf_token %}
+        <textarea class="crimi-publicar-input" placeholder="¿Qué te pareció esta serie? Deja tu reseña aquí..." rows="2" required></textarea>
+        <div class="crimi-publicar-acciones">
+          <button type="submit" class="crimi-boton-publicar">Publicar Reseña</button>
+        </div>
+      </form>
+    </div>
+    
+    <div class="muro-comentarios-flujo">
+      
+      <div class="muro-comentario-sin-caja">
+        <div class="muro-comentario-avatar purple-bg"><span>A</span></div>
+        <div class="muro-comentario-cuerpo">
+          <div class="muro-comentario-meta">
+            <span class="muro-comentario-usuario-badge">@AnónimoCrimi</span>
+            <span class="muro-comentario-fecha">Hace 2 días</span>
+          </div>
+          <p class="muro-comentario-texto">
+            ¡Esta serie animada es una completa obra de arte! El desarrollo de la trama en el Reino de los Demonios es espectacular. Totalmente recomendada.
+          </p>
+        </div>
+      </div>
+
+      <div class="muro-comentario-sin-caja">
+        <div class="muro-comentario-avatar terracotta-bg"><span>H</span></div>
+        <div class="muro-comentario-cuerpo">
+          <div class="muro-comentario-meta">
+            <span class="muro-comentario-usuario-badge">@Hammer</span>
+            <span class="muro-comentario-fecha">Hace 3 horas</span>
+          </div>
+          <p class="muro-comentario-texto">
+            La animación de los últimos capítulos mantiene un nivel tremendo. La paleta de colores de este proyecto me encanta. ¡Esperando más contenido!
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="crimi-columna-lateral-ancha">
+    <div class="caja-lateral-datos caja-actividad-espaciosa">
+      
+      <div class="widget-comunidad-header">
+        <h4 class="caja-lateral-titulo" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">Actividad</h4>
+        
+        <label class="crimi-switch-contenedor">
+          <input type="checkbox" id="switch-solo-amigos">
+          <span class="crimi-switch-slider"></span>
+          <span class="crimi-switch-texto">Amigos</span>
+        </label>
+      </div>
+
+      <div class="actividad-feed-lista" id="contenedor-feed-actividad">
+        
+        <div class="actividad-item-tarjeta terminado" data-amigo="true">
+          <strong>Hammer</strong> ha <span>terminado</span> la serie.
+          <span class="actividad-item-tiempo">Hace un momento</span>
+        </div>
+        
+        <div class="actividad-item-tarjeta viendo" data-amigo="false">
+          <strong>Cris</strong> empezó a <span>ver</span> la serie.
+          <span class="actividad-item-tiempo">Ayer</span>
+        </div>
+
+        <div class="actividad-item-tarjeta pausado" data-amigo="true">
+          <strong>Nilson</strong> ha <span>pausado</span> la serie.
+          <span class="actividad-item-tiempo">Hace 2 días</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SCRIPT DE FILTRADO -->
+<script>
+  document.getElementById('switch-solo-amigos').addEventListener('change', function() {
+    const filtrarSoloAmigos = this.checked;
+    const tarjetasActividad = document.querySelectorAll('#contenedor-feed-actividad .actividad-item-tarjeta');
+
+    tarjetasActividad.forEach(tarjeta => {
+      const esAmigo = tarjeta.getAttribute('data-amigo') === 'true';
+      tarjeta.style.display = filtrarSoloAmigos ? (esAmigo ? 'block' : 'none') : 'block';
+    });
+  });
+</script>

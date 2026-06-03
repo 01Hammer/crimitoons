@@ -1,0 +1,82 @@
+body {
+    background-color: #0b0e14;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Contenedor Principal */
+.contenedor-perfil { max-width: 1100px; margin: 0 auto; padding-bottom: 60px; }
+
+/* Banner */
+.perfil-banner {
+    height: 260px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+.capa-oscura {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, transparent, rgba(11, 14, 20, 0.9));
+}
+
+/* Info Usuario */
+.perfil-info-bloque { display: flex; gap: 30px; padding: 0 40px; margin-top: -50px; position: relative; z-index: 2; }
+.perfil-avatar { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #0b0e14; object-fit: cover; }
+.perfil-detalles { margin-top: 55px; flex-grow: 1; }
+.perfil-encabezado { display: flex; justify-content: space-between; align-items: center; }
+.perfil-encabezado h2 { margin: 0; font-size: 1.8rem; }
+.btn-editar-perfil { background-color: #1e232b; color: #ffffff; border: 1px solid #38444d; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
+.perfil-biografia { color: #9ab0c1; margin-top: 8px; font-size: 0.95rem; line-height: 1.5; }
+
+/* MENÚ DE PESTAÑAS (Estilo Anilist) */
+.menu-tabs-perfil {
+    display: flex;
+    gap: 30px;
+    margin: 30px 40px 10px 40px;
+    border-bottom: 1px solid #1e232b;
+    padding-bottom: 10px;
+}
+.tab-link {
+    color: #9ab0c1;
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 500;
+    padding-bottom: 8px;
+    transition: color 0.2s;
+}
+.tab-link:hover { color: #ffffff; }
+.tab-link.activa {
+    color: #00b0f0;
+    border-bottom: 2px solid #00b0f0;
+}
+
+/* Área de Contenido */
+.contenido-tab-dinamico { padding: 20px 40px; }
+.tarjeta-estat { background-color: #14171c; border: 1px solid #1e232b; padding: 25px; border-radius: 10px; }
+.tarjeta-estat h3 { margin-top: 0; color: #00b0f0; }
+
+/* DISEÑO DE TU LISTA VERTIVAL REAL (Imagen 2) */
+.cabecera-lista-privada { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+.btn-anadir { background-color: #ff9f1c; color: #000000; text-decoration: none; padding: 10px 20px; font-weight: bold; border-radius: 6px; }
+
+.lista-tarjetas-verticales { display: flex; flex-direction: column; gap: 20px; }
+.tarjeta-serie-privada { display: flex; background-color: #14171c; border-radius: 10px; overflow: hidden; border: 1px solid #1e232b; }
+
+.poster-privado-wrapper { width: 160px; min-width: 160px; height: 230px; }
+.poster-privado-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+.info-serie-privada { padding: 20px; flex-grow: 1; }
+.titulo-linea { display: flex; justify-content: space-between; align-items: center; }
+.titulo-linea h2 { margin: 0; font-size: 1.5rem; color: #ffffff; }
+.ver-mas-link { font-size: 0.9rem; color: #ff9f1c; margin-left: 10px; cursor: pointer; }
+.btn-eliminar { color: #ff4d4d; text-decoration: none; font-size: 0.9rem; }
+
+.meta-linea { display: flex; gap: 15px; margin: 10px 0; color: #9ab0c1; font-size: 0.9rem; }
+.meta-linea .nota { color: #ffc107; font-weight: bold; }
+.generos-lista { margin: 5px 0; color: #ffffff; font-size: 0.9rem; }
+.sinopsis-lista { color: #9ab0c1; font-size: 0.9rem; line-height: 1.5; margin-top: 10px; }
