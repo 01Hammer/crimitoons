@@ -39,18 +39,31 @@
 }
 
 /* ==========================================================================
-   VISTA HOME
+   VISTA DETALLE SERIE: LAYOUT MAESTRO
    ========================================================================== */
-.crimi-layout-home-modulo {
-  display: grid;
-  grid-template-columns: 2fr 1fr; /* 2 partes para la izquierda, 1 para la derecha */
-  gap: 30px;
+.crimi-home-wrapper {
   width: 100%;
-  align-items: start;
+  max-width: 1500px;  
+  margin: 0 auto;    
+  padding: 0 20px;    
+  box-sizing: border-box;
 }
 
-/* Responsivo para tablets/móviles: se vuelve una sola columna */
+.crimi-layout-home-modulo {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 35px;
+  width: 100%;
+  align-items: start;
+  margin-bottom: 24px;
+}
+
+/* Responsivo para tablets/móviles */
 @media (max-width: 992px) {
+  .crimi-home-wrapper {
+    padding: 0 15px;
+  }
   .crimi-layout-home-modulo {
     grid-template-columns: 1fr;
     gap: 25px;
@@ -62,7 +75,7 @@
 }
 
 /* ==========================================================================
-   COLUMNA IZQUIERDA: GÉNEROS PRINCIPALES
+   COLUMNA IZQUIERDA: GÉNEROS
    ========================================================================== */
 .home-generos-lista {
   display: flex;
@@ -72,8 +85,8 @@
 }
 
 .crimi-tag-genero {
-  background-color: #fcefe9; /* Un tono cálido muy suave, puedes cambiarlo por tu color base */
-  color: #3d262b;
+  background-color: #B25E38;
+  color: #ffffff;
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 0.9rem;
@@ -83,13 +96,12 @@
 }
 
 .crimi-tag-genero:hover {
-  background-color: #3d262b;
   color: #ffffff;
   transform: translateY(-2px);
 }
 
 /* ==========================================================================
-   COLUMNA IZQUIERDA: CARRUSEL DE PERSONAJES (Horizontal)
+   COLUMNA IZQUIERDA: CARRUSEL DE PERSONAJES COMUNITARIO
    ========================================================================== */
 .home-personajes-carrusel-wrapper {
   position: relative;
@@ -100,21 +112,18 @@
 .home-personajes-lista {
   display: flex;
   gap: 16px;
-  overflow-x: auto; /* Habilita el scroll horizontal */
+  overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 5px 5px 15px 5px; /* Padding abajo para que la sombra respire */
-  
-  /* Ocultar barra de scroll en Firefox */
+  padding: 5px 5px 15px 5px;
   scrollbar-width: none; 
 }
 
-/* Ocultar barra de scroll en Chrome, Safari y Edge */
 .home-personajes-lista::-webkit-scrollbar {
   display: none;
 }
 
 .home-personajes-item {
-  flex: 0 0 140px; /* Evita que las tarjetas se encojan, tamaño fijo de ancho */
+  flex: 0 0 140px;
   background-color: #ffffff;
   border-radius: 14px;
   border: 2px solid rgba(61, 38, 43, 0.12);
@@ -139,16 +148,13 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  position: relative;
 }
 
 .home-personaje-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.home-personaje-placeholder {
-  font-size: 2.2rem;
 }
 
 .home-personaje-info {
@@ -164,38 +170,102 @@
   color: #3d262b;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Si el nombre es muy largo, pone tres puntitos */
-}
-
-.home-personaje-info span {
-  font-size: 0.75rem;
-  color: #8c7a7d;
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ==========================================================================
-   COLUMNA IZQUIERDA: REEL DE AMIGOS (Sistema de Contornos por Estado)
-   ========================================================================== */
-.home-amigos-actividad-container {
-  background-color: rgba(255, 255, 255, 0.5);
+/* --- ESCENARIO A: BLOQUE EN BLANCO COMUNITARIO --- */
+.crimi-aporte-vacio-bloque {
+  width: 100%;
+  background-color: #fdfaf7;
+  border: 2px dashed rgba(61, 38, 43, 0.15);
   border-radius: 16px;
-  padding: 20px;
-  border: 2px dashed rgba(61, 38, 43, 0.1); /* Toque minimalista */
-  margin-top: 15px;
-}
-
-.home-amigos-subtexto {
-  font-size: 0.85rem;
-  color: #8c7a7d;
-  margin-bottom: 15px;
-}
-
-.home-amigos-avatar-reel {
+  padding: 30px;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.aporte-vacio-icono {
+  font-size: 2.5rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.aporte-vacio-texto {
+  font-size: 0.95rem;
+  color: #5c4d50;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic; /* ✨ Cursiva añadida al mensaje de apoyo */
+}
+
+.crimi-enlace-aporte {
+  color: #3d262b;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.crimi-enlace-aporte:hover {
+  color: #db7a5d;
+}
+
+/* --- ESCENARIO B: TARJETA BOTÓN MINI (EMPUJADA POR LAS OTRAS) --- */
+.item-subida-tarjeta {
+  border-style: dashed;
+  background-color: #faf8f7;
+}
+
+.tarjeta-subida-enlace {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.subida-icono-wrapper {
+  color: rgba(61, 38, 43, 0.3);
+  font-size: 2rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.item-subida-tarjeta:hover .subida-icono-wrapper {
+  color: #3d262b;
+  transform: scale(1.1);
+}
+
+.texto-subida-mini {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #3d262b;
+}
+
+.text-centro { text-align: center; }
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ==========================================================================
+   COLUMNA IZQUIERDA: REEL DE AMIGOS (Panal Intercalado)
+   ========================================================================== */
+.home-amigos-bloque-filas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-amigos-avatar-row {
+  display: flex;
   gap: 16px;
+}
+
+.home-amigos-avatar-row.fila-par {
+  margin-left: 35px;
 }
 
 .home-amigo-avatar-item {
@@ -203,45 +273,27 @@
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  padding: 2px; /* Espacio de aire entre el contorno de color y la foto */
+  padding: 2px;
   background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s ease;
-  
-  /* Contorno base por defecto (si no tiene estado) */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   border: 3px solid #cbd5e1; 
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .home-amigo-avatar-item:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  z-index: 10;
 }
 
-/* 🟢 ESTADO: PENDIENTE (Verde) */
-.home-amigo-avatar-item.status-pendiente {
-  border-color: #22c55e; /* Verde esmeralda brillante */
-}
+.home-amigo-avatar-item.status-pendiente { border-color: #22c55e; }
+.home-amigo-avatar-item.status-visto { border-color: #3b82f6; }
+.home-amigo-avatar-item.status-dropeado { border-color: #ef4444; }
 
-/* 🔵 ESTADO: TERMINADA (Azul) */
-.home-amigo-avatar-item.status-visto {
-  border-color: #3b82f6; /* Azul eléctrico */
-}
-
-/* 🔴 ESTADO: DROPEADA (Rojo) */
-.home-amigo-avatar-item.status-dropeado {
-  border-color: #ef4444; /* Rojo coral */
-}
-
-.home-amigo-avatar-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-/* Estilos de los Avatares Placeholder (con letras de iniciales) */
 .home-amigo-avatar-placeholder {
   width: 100%;
   height: 100%;
@@ -254,52 +306,59 @@
   color: #ffffff;
 }
 
-/* Colores divertidos personalizados para las iniciales basados en tus hermanos */
-.text-musical { background-gradient: linear-gradient(135deg, #a855f7, #6366f1); background-color: #6366f1; } /* Nilson - Notas musicales */
-.text-taxi { background-color: #eab308; color: #1e1b4b !important; } /* Yesid - Amarillo Taxi */
+.text-musical { background-color: #6366f1; }
+.text-taxi { background-color: #eab308; color: #1e1b4b !important; }
+.bg-amigo-3 { background-color: #ec4899; }
+.bg-amigo-4 { background-color: #14b8a6; }
+.bg-amigo-5 { background-color: #f97316; }
+.bg-amigo-6 { background-color: #8b5cf6; }
 
 /* ==========================================================================
-   COLUMNA DERECHA: INFORMACIÓN CLAVE Y NANOGÉNEROS
+   COLUMNA DERECHA: CAJA UNIFICADA INFORMACIÓN
    ========================================================================== */
-.caja-lateral-datos {
+.caja-lateral-datos-unificada {
   background-color: #ffffff;
   border-radius: 16px;
-  border: 2px solid rgba(61, 38, 43, 0.15);
-  padding: 22px;
-  box-shadow: 0 5px 15px rgba(61, 38, 43, 0.02);
-}
-
-.caja-info-clave-solida {
-  background-color: #ffffff;
+  border: 2px solid rgba(61, 38, 43, 0.12);
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(61, 38, 43, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .caja-lateral-titulo-home {
-  font-size: 1rem;
+  font-size: 1.3rem;
   color: #3d262b;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
-  border-bottom: 2px solid rgba(61, 38, 43, 0.05);
-  padding-bottom: 10px;
+}
+
+.divisor-lateral-sutil {
+  border: 0;
+  border-top: 1px solid rgba(61, 38, 43, 0.08);
+  margin: 0;
+  width: 100%;
 }
 
 .info-clave-lista {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
 .info-clave-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .info-clave-etiqueta {
-  font-size: 0.75rem;
-  color: #8c7a7d;
+  font-size: 0.98rem;
+  color: #000000;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -315,12 +374,12 @@
   font-weight: 400;
 }
 
-/* Rating destacado */
 .item-destacado-rating {
   background-color: #fdf6f0;
   padding: 12px;
   border-radius: 10px;
   border-left: 4px solid #3d262b;
+  margin-bottom: 15px;
 }
 
 .info-clave-valor-rating {
@@ -331,19 +390,11 @@
 }
 
 .info-clave-valor-rating strong {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   color: #3d262b;
   font-weight: 800;
 }
 
-.crimi-estrellas {
-  color: #f59e0b; /* Color oro para las estrellas */
-  font-size: 0.85rem;
-  display: flex;
-  gap: 2px;
-}
-
-/* --- BLOQUE DE NANOGÉNEROS --- */
 .home-nanogeneros-grilla {
   display: flex;
   flex-wrap: wrap;
@@ -351,14 +402,13 @@
 }
 
 .crimi-tag-nano {
-  background-color: #f8f6f6;
-  color: #5c4d50;
+  background-color: #F7F3E3;
+  color: #2B2625;
   padding: 6px 12px;
   border-radius: 8px;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 500;
   border: 1px solid rgba(61, 38, 43, 0.05);
-  cursor: help; /* Indica que al pasar el mouse hay un tooltip con los votos */
   transition: all 0.2s ease;
 }
 
@@ -1017,11 +1067,12 @@
 
 /* --- TARJETA VERTICAL MEJORADA --- */
 .staff-card-vertical {
+  position: relative;
   background-color: #ffffff;
-  border-radius: 14px;
+  border-radius: 12px 12px 0px 0px;
   /* 🌟 Añadimos un borde marrón oscuro sutil pero definido para dar contraste */
   border: 2px solid rgba(61, 38, 43, 0.15);
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   box-shadow: 0 5px 12px rgba(61, 38, 43, 0.03);
@@ -1045,6 +1096,8 @@
   border-bottom: 1px solid rgba(61, 38, 43, 0.08);
   border-top-left-radius: 12px; /* Ajusta al radio que tengan tus tarjetas */
   border-top-right-radius: 12px;
+  border-radius: 12px 12px 0px 0px;     /* Asegúrate de que tenga el radio que buscas */
+  overflow: hidden;
 }
 
 .staff-card-img {
@@ -1138,92 +1191,70 @@
   user-select: none;
   display: inline-block;
 }
-
-/* 🍫 Ventana flotante Arcane (Oculta por defecto) */
 /* =========================================================================
    🛸 VENTANA FLOTANTE INTEGRADA EN LA TARJETA (ESTILO ARCANE MEJORADO)
    ========================================================================= */
 
-/* 1. Forzar que la tarjeta sea el punto de anclaje absoluto */
+/* 1. Aseguramos que la tarjeta sea el punto de referencia */
 .staff-card-vertical {
-  position: relative !important;
-  overflow: visible !important;
-  /* Mantiene los estilos que ya tenías establecidos (background, border, etc.) */
+  position: relative; /* ¡Obligatorio para que la ventana flote respecto a la tarjeta! */
 }
 
-/* El rol mantiene su color terracota limpio de base */
-.staff-card-rol {
-  color: #b25e38 !important;
-  font-weight: 700;
-  font-size: 0.82rem;
+/* 2. Convertimos el bloque de roles en una verdadera ventana flotante */
+.crimi-ventana-flotante-roles {
+  display: none; /* La ocultamos por defecto */
+  position: absolute;
+  bottom: 105%; /* La posiciona justo arriba de la tarjeta */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #3d262b !important; /* Cambia esto por tu color insignia oscuro */
+  color: #ffffff;
+  width: 220px;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 99999 !important; /* Asegura que flote por encima de cualquier otra tarjeta */
+  text-align: left;
+}
+
+/* Estilos sutiles para la lista interna de la ventana */
+.crimi-ventana-flotante-roles .tooltip-titulo {
+  font-weight: bold;
+  font-size: 0.85rem;
+  display: block;
+  margin-bottom: 6px;
+  color: #ffb3c1; /* Color destacado para el título */
+}
+
+.crimi-ventana-flotante-roles ul {
+  list-style: none;
+  padding: 0;
   margin: 0;
 }
 
-/* 🍫 Ventana flotante: Remodelada, más grande y sin cabecera */
-.arcane-popup-roles {
-  visibility: hidden;
-  visibility: hidden;
-  opacity: 0;
+.crimi-ventana-flotante-roles ul li {
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  color: #f5eff0;
+}
+
+/* 3. 🔥 EL TRUCO MÁGICO: Mostrarla cuando el mouse pase sobre la tarjeta */
+.staff-card-vertical:hover .crimi-ventana-flotante-roles {
+  display: block !important;
+}
+
+/* 4. Estilo sutil para el indicador numérico (+2) en la esquina */
+.indicador-multi-rol {
   position: absolute;
-  bottom: 110%; /* Lo subimos un poco más para que flote con aire elegante sobre la tarjeta */
-  left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  background-color: #3d2327; /* Chocolate oscuro Arcane */
-  border-radius: 12px;
-  padding: 12px 16px;
-  width: 190px; /* Un ancho cómodo para que no se corten los textos */
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5); /* Sombra para resaltar sobre el fondo */
-  z-index: 9999; /* Máxima prioridad de capa para que no quede detrás de otra tarjeta */
-  pointer-events: none;
-
-  /* Animación suave de transición */
-  transition:
-    opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-    visibility 0.2s;
-}
-
-/* 📐 Indicador triangular inferior centrado respecto a la tarjeta */
-.arcane-popup-roles::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 6px;
-  border-style: solid;
-  border-color: #3d2327 transparent transparent transparent;
-}
-
-.arcane-popup-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 6px; /* Separación limpia entre los roles listados */
-}
-
-/* Textos de los roles: Más grandes, legibles y nítidos */
-.arcane-popup-item {
-  color: #ffffff;
-  font-size: 0.88rem; /* Escalado perfecto para lectura sin romper proporciones */
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-align: left;
-  line-height: 1.3;
-}
-
-.arcane-popup-item i {
-  color: #b25e38; /* Viñeta terracota */
-  font-size: 0.48rem;
-  flex-shrink: 0; /* Evita que el punto se deforme si el texto llega a ocupar dos líneas */
-}
-
-/* 🔥 NUEVO DISPARADOR GLOBAL: La magia ocurre al rozar CUALQUIER punto de la tarjeta */
-.staff-card-vertical:hover .arcane-popup-roles {
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: translateX(-50%) translateY(0) !important;
+  top: 8px;
+  right: 8px;
+  background-color: #e65c00; /* Tu color de acento o naranja */
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 

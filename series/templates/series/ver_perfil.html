@@ -6,200 +6,213 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Perfil de {{ usuario.username }} - CRIMITOONS</title>
     <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1" />
-    <link rel="stylesheet" href="{% static 'series/index.css' %}?v=1009" />
-    <style>
-      .perfil-banner {
-        width: 100%;
-        height: 300px;
-        object-fit: cover;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      }
-      .perfil-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      .perfil-header {
-        position: relative;
-        margin-top: -80px;
-        display: flex;
-        align-items: flex-end;
-        gap: 20px;
-        margin-bottom: 40px;
-      }
-      .perfil-avatar {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        border: 5px solid white;
-        object-fit: cover;
-        background: #e0e0e0;
-      }
-      .perfil-info {
-        flex: 1;
-        padding-bottom: 20px;
-      }
-      .perfil-info h1 {
-        margin: 0;
-        font-size: 32px;
-      }
-      .perfil-info p {
-        margin: 10px 0 0 0;
-        color: #888;
-        font-size: 14px;
-      }
-      .perfil-bio {
-        margin-top: 15px;
-        max-width: 600px;
-        line-height: 1.6;
-      }
-      .botones-perfil {
-        display: flex;
-        gap: 10px;
-        margin-left: auto;
-      }
-      .boton-editar,
-      .boton-logout {
-        padding: 10px 20px;
-        background: #667eea;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        text-decoration: none;
-        font-size: 14px;
-      }
-      .boton-editar:hover,
-      .boton-logout:hover {
-        background: #764ba2;
-      }
-      .series-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 20px;
-        margin-top: 30px;
-      }
-      .serie-card {
-        text-align: center;
-      }
-      .serie-poster {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 8px;
-        background: #e0e0e0;
-      }
-      .serie-titulo {
-        margin-top: 10px;
-        font-size: 14px;
-        font-weight: bold;
-      }
-      .seccion-vacia {
-        text-align: center;
-        padding: 40px 20px;
-        color: #999;
-      }
-    </style>
+    <link rel="stylesheet" href="{% static 'series/miperfil/ver_perfil.css' %}" />
+    <link rel="stylesheet" href="{% static 'series/miperfil/menus_perfil.css' %}" />
   </head>
-  <body class="page-with-banner">
+  <body>
     {% include 'series/includes/barra_navegacion.html' %}
 
-    <div class="perfil-container">
-      <!-- Banner -->
+    <div class="perfil-banner-wrapper">
       {% if perfil.banner %}
-      <img src="{{ perfil.banner.url }}" alt="Banner" class="perfil-banner" />
+      <img src="{{ perfil.banner.url }}" class="perfil-banner-blur" />
+
+      <img
+        src="{{ perfil.banner.url }}"
+        alt="Banner"
+        class="perfil-banner-principal"
+      />
       {% else %}
-      <div
-        class="perfil-banner"
-        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-      ></div>
-      {% endif %}
-
-      <!-- Header del Perfil -->
-      <div class="perfil-header">
-        <!-- Avatar -->
-        {% if perfil.foto_perfil %}
-        <img
-          src="{{ perfil.foto_perfil.url }}"
-          alt="Avatar"
-          class="perfil-avatar"
-        />
-        {% else %}
-        <div
-          class="perfil-avatar"
-          style="
-            background: #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-          "
-        >
-          👤
-        </div>
-        {% endif %}
-
-        <!-- Información -->
-        <div class="perfil-info">
-          <h1>{{ usuario.username }}</h1>
-          <p>
-            Se unió hace {{ usuario.date_joined|date:"d \\d\\e N \\d\\e Y" }}
-          </p>
-          {% if perfil.bio %}
-          <p class="perfil-bio">{{ perfil.bio }}</p>
-          {% endif %}
-        </div>
-
-        <!-- Botones -->
-        {% if es_propietario %}
-        <div class="botones-perfil">
-          <a href="{% url 'editar_perfil' %}" class="boton-editar"
-            >Editar Perfil</a
-          >
-          <a href="{% url 'cerrar_sesion' %}" class="boton-logout"
-            >Cerrar Sesión</a
-          >
-        </div>
-        {% endif %}
-      </div>
-
-      <!-- Series del Usuario -->
-      <h2>Mis Series</h2>
-      {% if series %}
-      <div class="series-grid">
-        {% for serie in series %}
-        <div class="serie-card">
-          {% if serie.poster_path %}
-          <img
-            src="https://image.tmdb.org/t/p/w200{{ serie.poster_path }}"
-            alt="{{ serie.titulo }}"
-            class="serie-poster"
-          />
-          {% else %}
-          <div
-            class="serie-poster"
-            style="
-              background: #e0e0e0;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
-          >
-            Sin Imagen
-          </div>
-          {% endif %}
-          <p class="serie-titulo">{{ serie.titulo }}</p>
-        </div>
-        {% endfor %}
-      </div>
-      {% else %}
-      <div class="seccion-vacia">
-        <p>No hay series agregadas aún</p>
-        {% if es_propietario %}
-        <p><a href="{% url 'crear_serie' %}">Agrega tu primera serie</a></p>
-        {% endif %}
-      </div>
+      <div class="perfil-banner-vacio"></div>
       {% endif %}
     </div>
-  </body>
+
+    <div class="perfil-container">
+      <div class="perfil-header">
+        <div class="perfil-identidad">
+          {% if perfil.foto_perfil %}
+          <img
+            src="{{ perfil.foto_perfil.url }}"
+            alt="Avatar"
+            class="perfil-avatar"
+          />
+          {% else %}
+          <div class="perfil-avatar-vacio">👤</div>
+          {% endif %}
+
+          <div class="perfil-titulos">
+            <h1>{{ usuario.username }}</h1>
+          </div>
+        </div>
+
+        <div class="perfil-pines-vitrina">
+          <div class="pin-badge-vacio" title="Ranura para insignia vacía">
+            🔒
+          </div>
+          <div class="pin-badge-vacio" title="Ranura para insignia vacía">
+            🔒
+          </div>
+          <div class="pin-badge-vacio" title="Ranura para insignia vacía">
+            🔒
+          </div>
+        </div>
+      </div>
+
+      <div class="perfil-layout-grid">
+        <div class="columna-bio-sandbox">
+          {% if perfil.bio %}
+          <div>
+            <h2>Sobre mí</h2>
+
+            <div class="sandbox-dinamico-wrapper">
+              <div class="sandbox-box-item">
+                🎯 Box 1: Viendo actualmente...
+              </div>
+              <div class="sandbox-box-item">⭐ Serie Favorita: Hilda</div>
+
+              <div class="bio-texto-wrapper">{{ perfil.bio }}</div>
+            </div>
+          </div>
+          {% else %}
+          <div>
+            <h2>Resumen de Cuenta</h2>
+            <div class="stats-mini-container">
+              <div class="stat-box-item">
+                <span class="stat-numero-b25e38">{{ stats.total_vistas }}</span>
+                <span class="stat-label-887b78">Series Vistas</span>
+              </div>
+              <div class="stat-box-item">
+                <span class="stat-genero-top">{{ stats.genero_top }}</span>
+                <span class="stat-label-887b78">Género Dominante</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2>Mis Favoritas</h2>
+            <div class="favoritas-slider">
+              <div class="favorita-card">Hilda</div>
+              <div class="favorita-card">Arcane</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="seccion-amigos-perfil">
+            <h2>Amigos (12)</h2>
+            <div class="amigos-mini-grid">
+              <div class="amigo-avatar-item" title="Nilson">👤</div>
+              <div class="amigo-avatar-item" title="Amigo 2">👤</div>
+              <div class="amigo-avatar-item" title="Amigo 3">👤</div>
+              <div class="amigo-avatar-item" title="Amigo 4">👤</div>
+            </div>
+          </div>
+
+          <div class="info-adicional-perfil">
+            <p>📅 Miembro desde: {{ usuario.date_joined|date:"M Y" }}</p>
+          </div>
+        </div>
+
+        <div class="columna-datos-catalogo">
+          {% if perfil.bio %}
+          <div class="resumen-bio-stats">
+            <div class="stats-izq-border">
+              <span class="stat-numero-grande">{{ stats.total_vistas }}</span>
+              <span class="stat-label-bold">Series Vistas</span>
+            </div>
+            <div class="stats-der-info">
+              <span class="top-tag-text"
+                >Top Tag:
+                <span class="tag-color-destacado"
+                  >{{ stats.tag_top }}</span
+                ></span
+              >
+              <span class="genero-predilecto-text"
+                >Género predilecto: {{ stats.genero_top }}</span
+              >
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="seccion-actividad">
+            <h2>Actividad Reciente</h2>
+            <div class="actividad-box">
+              {% if actividad %} {% for item in actividad %}
+              <div class="actividad-item-row">
+                <span>{{ item.texto }}</span>
+                <span class="actividad-tiempo-label">{{ item.tiempo }}</span>
+              </div>
+              {% endfor %} {% else %}
+              <p class="sin-actividad-text">
+                Este usuario aún no tiene actividad reciente...
+              </p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+<!-- ... (Todo el código anterior del grid se mantiene exactamente igual) ... -->
+      </div> <!-- Cierre de .perfil-layout-grid -->
+
+      <!-- El menú horizontal es lo último que se queda en el contenedor estrecho -->
+      <nav class="perfil-menu-tabs">
+          <button class="tab-btn active" data-tab="actividad">Actividad</button>
+          <button class="tab-btn" data-tab="biblioteca">Biblioteca</button>
+          <button class="tab-btn" data-tab="favoritos">Favoritos</button>
+          <button class="tab-btn" data-tab="estadisticas">Estadísticas</button>
+          <button class="tab-btn" data-tab="aportes">Aportes</button>
+      </nav>
+
+    </div> <!-- 🌟 ¡MUEVE ESTE CIERRE AQUÍ! Cierra el .perfil-container justo debajo del menú -->
+
+    <!-- Ahora el viewport-wrapper está suelto en el body y puede expandirse de forma natural -->
+    <div class="viewport-wrapper">
+      <div class="tab-content-viewport">
+
+        <div id="tab-actividad" class="tab-content-section" style="display: block;">
+            {% include "series/Mi_perfil/actividad.html" %}
+        </div>
+
+        <div id="tab-biblioteca" class="tab-content-section" style="display: none;">
+            {% include "series/Mi_perfil/biblioteca.html" %}
+        </div>
+
+        <div id="tab-favoritos" class="tab-content-section" style="display: none;">
+            {% include "series/Mi_perfil/favoritos.html" %}
+        </div>
+
+        <div id="tab-estadisticas" class="tab-content-section" style="display: none;">
+            <p>Aquí irán tus Gráficos y Estadísticas detalladas.</p>
+        </div>
+
+        <div id="tab-aportes" class="tab-content-section" style="display: none;">
+            {% include "series/Mi_perfil/aportes.html" %}
+        </div>
+      </div>
+    </div> <!-- Cierre de .viewport-wrapper -->
+
+</body>
+  <!-- Script: navegar entre páginas -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabs = document.querySelectorAll(".perfil-menu-tabs .tab-btn");
+        const contents = document.querySelectorAll(".tab-content-viewport .tab-content-section");
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", function () {
+                const targetTab = this.getAttribute("data-tab");
+
+                // 1. Cambiar el estado activo en los botones visuales
+                tabs.forEach(t => t.classList.remove("active"));
+                this.classList.add("active");
+
+                // 2. Recorrer los contenedores y alternar visibilidad de forma automática
+                contents.forEach(content => {
+                    if (content.id === `tab-${targetTab}`) {
+                        content.style.display = "block";
+                    } else {
+                        content.style.display = "none";
+                    }
+                });
+            });
+        });
+    });
+</script>
 </html>

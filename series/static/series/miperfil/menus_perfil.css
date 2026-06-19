@@ -1,0 +1,1243 @@
+/* ============ CRIMITOONS: MENUS Y PESTAÑA ACTIVIDAD ============ */
+
+/* Layout Base de Dos Columnas Inteligente (Proporción Áurea 70% / 30%) */
+.actividad-layout-grid {
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    gap: 32px;
+    align-items: start;
+}
+
+/* ==========================================================================
+   COLUMNA IZQUIERDA: TARJETAS DEL HISTORIAL (70%)
+   ========================================================================== */
+
+.actividad-col-principal {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Tarjeta del historial hablado */
+.historial-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(43, 38, 37, 0.05);
+    padding: 20px;
+    display: flex;
+    gap: 22px;
+    border-left: 5px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.historial-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(43, 38, 37, 0.09);
+}
+
+/* Bordes dinámicos según el estado de la serie */
+.historial-card.terminada { border-left-color: #2e7d32; }
+.historial-card.pausada { border-left-color: #b25e38; }
+.historial-card.abandonada { border-left-color: #c62828; }
+
+/* Contenedor del póster en la tarjeta */
+.historial-poster-wrapper {
+    width: 90px;
+    height: 130px;
+    flex-shrink: 0;
+}
+
+.historial-poster-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #e7d7c4 0%, #f7f3e3 100%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Contenido textual */
+.historial-contenido {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.historial-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.header-status-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Espaciado entre el badge y el número */
+}
+
+/* Estilos de la nota gigante y limpia */
+.historial-nota {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Colores dinámicos para las notas basados en tus estados */
+.text-terminada { color: black; }
+.text-pausada { color: #b25e38; }
+.text-abandonada { color: #c62828; }
+
+/* Badges de estado estilizados */
+.status-badge {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.4px;
+}
+
+.status-terminada { background: rgba(46, 125, 50, 0.1); color: #2e7d32; }
+.status-pausada { background: rgba(178, 94, 56, 0.1); color: #b25e38; }
+.status-abandonada { background: rgba(198, 40, 40, 0.1); color: #c62828; }
+
+.historial-fecha {
+    font-size: 12px;
+    color: #887b78;
+}
+
+.historial-serie-titulo {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #2B2625;
+}
+
+.historial-comentario {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #514745;
+    margin: 0;
+}
+
+/* ==========================================================================
+   COLUMNA DERECHA: BARRA LATERAL DE WIDGETS (30%)
+   ========================================================================== */
+
+.actividad-col-lateral {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Contenedor base de cada bloque de la derecha */
+.lateral-widget {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 18px rgba(43, 38, 37, 0.04);
+    border: 1px solid rgba(178, 94, 56, 0.08);
+}
+
+.lateral-widget h3 {
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #887b78;
+    letter-spacing: 0.6px;
+    margin: 0 0 16px 0;
+    border-bottom: 1px solid rgba(178, 94, 56, 0.1);
+    padding-bottom: 8px;
+}
+
+/* 1. Ajuste de Insignias */
+.perfil-pines-vitrina-lateral {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.pin-badge-lateral {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #fff8ec;
+    border: 1px solid rgba(178, 94, 56, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 3px 8px rgba(178, 94, 56, 0.05);
+}
+
+.widget-ver-mas-btn {
+    width: 100%;
+    background: rgba(178, 94, 56, 0.06);
+    border: none;
+    color: #b25e38;
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.widget-ver-mas-btn:hover {
+    background: rgba(178, 94, 56, 0.12);
+}
+
+/* 2. Bloque Semanal Dinámico */
+.semanal-dinamico-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rank-item {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rank-item.mejor { background: rgba(46, 125, 50, 0.06); color: #2e7d32; }
+.rank-item.peor { background: rgba(43, 38, 37, 0.04); color: #514745; }
+
+.rank-label { font-weight: 700; }
+.rank-name { font-weight: 540; text-align: right; }
+
+/* Estado Vacío de Paz: Summer Camp Island */
+.semanal-vacio-campamento {
+    padding: 12px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(255, 248, 236, 0.6) 0%, rgba(231, 215, 196, 0.3) 100%);
+    border-radius: 12px;
+    border: 1px dashed rgba(178, 94, 56, 0.2);
+}
+
+.semanal-vacio-campamento p {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #887b78;
+    font-style: italic;
+    margin: 0;
+}
+
+/* 3. Registros Numéricos Secos */
+.stats-num-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stat-num-box {
+    display: flex;
+    flex-direction: column;
+    background: #fff8ec;
+    padding: 10px 14px;
+    border-radius: 10px;
+}
+
+.stat-number {
+    font-size: 22px;
+    font-weight: 800;
+    color: #b25e38;
+}
+
+.stat-title-long {
+    font-size: 15px;
+    font-weight: 700;
+    color: #b25e38;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #887b78;
+    font-weight: 550;
+    margin-top: 2px;
+}
+
+/* 4. Balance de Consumo */
+.balance-eficiencia {
+    margin-bottom: 16px;
+}
+
+.balance-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    color: #514745;
+    margin-bottom: 6px;
+}
+
+.barra-progreso-bg {
+    width: 100%;
+    height: 8px;
+    background: #f7f3e3;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.barra-progreso-fill {
+    height: 100%;
+    background: #b25e38;
+    border-radius: 10px;
+}
+
+.polos-generos {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.polo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #514745;
+}
+
+.polo-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.polo-dot.mas { background: #2e7d32; }
+.polo-dot.menos { background: #c62828; }
+
+/* ============ CRIMITOONS: BIBLIOTECA ============ */
+
+/* Contenedor general extendido a 1300px alineado con el layout del perfil */
+.biblioteca-wrapper {
+    max-width: 1300px;
+    width: 100%;
+    margin: 0px auto 60px -20px;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 280px 1fr; /* Sidebar fijo de 280px y el resto para las tarjetas */
+    gap: 40px;
+    box-sizing: border-box;
+}
+
+/* 📌 Estilos de la Columna Izquierda (Sidebar) */
+.biblioteca-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Bloque contenedor del Menú de Listas */
+.biblioteca-menu {
+    background: #ffffff;
+    border: 1px solid rgba(178, 94, 56, 0.12);
+    border-radius: 18px;
+    padding: 20px 16px; /* Más aire interno general */
+    box-shadow: 0 4px 15px rgba(43, 38, 37, 0.02);
+}
+
+/* Fila flexible para alinear "MIS LISTAS" y el botón en paralelo */
+.menu-seccion-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 25px 4px 12px 10px; /* Más separación con el bloque de arriba */
+}
+
+.menu-seccion-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #887b78;
+    letter-spacing: 0.8px;
+    margin: 0; /* Reseteado para que se alinee perfectamente con flex */
+}
+
+/* Ajuste individual para el primer label superior */
+.biblioteca-menu > .menu-seccion-label:first-child {
+    margin: 5px 0 12px 10px;
+}
+
+/* ✨ NUEVO BOTÓN DISCRETO: Pequeño, limpio y sutil */
+.btn-crear-lista {
+    background: rgba(178, 94, 56, 0.08);
+    color: #b25e38;
+    border: 1px solid rgba(178, 94, 56, 0.1);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-crear-lista:hover {
+    background: #b25e38;
+    color: #fff8ec;
+    border-color: #b25e38;
+    transform: translateY(-1px);
+}
+
+/* 🚀 ESPACIADO INCREMENTADO: Botones individuales del menú izquierdo */
+/* 🚀 ESPACIADO INCREMENTADO: Botones individuales del menú izquierdo */
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px; /* Aumentado para dar mayor colchón visual */
+    color: #514745;
+    text-decoration: none;
+    font-size: 14.5px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    margin-bottom: 8px; /* Más separación entre un ítem y otro */
+    
+    /* 🛠️ RESETEO CLAVE PARA BOTONES: Elimina el estilo horrible del navegador */
+    background: transparent;    /* Quita el fondo gris de fábrica */
+    border: none;             /* Elimina el borde negro espantoso */
+    font-family: inherit;     /* Fuerza a usar la fuente tipográfica de CRIMITOONS */
+    width: 100%;              /* Asegura que ocupe todo el ancho del contenedor */
+    text-align: left;         /* Alinea el texto a la izquierda como estaba antes */
+    cursor: pointer;          /* Coloca la manito al pasar el cursor */
+}
+
+.menu-item:last-child {
+    margin-bottom: 0;
+}
+
+.menu-item:hover {
+    background: rgba(178, 94, 56, 0.05);
+    color: #b25e38;
+}
+
+/* Estado Activo para la lista seleccionada */
+.menu-item.active {
+    background: #fff8ec;
+    color: #b25e38;
+    font-weight: 700;
+    border-left: 4px solid #b25e38;
+    /* Suavizado de bordes para convivir con el borde izquierdo naranja */
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.menu-icon {
+    font-size: 17px;
+}
+
+/* Texto de marcador si no hay listas personalizadas creadas */
+.listas-personalizadas-vacias {
+    padding: 20px 10px; /* Más aire para que respire abajo */
+    font-size: 13px;
+    color: #887b78;
+    font-style: italic;
+    text-align: center;
+}
+
+/* 📊 Estilos de la Columna Derecha (Panel de Contenido) */
+.biblioteca-contenido {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fila de Controles Superior: Buscador + Filtros */
+.biblioteca-controles-barra {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    border-radius: 16px;
+}
+
+/* Input de Búsqueda Interno del Catálogo */
+.buscador-interno-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    padding: 0 14px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 360px;
+    height: 40px;
+    border: 1.5px solid rgba(178, 94, 56, 0.05);
+    border-color: #3D262B;
+}
+
+.buscador-interno-wrapper .search-icon {
+    font-size: 14px;
+    color: #887b78;
+}
+
+.input-busqueda-biblioteca {
+    border: none;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+    font-size: 13.5px;
+    color: #2B2625;
+    outline: none;
+}
+
+.input-busqueda-biblioteca::placeholder {
+    color: #887b78;
+}
+
+/* Dropdowns / Selects de filtrado */
+.filtros-biblioteca-grupo {
+    display: flex;
+    gap: 12px;
+}
+
+.select-filtro-crimi {
+    background: #ffffff;
+    border: 1px solid rgba(178, 94, 56, 0.2);
+    padding: 0 30px 0 14px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #2B2625;
+    cursor: pointer;
+    outline: none;
+    appearance: none; /* Elimina la flecha por defecto del sistema */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b25e38' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.select-filtro-crimi:hover {
+    border-color: #b25e38;
+}
+
+/* Ajustes del Encabezado de la Sección */
+.biblioteca-titulo-seccion {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2B2625;
+    margin: 10px 0 20px 5px;
+}
+
+/* ============ CONFIGURACIÓN DE LOS DOS ESTILOS DE VISTA ============ */
+
+/* --- Reseteo Crítico del Enlace del Navegador --- */
+.card-link {
+    text-decoration: none !important; /* Elimina por completo la línea morada */
+    color: inherit !important;         /* Evita que el texto herede el color azul/morado de link */
+    display: block;                   /* Convierte toda la tarjeta en una zona interactiva */
+    width: 100%;
+}
+
+.card-link:visited, 
+.card-link:active, 
+.card-link:focus {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+/* --- 1. Tarjeta Estándar (Por defecto / Mosaico) --- */
+.serie-card {
+    background: #ffffff;
+    border: 1.5px solid rgba(178, 94, 56, 0.08);
+    border-radius: 14px;
+    padding: 12px;
+    box-sizing: border-box;
+    transition: all 0.25s ease-in-out;
+    max-width: 220px; /* Evita que la tarjeta se ensanche al infinito si hay pocos elementos */
+    width: 100%;
+}
+
+.serie-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(178, 94, 56, 0.06);
+}
+
+/* Contenedor del Póster en Mosaico */
+.poster-container {
+    width: 100%;
+    aspect-ratio: 2 / 3; /* Proporción estándar de póster cinematográfico */
+    background: #f7f5f4;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative; /* Clave para posicionar los badges flotantes */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.serie-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ajusta la imagen sin deformarla */
+    display: block;
+}
+
+/* Estado cuando no hay imagen de portada */
+.serie-poster-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #887b78;
+    font-size: 13px;
+    font-weight: 600;
+    width: 100%;
+    height: 100%;
+}
+
+/* Badges flotantes sobre la imagen */
+.card-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(43, 38, 37, 0.85); /* Fondo oscuro semitransparente estilo CRIMITOONS */
+    color: #ffffff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(4px); /* Suavizado de fondo moderno */
+    z-index: 2;
+}
+
+/* Puntuación o estados específicos con variaciones de color sutiles si se desea */
+.completed-badge {
+    background: rgba(178, 94, 56, 0.95);
+    color: #fff8ec;
+}
+
+/* Título de la Serie en Mosaico */
+.serie-titulo {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2D2625;
+    margin: 10px 0 2px 0;
+    text-align: left; /* Alineado al estándar de interfaces de catálogos */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Corta textos largos con "..." elegantemente */
+}
+
+/* 🔥 EVENTO ESPECIAL: Tarjeta Favorita */
+.serie-card.tarjeta-favorita {
+    background: #fffdf9; 
+    border: 2px solid #b25e38; 
+    box-shadow: 0 4px 18px rgba(178, 94, 56, 0.12); 
+}
+
+
+/* --- 2. Estructura de la Vista Lista Larga --- */
+.series-grid.vista-lista {
+    grid-template-columns: 1fr !important; 
+    gap: 12px;
+}
+
+.series-grid.vista-lista .serie-card {
+    max-width: 100%; /* Rompe el límite del mosaico para ocupar todo el ancho */
+}
+
+.series-grid.vista-lista .bloque-vista-tarjeta {
+    display: none !important; 
+}
+
+.series-grid.vista-lista .bloque-vista-lista {
+    display: flex !important; 
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Componentes de la Fila Larga */
+.lista-izquierda-layout {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.lista-mini-poster {
+    width: 45px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #f7f5f4;
+}
+
+.lista-mini-poster-vacio {
+    width: 45px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f7f5f4;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.lista-info-titulos {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lista-serie-titulo {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2D2625;
+}
+
+.lista-serie-subtext {
+    font-size: 12px;
+    color: #887b78;
+    font-weight: 600;
+}
+
+.lista-derecha-datos {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.lista-dato-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.label-mini-dato {
+    font-size: 10px;
+    font-weight: 700;
+    color: #887b78;
+    letter-spacing: 0.5px;
+}
+
+.valor-mini-dato {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #2D2625;
+}
+
+.corazon-favorito-icon {
+    font-size: 18px;
+    animation: pulseSutil 2s infinite alternate;
+}
+
+@keyframes pulseSutil {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.08); }
+}
+/* ============ CRIMITOONS: Favoritos ============ */
+
+.favoritos-wrapper {
+    max-width: 1300px;
+    width: 100%;
+    margin: 40px auto 60px auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.favoritos-gran-titulo {
+    font-size: 26px;
+    font-weight: 800;
+    color: #2B2625;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+/* 🏆 ALTAR SUPERIOR FLOTANTE (Sin contenedores de fondo) */
+.altar-honor-flotante {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.altar-subtitulo {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #887b78;
+    letter-spacing: 1.2px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.podio-flex-alineado {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+.podio-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 145px;
+    position: relative;
+}
+
+.podio-tarjeta {
+    position: relative;
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(43, 38, 37, 0.08);
+    border: 3px solid #ffffff;
+    background: #2B2625;
+}
+
+.podio-poster {
+    width: 100%;
+    height: 205px;
+    object-fit: cover;
+    display: block;
+}
+
+.pedestal-numero {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 3px 0;
+}
+.num-oro { background: #d4af37; color: #2B2625; font-size: 14px; }
+.num-plata { background: #b0b7bd; color: #2B2625; }
+.num-bronce { background: #b87333; color: #fff8ec; }
+
+.puesto-destacado .podio-tarjeta {
+    border-color: #d4af37;
+    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2);
+}
+.corona-altar {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+.podio-titulo, .podio-titulo-top1 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2B2625;
+    margin-top: 12px;
+    text-align: center;
+}
+.etiqueta-irremplazable {
+    font-size: 9px;
+    font-weight: 800;
+    color: #d4af37;
+    background: rgba(212, 175, 55, 0.08);
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-top: 5px;
+}
+
+/* 👤 PERSONAJE TOP 1 FLOTANTE */
+.personaje-top1-card-flotante {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 28px;
+}
+.avatar-top1-wrapper { position: relative; margin-bottom: 12px; }
+.avatar-personaje-top1 {
+    width: 115px;
+    height: 115px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #b25e38;
+    box-shadow: 0 6px 15px rgba(178, 94, 56, 0.15);
+}
+.medalla-top1 {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background: #b25e38;
+    color: #fff8ec;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 8px;
+    border: 2px solid #ffffff;
+}
+.personaje-top1-nombre { font-size: 17px; font-weight: 700; color: #2B2625; margin: 0; }
+.personaje-top1-meta { font-size: 12px; color: #887b78; margin: 2px 0 8px 0; }
+.badge-favorito-absoluto {
+    font-size: 10.5px;
+    font-weight: 700;
+    background: #fff8ec;
+    color: #b25e38;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(178, 94, 56, 0.12);
+}
+
+/* 🏛️ GRID DEL CUERPO (Layout de 2 Columnas) */
+.santuario-cuerpo-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 50px;
+}
+
+.bloque-favoritos-seccion {
+    margin-bottom: 35px;
+}
+.titulo-bloque-favoritos {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2B2625;
+    margin-bottom: 18px;
+    border-left: 3px solid #b25e38;
+    padding-left: 10px;
+}
+
+/* Otros personajes (Avatares redondos) */
+.personajes-favoritos-flex {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.personaje-mini-avatar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 85px;
+}
+.avatar-mini-redondo {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+}
+.avatar-mini-nombre {
+    font-size: 12px;
+    font-weight: 600;
+    color: #514745;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* Staff Favoritos Grid */
+.staff-favoritos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+.staff-tag-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #ffffff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(178, 94, 56, 0.08);
+}
+.staff-icono { font-size: 16px; }
+.staff-info-mini .staff-nombre { font-size: 13.5px; font-weight: 600; color: #2B2625; margin: 0; }
+.staff-info-mini .staff-rol { font-size: 11.5px; color: #887b78; margin: 0; }
+
+/* Episodios Favoritos Flex */
+.episodios-favoritos-lista-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.episodio-favorito-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #ffffff;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(178, 94, 56, 0.08);
+}
+.episodio-favorito-item .estrella-icono { color: #d4af37; font-size: 16px; }
+.episodio-info-mini .ep-titulo { font-size: 14px; font-weight: 600; color: #2B2625; margin: 0 0 2px 0; }
+.episodio-info-mini .ep-serie-origen { font-size: 12px; color: #887b78; margin: 0; }
+
+/* 💬 COLUMNA DERECHA: FRASES MEMORABLES */
+.favoritos-frases-sidebar {
+    background: #ffffff;
+    border: 1px solid rgba(178, 94, 56, 0.12);
+    border-radius: 20px;
+    padding: 25px 20px;
+    box-shadow: 0 4px 15px rgba(43, 38, 37, 0.02);
+    align-self: flex-start;
+}
+.subtitulo-sidebar-frases {
+    font-size: 12px;
+    color: #887b78;
+    margin: -10px 0 20px 0;
+    font-style: italic;
+}
+.frases-contenedor-limite {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.burbuja-frase-premium {
+    background: #fff8ec;
+    border-radius: 14px;
+    padding: 15px 18px;
+    position: relative;
+    border: 1px solid rgba(178, 94, 56, 0.06);
+}
+.comilla-decorativa {
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    font-size: 28px;
+    font-weight: 800;
+    color: rgba(178, 94, 56, 0.15);
+    font-family: serif;
+    line-height: 1;
+}
+.texto-frase-contenido {
+    font-size: 13px;
+    line-height: 1.45;
+    color: #4a3e3c;
+    margin: 5px 0 8px 0;
+    position: relative;
+    z-index: 1;
+}
+.autor-frase-origen {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #b25e38;
+    margin: 0;
+    text-align: right;
+}
+
+/* Linea divisora */
+.divisor-santuario {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(178, 94, 56, 0.12), transparent);
+    margin: 35px 0;
+}
+
+/* ============ CRIMITOONS: ESTADISTICAS (EN PAUSA) ============ */
+
+/* ============ CRIMITOONS: ESTILOS DE LA VISTA DE APORTES ============ */
+
+.aportes-wrapper {
+    max-width: 1300px;
+    width: 100%;
+    margin: 40px auto 60px auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.aportes-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    background: #ffffff;
+    padding: 24px 30px;
+    border-radius: 20px;
+    border: 1px solid rgba(178, 94, 56, 0.12);
+    box-shadow: 0 4px 15px rgba(43, 38, 37, 0.02);
+}
+
+.aportes-gran-titulo {
+    font-size: 24px;
+    font-weight: 800;
+    color: #2B2625;
+    margin: 0 0 6px 0;
+}
+
+.aportes-subtitulo-comunidad {
+    font-size: 13.5px;
+    color: #887b78;
+    margin: 0;
+}
+
+/* Botón llamativo premium */
+.btn-nuevo-aporte {
+    background: #b25e38;
+    color: #fff8ec;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(178, 94, 56, 0.2);
+}
+
+.btn-nuevo-aporte:hover {
+    background: #964d2c;
+    transform: translateY(-1px);
+}
+
+/* Bloques de Categorías */
+.seccion-aportes-bloque {
+    margin-bottom: 45px;
+}
+
+.titulo-categoria-aporte {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2B2625;
+    margin-bottom: 20px;
+    border-left: 3px solid #b25e38;
+    padding-left: 12px;
+}
+
+/* Grids Adaptativos según el tipo de imagen */
+.aportes-grid-thumbnails, .aportes-grid-posters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 25px;
+}
+
+.aportes-grid-banners {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+/* Tarjeta base vertical (Personajes y Pósteres) */
+.tarjeta-aporte-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(178, 94, 56, 0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01);
+}
+
+/* Manejo geométrico de contenedores */
+.wrapper-imagen-aporte {
+    position: relative;
+    overflow: hidden;
+    background: #2B2625;
+    margin-bottom: 12px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+.img-circular {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+}
+
+.img-vertical-poster {
+    width: 105px;
+    height: 150px;
+    border-radius: 10px;
+}
+
+.img-aporte-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Tarjeta Horizontal para Banners */
+.tarjeta-aporte-horizontal {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(178, 94, 56, 0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01);
+}
+
+.wrapper-banner-preview {
+    width: 100%;
+    height: 110px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: #2B2625;
+}
+
+.img-banner-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Metadata de los aportes */
+.info-aporte-meta {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tarjeta-aporte-horizontal .info-aporte-meta {
+    align-items: flex-start;
+    text-align: left;
+    padding-left: 4px;
+}
+
+.nombre-aporte-objeto {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #2B2625;
+    margin: 0 0 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.serie-aporte-origen {
+    font-size: 11.5px;
+    color: #887b78;
+    margin: 0 0 8px 0;
+}
+
+.fecha-aporte-txt {
+    font-size: 10.5px;
+    color: #b0a6a4;
+    margin-top: 6px;
+}
+
+/* Etiquetas de Estado (Badges) */
+.status-badge {
+    font-size: 9.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+}
+
+.status-aprobado {
+    background: rgba(46, 125, 50, 0.08);
+    color: #2e7d32;
+}
+
+.status-pendiente {
+    background: rgba(239, 108, 0, 0.08);
+    color: #ef6c00;
+}

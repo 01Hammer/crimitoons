@@ -4,13 +4,16 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro - CRIMITOONS</title>
-    <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1">
+    <title>Registrarse - CRIMITOONS</title>
     <link rel="stylesheet" href="{% static 'series/auth.css' %}">
     <link rel="stylesheet" href="{% static 'series/index.css' %}?v=1009">
 </head>
 <body>
-    {% include 'series/includes/barra_navegacion.html' %}
+    <header class="auth-header-minimalista">
+        <a href="{% url 'index_invitado' %}" class="auth-logo-centrado">
+            <img src="{% static 'series/logotipo-crimitoons.png' %}" alt="Crimitoons Logo">
+        </a>
+    </header>
 
     <div class="contenedor-auth">
         <div class="formulario-container">
@@ -52,7 +55,6 @@
                             <span class="error">{{ form.password.errors.0 }}</span>
                         {% endif %}
                     </div>
-
 
                     <button type="submit" class="boton-enviar">Registrarse</button>
                 </form>

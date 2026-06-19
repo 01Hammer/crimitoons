@@ -1,0 +1,210 @@
+<div class="biblioteca-wrapper">
+  <aside class="biblioteca-sidebar">
+    <nav class="biblioteca-menu">
+      <div class="menu-seccion-label">Listas principales</div>
+      
+      <button class="menu-item tab-biblioteca-enlace active" data-tab="plan_to_watch">
+        <span class="menu-icon"></span> Pendiente
+      </button>
+      <button class="menu-item tab-biblioteca-enlace" data-tab="watching">
+        <span class="menu-icon"></span> Viendo
+      </button>
+      <button class="menu-item tab-biblioteca-enlace" data-tab="paused">
+        <span class="menu-icon"></span> En Pausa
+      </button>
+      <button class="menu-item tab-biblioteca-enlace" data-tab="completed">
+        <span class="menu-icon"></span> Completados
+      </button>
+      <button class="menu-item tab-biblioteca-enlace" data-tab="dropped">
+        <span class="menu-icon"></span> Abandonadas
+      </button>
+
+      <div class="menu-seccion-header-flex">
+        <div class="menu-seccion-label">Mis listas</div>
+        {% if es_propietario %}
+          <button class="btn-crear-lista" id="btn-nueva-lista-serie">＋ Crear lista</button>
+        {% endif %}
+      </div>
+      
+      <div class="listas-personalizadas-contenedor">
+        {% for lista in listas_personalizadas %}
+          <button class="menu-item tab-biblioteca-enlace" data-tab="lista-{{ lista.id }}">
+            <span class="menu-icon">📂</span> {{ lista.name }}
+          </button>
+        {% empty %}
+          <div class="listas-personalizadas-vacias">
+            <span>No has creado listas aún</span>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="menu-seccion-header-flex">
+        <div class="menu-seccion-label">Episodios guardados</div>
+        {% if es_propietario %}
+          <button class="btn-crear-lista" id="btn-nueva-lista-ep">＋ Crear lista</button>
+        {% endif %}
+      </div>
+
+      <div class="listas-personalizadas-contenedor">
+        {% for lista_ep in listas_episodios %}
+          <button class="menu-item tab-biblioteca-enlace" data-tab="episodios-{{ lista_ep.id }}">
+            <span class="menu-icon">🎞️</span> {{ lista_ep.name }}
+          </button>
+        {% empty %}
+          <div class="listas-personalizadas-vacias">
+            <span>No has guardado episodios aún</span>
+          </div>
+        {% endfor %}
+      </div>
+    </nav>
+  </aside>
+
+  <main class="biblioteca-contenido">
+    <div class="biblioteca-controles-barra">
+      <div class="buscador-interno-wrapper">
+        <input
+          type="text"
+          placeholder="Buscar en mis series..."
+          class="input-busqueda-biblioteca"
+          id="buscador-biblioteca"
+        />
+      </div>
+
+      <div class="filtros-biblioteca-grupo">
+        <select class="select-filtro-crimi" id="filtro-genero-biblioteca">
+          <option value="">Todos los géneros</option>
+          {% for genero in generos_disponibles %}
+            <option value="{{ genero.slug }}">{{ genero.nombre }}</option>
+          {% endfor %}
+        </select>
+
+        <select class="select-filtro-crimi">
+          <option value="recientes">Añadidos recientes</option>
+          <option value="alfabetico">Orden Alfabético</option>
+          <option value="nota">Mejor puntuadas</option>
+        </select>
+      </div>
+    </div>
+
+    <h2 class="biblioteca-titulo-seccion" id="titulo-biblioteca-dinamico" style="display: none;">Series Por ver</h2>
+
+  <div class="series-grid vista-mosaico" id="grid-progresos-biblioteca">
+  {% for progreso in progresos %}
+    <div class="serie-card {% if progreso.is_favorite %}tarjeta-favorita{% endif %}" data-estado="{{ progreso.status }}">
+      <a href="{% url 'detalle_serie' progreso.serie.id_tmdb %}" class="card-link">
+        
+        <div class="bloque-vista-tarjeta">
+          <div class="poster-container">
+            {% if progreso.serie.poster_path %}
+              <img src="{{ progreso.serie.poster_path }}" alt="{{ progreso.serie.titulo }}" class="serie-poster" />
+            {% else %}
+              <div class="serie-poster-vacio">
+                <span style="font-size: 24px; margin-bottom: 5px">🎬</span>
+                <span>Sin Portada</span>
+              </div>
+            {% endif %}
+
+            {% if progreso.status == 'plan_to_watch' %}
+              <div class="card-badge plan-badge" style="background-color: #9b59b6; color: #fff;">Pendiente</div>
+            {% elif progreso.status == 'watching' %}
+              <div class="card-badge watching-badge">T{{ progreso.current_season }} - E{{ progreso.current_episode }}</div>
+            {% elif progreso.status == 'completed' and progreso.score %}
+              <div class="card-badge completed-badge">⭐ {{ progreso.score }}</div>
+            {% elif progreso.status == 'paused' %}
+              <div class="card-badge paused-badge">Pausa T{{ progreso.current_season }}</div>
+            {% endif %}
+          </div>
+          
+          <p class="serie-titulo" title="{{ progreso.serie.titulo }}">
+            {{ progreso.serie.titulo }}
+          </p>
+        </div>
+
+        <div class="bloque-vista-lista" style="display: none;">
+          <div class="lista-izquierda-layout">
+            {% if progreso.serie.poster_path %}
+              <img src="{{ progreso.serie.poster_path }}" alt="{{ progreso.serie.titulo }}" class="lista-mini-poster" />
+            {% else %}
+              <div class="lista-mini-poster-vacio">🎬</div>
+            {% endif %}
+            
+            <div class="lista-info-titulos">
+              <span class="lista-serie-titulo">{{ progreso.serie.titulo }}</span>
+              <span class="lista-serie-subtext">
+                {% if progreso.serie.total_capitulos %}{{ progreso.serie.total_capitulos }} Episodios{% else %}Capítulos en emisión{% endif %}
+              </span>
+            </div>
+          </div>
+
+          <div class="lista-derecha-datos">
+            {% if progreso.score %}
+              <div class="lista-dato-item score-item">
+                <span class="label-mini-dato">MI NOTA</span>
+                <span class="valor-mini-dato">⭐ {{ progreso.score }}</span>
+              </div>
+            {% endif %}
+
+            {% if progreso.is_favorite %}
+              <div class="lista-dato-item favorito-item" title="Serie favorita">
+                <span class="corazon-favorito-icon">❤️</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </a>
+    </div>
+  {% empty %}
+    <div class="seccion-vacia" id="biblioteca-vacia-global" style="width: 100%; grid-column: 1/-1;">
+      <p style="font-size: 16px; font-weight: 600; margin: 0;">
+        No tienes series guardadas.
+      </p>
+    </div>
+  {% endfor %}
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const botonesTab = document.querySelectorAll('.tab-biblioteca-enlace');
+    const tarjetas = document.querySelectorAll('.serie-card');
+    const tituloDinamico = document.getElementById('titulo-biblioteca-dinamico');
+    const mensajeVacio = document.getElementById('mensaje-pestaña-vacia');
+
+    function filtrarBiblioteca(estadoObjetivo, textoTitulo) {
+        let contadorVisibles = 0;
+        
+        tituloDinamico.textContent = textoTitulo;
+
+        tarjetas.forEach(tarjeta => {
+            if (tarjeta.getAttribute('data-estado') === estadoObjetivo) {
+                tarjeta.style.display = '';
+                contadorVisibles++;
+            } else {
+                tarjeta.style.display = 'none';
+            }
+        });
+
+        if (contadorVisibles === 0 && tarjetas.length > 0) {
+            if (mensajeVacio) mensajeVacio.style.display = 'block';
+        } else {
+            if (mensajeVacio) mensajeVacio.style.display = 'none';
+        }
+    }
+
+    botonesTab.forEach(boton => {
+        boton.addEventListener('click', function() {
+            botonesTab.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            const estado = this.getAttribute('data-tab');
+            const texto = this.textContent.trim();
+
+            filtrarBiblioteca(estado, `Series ${texto}`);
+        });
+    });
+
+    // MODIFICADO: Arrancar mostrando por defecto "Por ver" (plan_to_watch) al cargar la biblioteca
+    filtrarBiblioteca('plan_to_watch', 'Series Por ver');
+});
+</script>

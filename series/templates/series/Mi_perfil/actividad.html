@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crimitoons - Actividad de Perfil</title>
+    <!-- Enlace al nuevo archivo de estilos dedicado -->
+    <link rel="stylesheet" href="{% static 'series/miperfil/menus_perfil.css' %}" />
+</head>
+<body>
+
+    <!-- Contenedor del Layout en dos columnas calibrado (70% / 30%) -->
+    <div class="actividad-layout-grid">
+
+        <!-- ================= COLUMNA IZQUIERDA (70%): HISTORIAL COMENTADO ================= -->
+        <section class="actividad-col-principal">
+            
+            <!-- Tarjeta de Historial: Estado Terminada -->
+            <div class="historial-card terminada">
+                <div class="historial-poster-wrapper">
+                    <!-- Placeholder del póster (En Django usarías tu tag <img>) -->
+                    <div class="historial-poster-placeholder"></div> 
+                </div>
+                <div class="historial-contenido">
+                    <div class="historial-header-card">
+                        <span class="status-badge status-terminada">Terminada</span>
+                        <span class="historial-nota text-terminada">10.0</span>
+                        <span class="historial-fecha">Hace 2 días</span>
+                    </div>
+                    <h3 class="historial-serie-titulo">Hilda</h3>
+                    <p class="historial-comentario">
+                        El final es una obra maestra absoluta. La atmósfera que maneja la serie y cómo cierra el arco de los personajes es perfecto. Tenía que dejar mi argumento de por qué se lleva un 10 definitivo.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Historial: Estado Pausada -->
+            <div class="historial-card pausada">
+                <div class="historial-poster-wrapper">
+                    <div class="historial-poster-placeholder"></div>
+                </div>
+                <div class="historial-contenido">
+                    <div class="historial-header-card">
+                        <span class="status-badge status-pausada">Pausada</span>
+                        <span class="historial-fecha">Hace 1 semana</span>
+                    </div>
+                    <h3 class="historial-serie-titulo">The Owl House</h3>
+                    <p class="historial-comentario">
+                        La dejé en el inicio de la segunda temporada por falta de tiempo, pero el desarrollo de la magia y Luz me está fascinando. Volveré pronto.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Historial: Estado Abandonada -->
+            <div class="historial-card abandonada">
+                <div class="historial-poster-wrapper">
+                    <div class="historial-poster-placeholder"></div>
+                </div>
+                <div class="historial-contenido">
+                    <div class="historial-header-card">
+                        <span class="status-badge status-abandonada">Abandonada</span>
+                        <span class="historial-nota text-terminada">2.0</span>
+                        <span class="historial-fecha">Hace 3 semanas</span>
+                    </div>
+                    <h3 class="historial-serie-titulo">Amphibia</h3>
+                    <p class="historial-comentario">
+                        No me terminó de enganchar el ritmo de los primeros episodios. Sé que se pone mejor más adelante, pero de momento la suelto.
+                    </p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ================= COLUMNA DERECHA (30%): VITRINA Y ESTADÍSTICAS ================= -->
+        <aside class="actividad-col-lateral">
+
+            <!-- 1. VITRINA DE INSIGNIAS -->
+            <div class="lateral-widget">
+                <h3>Mis Insignias</h3>
+                <div class="perfil-pines-vitrina-lateral">
+                    <div class="pin-badge-lateral" title="Primera serie vista">🏅</div>
+                    <div class="pin-badge-lateral" title="5 series terminadas">⭐</div>
+                    <div class="pin-badge-lateral" title="Crítico experto">✍️</div>
+                    <div class="pin-badge-lateral" title="Maratonista">🔥</div>
+                </div>
+                <button class="widget-ver-mas-btn">Ver todas</button>
+            </div>
+
+            <!-- 2. BLOQUE SEMANAL DINÁMICO (Estado Activo) -->
+            <div class="lateral-widget">
+                <h3>Rendimiento Semanal</h3>
+                
+                <!-- Renderizado por Django si hay interacción en la semana -->
+                <div class="semanal-dinamico-content">
+                    <div class="rank-item mejor">
+                        <span class="rank-label">Lo mejor:</span>
+                        <span class="rank-name">Hilda (Temp. 3)</span>
+                    </div>
+                    <div class="rank-item peor">
+                        <span class="rank-label">Lo peor:</span>
+                        <span class="rank-name">Ninguna, buena semana</span>
+                    </div>
+                </div>
+
+                <!-- Estado Vacío Ilustrativo (Intercambiar con Django si no hay actividad en la semana) -->
+                <!-- 
+                <div class="semanal-vacio-campamento">
+                    <p>«Recuerda que siempre habrá un lugar tranquilo al cual ir, tu campamento de verano.»</p>
+                </div> 
+                -->
+            </div>
+
+            <!-- 3. ESTADÍSTICAS ACUMULATIVAS -->
+            <div class="lateral-widget">
+                <h3>Registros Históricos</h3>
+                <div class="stats-num-grid">
+                    <div class="stat-num-box">
+                        <span class="stat-number">4</span>
+                        <span class="stat-label">Semanas en racha</span>
+                    </div>
+                    <div class="stat-num-box">
+                        <span class="stat-number">12</span>
+                        <span class="stat-label">Capítulos en un día</span>
+                    </div>
+                    <div class="stat-num-box">
+                        <span class="stat-title-long">Amphibia</span>
+                        <span class="stat-label">Viaje más largo (106 ep)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. BALANCE DE CONSUMO -->
+            <div class="lateral-widget">
+                <h3>Balance de Consumo</h3>
+                <div class="balance-eficiencia">
+                    <div class="balance-labels">
+                        <span>Eficiencia de series</span>
+                        <span>75%</span>
+                    </div>
+                    <div class="barra-progreso-bg">
+                        <div class="barra-progreso-fill" style="width: 75%;"></div>
+                    </div>
+                </div>
+                <div class="polos-generos">
+                    <div class="polo-item">
+                        <span class="polo-dot mas"></span>
+                        <span class="polo-text"><strong>Más visto:</strong> Fantasía</span>
+                    </div>
+                    <div class="polo-item">
+                        <span class="polo-dot menos"></span>
+                        <span class="polo-text"><strong>Menos visto:</strong> Ciencia Ficción</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+
+</body>
+</html>

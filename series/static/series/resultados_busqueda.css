@@ -1,0 +1,527 @@
+/* ==========================================================================
+   🍃 CRIMITOONS: ESQUEMA COMPACTO Y CENTRADO DE BÚSQUEDA (CONEXIÓN EXACTA)
+   ========================================================================== */
+
+/* El contenedor principal de la búsqueda ahora está limitado y centrado */
+.explorar-interface-wrapper {
+    max-width: 1200px; /* Evita que se estire al infinito en pantallas anchas */
+    margin: 40px auto 20px auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+.explorar-form-dinamico {
+    display: flex;
+    flex-direction: column;
+    gap: 14px; /* Distancia corta y exacta entre renglones */
+}
+
+/* Fila Superior: Mantiene el buscador balanceado con los selectores ovalados */
+.explorar-linea-superior {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+}
+
+.search-bar-container {
+    position: relative;
+    flex-grow: 1; /* Ocupa el espacio restante de forma natural sin desproporción */
+}
+
+.search-bar-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #887b78;
+    font-size: 1.05rem;
+    pointer-events: none;
+}
+
+.input-busqueda-minimal {
+    width: 100%;
+    height: 42px; /* Reducido para que no se vea gigante */
+    padding: 10px 16px 10px 46px;
+    font-size: 0.95rem;
+    border: 1.5px solid #3c2f2f;
+    border-radius: 24px;
+    background-color: #ffffff;
+    color: #2b1e1e;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.input-busqueda-minimal:focus {
+    outline: none;
+    border-color: #b25e38;
+}
+
+/* Selectores ovalados de la primera línea */
+.selectores-rapidos-inline {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.select-redondeado {
+    height: 42px; /* Sincronizado exactamente con el input de búsqueda */
+    padding: 0 36px 0 18px;
+    font-size: 0.9rem;
+    color: #2b1e1e;
+    font-weight: 700;
+    background-color: #ffffff;
+    border: 1.5px solid #3c2f2f;
+    border-radius: 24px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233c2f2f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 16px) center;
+    box-sizing: border-box;
+}
+
+/* Fila Inferior: Ordenar texto plano e indicador de ajustes */
+.explorar-linea-inferior {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 4px;
+}
+
+.ordenar-por-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.label-ordenar {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #887b78;
+    letter-spacing: 0.05em;
+}
+
+/* Selector plano e idéntico de ordenamiento */
+.select-orden-texto {
+    font-size: 0.9rem;
+    color: #b25e38;
+    font-weight: 800;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    appearance: none;
+    padding-right: 18px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23b25e38' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: right center;
+}
+
+.select-orden-texto:focus {
+    outline: none;
+}
+
+/* Bloque para agrupar los tags recopilados y el botón */
+.zona-ajustes-compilacion {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Espacio reservado para los tags de filtros activos */
+.tags-filtros-compilados {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-ajustes-quirurgicos {
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6d5f5c;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+    transition: color 0.2s ease;
+}
+
+.btn-ajustes-quirurgicos:hover {
+    color: #b25e38;
+}
+
+/* Panel desplegable que empuja el contenido hacia abajo */
+.panel-ajustes-quirurgicos {
+    width: 100%;
+    background-color: #fffaf5;
+    border: 1.5px dashed #3c2f2f;
+    border-radius: 16px;
+    box-sizing: border-box;
+    transition: all 0.22s ease-in-out;
+    max-height: 400px;
+    opacity: 1;
+    padding: 20px;
+}
+
+.panel-ajustes-quirurgicos.oculto-panel {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 20px;
+    overflow: hidden;
+    border-color: transparent;
+}
+
+/* ==========================================================================
+   🖼️ VIEWPORT DEL GRID DE TARJETAS (CENTRADO CON LA INTERFAZ)
+   ========================================================================== */
+.viewport-wrapper-explorar {
+    max-width: 92%; /* Se expande hacia los lados de forma independiente a la búsqueda */
+    margin: 0 auto;
+    padding: 0 10px 60px 10px;
+    box-sizing: border-box;
+}
+
+.explorar-render-titulo {
+    font-size: 1.4rem;
+    color: #3c2f2f;
+    font-weight: 800;
+    margin: 32px 0 24px 0;
+}
+
+/* Grid configurado con tarjetas más robustas e imponentes */
+.explorar-clean-grid {
+    display: grid;
+    /* Subimos el mínimo de 160px a 190px para que las tarjetas se rendericen más grandes */
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); 
+    gap: 28px; /* Más separación para respirar con el nuevo tamaño */
+    width: 100%;
+}
+
+/* ==========================================================================
+   🃏 CONTROL DE CONTENEDOR Y PROPORCIONES DE TARJETA
+   ========================================================================== */
+.explorar-item-card {
+    position: relative !important;
+    overflow: visible !important; 
+    z-index: 1;                  
+    
+    /* Base de cristal limpio por defecto (Sin interactividad/Sin estado) */
+    background: linear-gradient(
+        135deg, 
+        rgba(255, 255, 255, 0.65) 0%, 
+        rgba(245, 240, 238, 0.35) 100%
+    ) !important;
+    
+    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+    
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+    border-radius: 20px; 
+    padding: 1px 1px 0 1px; 
+    box-sizing: border-box;
+    
+    box-shadow: 
+        0 4px 24px rgba(60, 47, 47, 0.04),
+        inset 0 1px 1px rgba(255, 255, 255, 0.6); 
+        
+    display: flex;
+    flex-direction: column;
+    transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.explorar-card-link {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+/* ==========================================================================
+   🟢 CONTROL DE ESTADOS (SISTEMA DE COLORES VIDRIOSOS LISTO)
+   ========================================================================== */
+
+/* 1. MORADO AMATISTA: Por Ver (Guardado Rápido) */
+.explorar-item-card.estado-por-ver {
+    background: linear-gradient(
+        135deg, 
+        rgba(155, 89, 182, 0.22) 0%, 
+        rgba(155, 89, 182, 0.05) 100%
+    ) !important;
+    border-color: rgba(155, 89, 182, 0.40) !important;
+}
+.explorar-item-card.estado-por-ver:hover {
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.32) 0%, rgba(155, 89, 182, 0.10) 100%) !important;
+    border-color: rgba(155, 89, 182, 0.55) !important;
+    box-shadow: 0 12px 30px rgba(155, 89, 182, 0.12);
+}
+
+/* 2. AZUL ZAFIRO: Viendo */
+.explorar-item-card.estado-viendo {
+    background: linear-gradient(
+        135deg, 
+        rgba(0, 122, 255, 0.20) 0%, 
+        rgba(0, 122, 255, 0.05) 100%
+    ) !important;
+    border-color: rgba(0, 122, 255, 0.35) !important;
+}
+.explorar-item-card.estado-viendo:hover {
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.30) 0%, rgba(0, 122, 255, 0.10) 100%) !important;
+    border-color: rgba(0, 122, 255, 0.50) !important;
+    box-shadow: 0 12px 30px rgba(0, 122, 255, 0.12);
+}
+
+/* 3. VERDE ESMERALDA: Completada */
+.explorar-item-card.estado-completada {
+    background: linear-gradient(
+        135deg, 
+        rgba(52, 199, 89, 0.18) 0%, 
+        rgba(52, 199, 89, 0.04) 100%
+    ) !important;
+    border-color: rgba(52, 199, 89, 0.35) !important;
+}
+.explorar-item-card.estado-completada:hover {
+    background: linear-gradient(135deg, rgba(52, 199, 89, 0.28) 0%, rgba(52, 199, 89, 0.08) 100%) !important;
+    border-color: rgba(52, 199, 89, 0.50) !important;
+    box-shadow: 0 12px 30px rgba(52, 199, 89, 0.10);
+}
+
+/* 4. AMARILLO/NARANJA TOPACIO: Pausada */
+.explorar-item-card.estado-pausada {
+    background: linear-gradient(
+        135deg, 
+        rgba(255, 149, 0, 0.16) 0%, 
+        rgba(255, 149, 0, 0.04) 100%
+    ) !important;
+    border-color: rgba(255, 149, 0, 0.38) !important;
+}
+.explorar-item-card.estado-pausada:hover {
+    background: linear-gradient(135deg, rgba(255, 149, 0, 0.26) 0%, rgba(255, 149, 0, 0.08) 100%) !important;
+    border-color: rgba(255, 149, 0, 0.52) !important;
+    box-shadow: 0 12px 30px rgba(255, 149, 0, 0.08);
+}
+
+/* 5. ROJO RUBÍ: Abandonada */
+.explorar-item-card.estado-abandonada {
+    background: linear-gradient(
+        135deg, 
+        rgba(255, 59, 48, 0.18) 0%, 
+        rgba(255, 59, 48, 0.04) 100%
+    ) !important;
+    border-color: rgba(255, 59, 48, 0.35) !important;
+}
+.explorar-item-card.estado-abandonada:hover {
+    background: linear-gradient(135deg, rgba(255, 59, 48, 0.28) 0%, rgba(255, 59, 48, 0.08) 100%) !important;
+    border-color: rgba(255, 59, 48, 0.50) !important;
+    box-shadow: 0 12px 30px rgba(255, 59, 48, 0.12);
+}
+
+.btn-guardado-rapido.guardado-exito {
+    background-color: rgba(155, 89, 182, 0.4) !important; /* Tono morado a juego */
+    color: #FFFFFF !important;
+    border-color: rgba(155, 89, 182, 0.6) !important;
+}
+
+/* --- EL PÓSTER --- */
+.item-card-poster {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    background-color: #1e1919; 
+    border-top-left-radius: 19px;
+    border-top-right-radius: 19px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    overflow: hidden; 
+    border: none; 
+    box-sizing: border-box;
+}
+
+.item-card-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ==========================================================================
+   ➕ BOTÓN DE GUARDADO RÁPIDO INTERACTIVO (CIRCULAR, PLANO Y OPTIMIZADO)
+   ========================================================================== */
+.btn-guardado-rapido {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    z-index: 10;
+    
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    padding: 0;
+    
+    background-color: #ffffff;
+    border: 1px solid rgba(60, 47, 47, 0.15); 
+    color: #3c2f2f; 
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-guardado-rapido svg {
+    width: 16px;  
+    height: 16px;
+    display: block;
+}
+
+/* Al pasar el mouse por la tarjeta, el botón redondo aparece */
+.explorar-item-card:hover .btn-guardado-rapido {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Feedback directo al interactuar sobre el botón (Cambio a naranja y blanco plano) */
+.btn-guardado-rapido:hover {
+    background-color: #3D262B; 
+    color: #ffffff;            
+    border-color: #3D262B;     
+}
+
+/* ==========================================================================
+   💬 TOOLTIP LATERAL MINIMALISTA (ESTILO SUTIL A LA DERECHA)
+   ========================================================================== */
+
+/* La mini-tarjeta de texto (Rectángulo plano, sutil y redondeado) */
+.btn-guardado-rapido::before {
+    content: "Guardar"; /* Forzamos el texto exacto con su capitalización tranquila */
+    position: absolute;
+    top: 50%;
+    left: 115%; /* Se posiciona inmediatamente a la derecha del botón */
+    transform: translateY(-50%) scale(0.9); /* Centrado vertical con micro-escala inicial */
+    
+    /* Diseño estilizado y espacioso */
+    background-color: #3c2f2f; /* Tu color oscuro de paleta */
+    color: #ffffff;
+    
+    /* Tipografía tranquila (Sin mayúsculas forzadas, tamaño suave) */
+    font-size: 0.75rem;
+    font-weight: 500; /* Peso medio, mucho menos agresivo que el anterior */
+    text-transform: none; /* Evita las mayúsculas automáticas */
+    letter-spacing: 0.2px;
+    
+    /* Padding espacioso a los lados para que respire el texto */
+    padding: 4px 12px; 
+    border-radius: 12px; /* Bordes notablemente más redondeados */
+    white-space: nowrap; 
+    
+    /* Estado oculto inicial */
+    opacity: 0;
+    pointer-events: none; 
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* ¡MÁGICA INSTANTÁNEA! Al pasar el cursor sobre el botón, emerge hacia la derecha */
+.btn-guardado-rapido:hover::before {
+    opacity: 1;
+    transform: translateY(-50%) scale(1); /* Mantiene el centrado vertical perfecto y escala a su tamaño real */
+}
+
+/* --- BLOQUE DE TEXTO DEL VIDRIO (CENTRADO) --- */
+.item-card-meta {
+    padding: 14px 12px 16px 12px; 
+    box-sizing: border-box;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-card-meta h3 {
+    margin: 0;
+    font-size: 0.95rem; 
+    font-weight: 700;
+    color: #3c2f2f; 
+    line-height: 1.3;
+    text-align: center; 
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* --- INTERACCIÓN HOVER DE LA TARJETA --- */
+.explorar-item-card:hover {
+    transform: none !important; 
+    z-index: 50 !important;     
+    
+    /* Conservamos la iluminación si no tiene clase de estado */
+    background: linear-gradient(
+        135deg, 
+        rgba(255, 255, 255, 0.85) 0%, 
+        rgba(245, 240, 238, 0.50) 100%
+    ) !important;
+    
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 
+        0 12px 30px rgba(60, 47, 47, 0.08), 
+        inset 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* Si la tarjeta tiene un estado activo, aumentamos la opacidad en hover para que destaque */
+.explorar-item-card.estado-terminado:hover { background: linear-gradient(135deg, rgba(46, 204, 113, 0.35) 0%, rgba(39, 174, 96, 0.15) 100%) !important; }
+.explorar-item-card.estado-pausa:hover { background: linear-gradient(135deg, rgba(52, 152, 219, 0.35) 0%, rgba(41, 128, 185, 0.15) 100%) !important; }
+.explorar-item-card.estado-pendiente:hover { background: linear-gradient(135deg, rgba(241, 196, 15, 0.35) 0%, rgba(211, 84, 0, 0.15) 100%) !important; }
+.explorar-item-card.estado-drop:hover { background: linear-gradient(135deg, rgba(231, 76, 60, 0.35) 0%, rgba(192, 41, 43, 0.15) 100%) !important; }
+
+.explorar-item-card:hover .item-card-meta h3 {
+    color: #3c2f2f !important;         
+    transform: translateY(-2px);       
+}
+
+.item-poster-vacio {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #887b78;
+    background-color: #241d1d;
+    border-top-left-radius: 19px;
+    border-top-right-radius: 19px;
+}
+
+/* ==========================================================================
+   🪟 POPOVER FLOTANTE NATIVO (INDEX.CSS COMPATIBILITY)
+   ========================================================================== */
+
+.popover-emergente-tarjeta {
+    position: absolute !important; /* Se despega del flujo y flota */
+    top: 10px;                     /* Se alinea un poquito abajo del borde superior del póster */
+    left: calc(100% + 6px);       /* ¡MAGIA! Se mueve al 100% a la derecha de la tarjeta, más un margen de 12px para que respire */
+    width: 260px;                  /* Le damos un ancho fijo para que mantenga estructura de tarjeta */
+    z-index: 9999;                 /* Pasa por encima de las series que estén en la columna de la derecha */
+    pointer-events: none;          /* Evita interferencias extrañas si mueves el cursor rápido */
+    
+    /* Aseguramos un color de fondo oscuro sólido para que no se transparente lo de abajo */
+    background: #1e1517 !important; 
+    border: 1px solid #3d262b;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+/* Comportamiento al pasar el mouse */
+.explorar-item-card:hover .popover-emergente-tarjeta {
+    display: block !important;
+    opacity: 1;
+}

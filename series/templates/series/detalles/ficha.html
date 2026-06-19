@@ -2,18 +2,19 @@
   
   <div class="ficha-columna-izquierda">
     
-    <section class="ficha-seccion-grupo">
+    <<section class="ficha-seccion-grupo">
       <h3 class="ficha-subtitulo"><i class="fa-solid fa-microphone"></i> Actores de Voz</h3>
       
       <div class="staff-grilla-vertical" id="grilla-actores">
-        {% for actor in actores %}
+        {% for actor in actores_visibles %}
           <div class="staff-card-vertical">
             <div class="staff-card-foto-wrapper">
+              
               {% if actor.foto_path %}
-                <img src="https://image.tmdb.org/t/p/w185{{ actor.foto_path }}" alt="{{ actor.nombre }}" class="staff-card-img" loading="lazy">
+                <img src="https://image.tmdb.org/t/p/w185{{ actor.foto_path }}" alt="{{ actor.nombre }}" class="home-personaje-img">
               {% else %}
-                <div class="staff-card-placeholder"><i class="fa-solid fa-user-tie"></i></div>
               {% endif %}
+              
             </div> 
             <div class="staff-card-info">
               <h4 class="staff-card-nombre">{{ actor.nombre }}</h4>
@@ -23,9 +24,24 @@
         {% empty %}
           <p class="ficha-sin-datos">No hay actores registrados para esta serie.</p>
         {% endfor %}
+
+        {% for actor in actores_ocultos %}
+          <div class="staff-card-vertical actor-tarjeta-oculta" style="display: none;">
+            <div class="staff-card-foto-wrapper">
+              {% if actor.foto_path %}
+                <img src="https://image.tmdb.org/t/p/w185{{ actor.foto_path }}" alt="{{ actor.nombre }}" class="home-personaje-img">
+              {% else %}
+              {% endif %}
+            </div> 
+            <div class="staff-card-info">
+              <h4 class="staff-card-nombre">{{ actor.nombre }}</h4>
+              <p class="staff-card-personaje">{{ actor.personaje }}</p>
+            </div>
+          </div>
+        {% endfor %}
       </div> 
 
-      {% if actores|length > 5 %}
+      {% if actores_ocultos %}
         <button id="btn-ver-mas-actores" class="arcane-btn-ver-mas" data-expandido="false">
           Ver más <i class="fa-solid fa-chevron-down"></i>
         </button>   
@@ -36,21 +52,72 @@
       <h3 class="ficha-subtitulo"><i class="fa-solid fa-clapperboard"></i> Staff Técnico</h3>
       
       <div class="staff-grilla-vertical" id="grilla-staff">
-        {% for miembro in staff %}
-          <div class="staff-card-vertical">
+        <!-- 🌟 CORREGIDO: Usamos la lista segmentada del backend unificado -->
+        {% for miembro in staff_visibles %}
+          <div class="staff-card-vertical {% if miembro.roles_lista|length > 1 %}tiene-multiples-roles{% endif %}" style="position: relative;">
             <div class="staff-card-foto-wrapper">
               {% if miembro.foto_path %}
                 <img src="https://image.tmdb.org/t/p/w185{{ miembro.foto_path }}" alt="{{ miembro.nombre }}" class="staff-card-img" loading="lazy">
               {% else %}
                 <div class="staff-card-placeholder"><i class="fa-solid fa-user"></i></div>
               {% endif %}
-            </div> <div class="staff-card-info">
+            </div> 
+            
+            <div class="staff-card-info">
               <h4 class="staff-card-nombre">{{ miembro.nombre }}</h4>
-              <p class="staff-card-rol">{{ miembro.rol }}</p> </div>
-          </div> {% empty %}
+              
+              <!-- 🌟 CORREGIDO: Pintamos el primer o único rol de la lista -->
+              <p class="staff-card-rol">{{ miembro.roles_lista|first }}</p> 
+              
+              <!-- 🌟 LA VENTANA FLOTANTE (Solo aparece si de verdad tiene más de un cargo) -->
+              {% if miembro.roles_lista|length > 1 %}
+                <div class="crimi-ventana-flotante-roles">
+                  <ul>
+                    {% for rol in miembro.roles_lista %}
+                      <li><i class="fa-solid fa-check"></i> {{ rol }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <!-- Un pequeño indicador visual flotante (ej: +2) -->
+                <span class="indicador-multi-rol">{{ miembro.roles_lista|length|add:"-1" }}</span>
+              {% endif %}
+            </div>
+          </div> 
+        {% empty %}
           <p class="ficha-sin-datos">No hay staff técnico registrado para esta serie.</p>
         {% endfor %}
-      </div> {% if staff|length > 5 %}
+
+        <!-- ✂️ BLOQUE OCULTO PARA EL BOTÓN "VER MÁS" -->
+        {% for miembro in staff_ocultos %}
+          <div class="staff-card-vertical staff-tarjeta-oculta" style="display: none; position: relative;">
+            <div class="staff-card-foto-wrapper">
+              {% if miembro.foto_path %}
+                <img src="https://image.tmdb.org/t/p/w185{{ miembro.foto_path }}" alt="{{ miembro.nombre }}" class="staff-card-img" loading="lazy">
+              {% else %}
+                <div class="staff-card-placeholder"><i class="fa-solid fa-user"></i></div>
+              {% endif %}
+            </div> 
+            <div class="staff-card-info">
+              <h4 class="staff-card-nombre">{{ miembro.nombre }}</h4>
+              <p class="staff-card-rol">{{ miembro.roles_lista|first }}</p> 
+              
+              {% if miembro.roles_lista|length > 1 %}
+                <div class="crimi-ventana-flotante-roles">
+                  <ul>
+                    {% for rol in miembro.roles_lista %}
+                      <li><i class="fa-solid fa-check"></i> {{ rol }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <span class="indicador-multi-rol">+{{ miembro.roles_lista|length|add:"-1" }}</span>
+              {% endif %}
+            </div>
+          </div> 
+        {% endfor %}
+      </div> 
+
+      <!-- 🌟 CORREGIDO: El botón ahora se muestra basándose en si existen miembros ocultos -->
+      {% if staff_ocultos %}
         <button id="btn-ver-mas-staff" class="arcane-btn-ver-mas" data-expandido="false">
           Ver más <i class="fa-solid fa-chevron-down"></i>
         </button>
@@ -85,7 +152,7 @@
     </div>
   </div>
 
-</div> ```
+</div>
 
   <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -139,4 +206,3 @@ document.addEventListener("DOMContentLoaded", function() {
     // configurarVerMas("btn-ver-mas-actores", ".actor-card-vertical");
 });
 </script>
-</div>

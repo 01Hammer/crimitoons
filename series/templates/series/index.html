@@ -11,17 +11,14 @@
   <body class="{% block body_class %}{% endblock %}">
     {% include 'series/includes/barra_navegacion.html' %}
 
+    <!-- Hero -->
     <header class="hero-marquesina-fluida">
       <div class="contenido-marquesina">
-        <span class="badge-comunidad">🎨 EL SANTUARIO DE LA ANIMACIÓN</span>
+        <span class="badge-comunidad">Descubre. Guarda. Comparte.</span>
         <h1>
           Descubre tu próxima <span class="texto-resaltado">serie animada</span>
         </h1>
-        <p>
-          Catálogo exclusivo para amantes del arte en 2D, 3D y Stop-Motion.
-          Libre de live-actions.
-        </p>
-
+        <p>Catálogo dedicado a la animación.</p>
         <form
           action="{% url 'buscar_series' %}"
           method="GET"
@@ -30,7 +27,7 @@
           <input
             type="text"
             name="q"
-            placeholder="Buscar mundos animados, personajes..."
+            placeholder="Busca tus series favoritas..."
             required
           />
           <button type="submit">Buscar</button>
@@ -38,33 +35,30 @@
       </div>
     </header>
 
+    <!-- Recomendación Semanal -->
     {% if recomendacion %}
     <div class="contenedor-landing-ancho">
-      <a
-        href="https://www.themoviedb.org/tv/{{ recomendacion.id }}"
-        target="_blank"
+
+      <a href="/serie/{% if recomendacion.id_tmdb %}{{ recomendacion.id_tmdb }}{% else %}{{ recomendacion.id }}{% endif %}/"
         class="premium-card-enlace-bloque"
       >
         <div class="premium-card-container">
           <div class="premium-card-flex">
             <div class="premium-card-image-box">
-              {% if recomendacion.banner %}
+              {% if recomendacion.backdrop_path %}
               <img
-                src="https://image.tmdb.org/t/p/w1280{{ recomendacion.banner }}"
+                src="https://image.tmdb.org/t/p/w1280{{ recomendacion.backdrop_path }}"
                 alt="{{ recomendacion.titulo }}"
                 class="premium-card-img"
-                loading="eager"
               />
               {% else %}
               <img
-                src="https://image.tmdb.org/t/p/w780{{ recomendacion.poster }}"
+                src="https://image.tmdb.org/t/p/w780{{ recomendacion.poster_path }}"
                 alt="{{ recomendacion.titulo }}"
                 class="premium-card-img"
-                loading="eager"
               />
               {% endif %}
             </div>
-
             <div class="premium-card-content">
               <div class="premium-card-badge-zone">
                 <span class="premium-card-tag"
@@ -76,10 +70,15 @@
                 {{ recomendacion.sinopsis }}
               </p>
               <div class="premium-card-meta">
+                <!-- 🛠️ CORREGIDO: Todo el bloque del if en la misma línea para evitar desconfigurar el renderizador -->
                 <span class="meta-item item-episodes">
-                  🍂 {{ recomendacion.temporadas }} {% if recomendacion.temporadas == 1 %}Temporada{% else %}Temporadas{% endif %}
+                  🍂 {{ recomendacion.total_temporadas }} Temporada{% if recomendacion.total_temporadas != 1 %}s{% endif %}
                 </span>
-                <span class="meta-item item-style">🎨 {{ recomendacion.generos }}</span>
+                {% if recomendacion.generos %}
+                <span class="meta-item item-style"
+                  >🎨 {{ recomendacion.generos }}</span
+                >
+                {% endif %}
               </div>
             </div>
           </div>
@@ -88,34 +87,34 @@
     </div>
     {% endif %}
 
+    <!-- Contenido Principal -->
     <main class="contenedor-landing-ancho">
       <div class="panel-dos-columnas-asimetrico">
         <div class="columna-izquierda-visual">
+          <!-- Vitrina: Tendencias -->
+          {% with grid_id="tendencias-grid" lista=tendencias titulo="Tendencias" %}
           <section class="vitrina-contenedor">
             <div class="vitrina-header">
               <h2 class="titulo-vitrina-enlace">
                 <a href="{% url 'index_invitado' %}" class="link-titulo"
-                  >Tendencias</a
+                  >{{ titulo }}</a
                 >
               </h2>
             </div>
-
             <div class="carousel-wrapper">
               <div class="hitbox-flecha hitbox-izq">
                 <button
                   class="btn-carousel btn-izq"
-                  onclick="scrollCarousel('tendencias-grid', -1)"
+                  onclick="scrollCarousel('{{ grid_id }}', -1)"
                 >
                   ❮
                 </button>
               </div>
-
-              <div id="tendencias-grid" class="grid-cuatro-series">
-                {% for serie in tendencias %}
+              <div id="{{ grid_id }}" class="grid-cuatro-series">
+                {% for serie in lista %}
                 <div class="mini-tarjeta-compacta">
                   <a
-                    href="https://www.themoviedb.org/tv/{{ serie.id }}"
-                    target="_blank"
+                    href="/serie/{{ serie.id }}/"
                     class="enlace-serie-tarjeta"
                     data-titulo="{{ serie.titulo }}"
                     data-nota="{{ serie.nota|floatformat:1 }}"
@@ -126,7 +125,6 @@
                       src="https://image.tmdb.org/t/p/w500{{ serie.poster_path }}"
                       alt="{{ serie.titulo }}"
                     />
-
                     <div class="mini-info">
                       <h3>{{ serie.titulo }}</h3>
                       <div class="meta-datos-tarjeta">
@@ -139,43 +137,42 @@
                 </div>
                 {% endfor %}
               </div>
-
               <div class="hitbox-flecha hitbox-der">
                 <button
                   class="btn-carousel btn-der"
-                  onclick="scrollCarousel('tendencias-grid', 1)"
+                  onclick="scrollCarousel('{{ grid_id }}', 1)"
                 >
                   ❯
                 </button>
               </div>
             </div>
           </section>
+          {% endwith %}
 
+          <!-- Vitrina: Novedades -->
+          {% with grid_id="novedades-grid" lista=novedades titulo="Novedades" %}
           <section class="vitrina-contenedor">
             <div class="vitrina-header">
               <h2 class="titulo-vitrina-enlace">
                 <a href="{% url 'index_invitado' %}" class="link-titulo"
-                  >Novedades</a
+                  >{{ titulo }}</a
                 >
               </h2>
             </div>
-
             <div class="carousel-wrapper">
               <div class="hitbox-flecha hitbox-izq">
                 <button
                   class="btn-carousel btn-izq"
-                  onclick="scrollCarousel('novedades-grid', -1)"
+                  onclick="scrollCarousel('{{ grid_id }}', -1)"
                 >
                   ❮
                 </button>
               </div>
-
-              <div id="novedades-grid" class="grid-cuatro-series">
-                {% for serie in novedades %}
+              <div id="{{ grid_id }}" class="grid-cuatro-series">
+                {% for serie in lista %}
                 <div class="mini-tarjeta-compacta">
                   <a
-                    href="https://www.themoviedb.org/tv/{{ serie.id }}"
-                    target="_blank"
+                    href="/serie/{{ serie.id }}/"
                     class="enlace-serie-tarjeta"
                     data-titulo="{{ serie.titulo }}"
                     data-nota="{{ serie.nota|floatformat:1 }}"
@@ -186,7 +183,6 @@
                       src="https://image.tmdb.org/t/p/w500{{ serie.poster_path }}"
                       alt="{{ serie.titulo }}"
                     />
-
                     <div class="mini-info">
                       <h3>{{ serie.titulo }}</h3>
                       <div class="meta-datos-tarjeta">
@@ -199,44 +195,42 @@
                 </div>
                 {% endfor %}
               </div>
-
               <div class="hitbox-flecha hitbox-der">
                 <button
                   class="btn-carousel btn-der"
-                  onclick="scrollCarousel('novedades-grid', 1)"
+                  onclick="scrollCarousel('{{ grid_id }}', 1)"
                 >
                   ❯
                 </button>
               </div>
             </div>
           </section>
+          {% endwith %}
 
-          <!-- ========== VITRINA: Mejor valoradas (Top Rated) ========= -->
+          <!-- Vitrina: Mejor Valoradas -->
+          {% with grid_id="mejor-grid" lista=mejor_valoradas titulo="Mejor Valoradas" %}
           <section class="vitrina-contenedor">
             <div class="vitrina-header">
               <h2 class="titulo-vitrina-enlace">
                 <a href="{% url 'index_invitado' %}" class="link-titulo"
-                  >Mejor Valoradas</a
+                  >{{ titulo }}</a
                 >
               </h2>
             </div>
-
             <div class="carousel-wrapper">
               <div class="hitbox-flecha hitbox-izq">
                 <button
                   class="btn-carousel btn-izq"
-                  onclick="scrollCarousel('mejor-grid', -1)"
+                  onclick="scrollCarousel('{{ grid_id }}', -1)"
                 >
                   ❮
                 </button>
               </div>
-
-              <div id="mejor-grid" class="grid-cuatro-series">
-                {% for serie in mejor_valoradas %}
+              <div id="{{ grid_id }}" class="grid-cuatro-series">
+                {% for serie in lista %}
                 <div class="mini-tarjeta-compacta">
                   <a
-                    href="https://www.themoviedb.org/tv/{{ serie.id }}"
-                    target="_blank"
+                    href="/serie/{{ serie.id }}/"
                     class="enlace-serie-tarjeta"
                     data-titulo="{{ serie.titulo }}"
                     data-nota="{{ serie.nota|floatformat:1 }}"
@@ -247,7 +241,6 @@
                       src="https://image.tmdb.org/t/p/w500{{ serie.poster_path }}"
                       alt="{{ serie.titulo }}"
                     />
-
                     <div class="mini-info">
                       <h3>{{ serie.titulo }}</h3>
                       <div class="meta-datos-tarjeta">
@@ -260,86 +253,62 @@
                 </div>
                 {% endfor %}
               </div>
-
               <div class="hitbox-flecha hitbox-der">
                 <button
                   class="btn-carousel btn-der"
-                  onclick="scrollCarousel('mejor-grid', 1)"
+                  onclick="scrollCarousel('{{ grid_id }}', 1)"
                 >
                   ❯
                 </button>
               </div>
             </div>
           </section>
+          {% endwith %}
 
+              <!-- Vitrina: Mis Series -->
+{% with grid_id="mis_series-grid" lista=mis_series titulo="Mis series" %}
           <section class="vitrina-contenedor">
             <div class="vitrina-header">
               <h2 class="titulo-vitrina-enlace">
-                <a href="{% url 'index_invitado' %}" class="link-titulo"
-                  >Mis series</a
-                >
+                <a href="{% url 'index_invitado' %}" class="link-titulo">{{ titulo }}</a>
               </h2>
             </div>
-
             <div class="carousel-wrapper">
               <div class="hitbox-flecha hitbox-izq">
-                <button
-                  class="btn-carousel btn-izq"
-                  onclick="scrollCarousel('mis_series-grid', -1)"
-                >
-                  ❮
-                </button>
+                <button class="btn-carousel btn-izq" onclick="scrollCarousel('{{ grid_id }}', -1)">❮</button>
               </div>
-
-              <div id="mis_series-grid" class="grid-cuatro-series">
-                {% for serie in mis_series %}
+              <div id="{{ grid_id }}" class="grid-cuatro-series">
+                {% for serie in lista %}
                 <div class="mini-tarjeta-compacta">
-                  <a
-                    href="https://www.themoviedb.org/tv/{{ serie.id }}"
-                    target="_blank"
-                    class="enlace-serie-tarjeta"
+                                    <a href="/serie/{{ serie.id_tmdb }}/" class="enlace-serie-tarjeta"
                     data-titulo="{{ serie.titulo }}"
                     data-nota="{{ serie.nota|floatformat:1 }}"
                     data-fecha="{{ serie.fecha_estreno }}"
-                    data-generos="{{ serie.generos }}"
-                  >
-                    <img
-                      src="https://image.tmdb.org/t/p/w500{{ serie.poster_path }}"
-                      alt="{{ serie.titulo }}"
-                    />
-
+                    data-generos="{{ serie.generos }}">
+                    <img src="{{ serie.poster_path }}" alt="{{ serie.titulo }}" />
                     <div class="mini-info">
                       <h3>{{ serie.titulo }}</h3>
                       <div class="meta-datos-tarjeta">
-                        <span class="nota-simple"
-                          >★ {{ serie.nota|floatformat:1 }}</span
-                        >
+                        <span class="nota-simple">★ {{ serie.nota|floatformat:1 }}</span>
                       </div>
                     </div>
                   </a>
                 </div>
                 {% endfor %}
               </div>
-
               <div class="hitbox-flecha hitbox-der">
-                <button
-                  class="btn-carousel btn-der"
-                  onclick="scrollCarousel('mis_series-grid', 1)"
-                >
-                  ❯
-                </button>
+                <button class="btn-carousel btn-der" onclick="scrollCarousel('{{ grid_id }}', 1)">❯</button>
               </div>
             </div>
           </section>
-        </div>
+          {% endwith %} 
+          </div>
 
         <aside class="columna-derecha-social">
           <div class="widget-comunidad">
             <div class="encabezado-widget-limpio">
               <h3>
-                <a href="#" class="titulo-widget-enlace"
-                  >💬 Foros Activos <span class="flecha-widget">→</span></a
-                >
+                <a href="#" class="titulo-widget-enlace">💬 Foros Activos <span class="flecha-widget">→</span></a>
               </h3>
             </div>
             <div class="lista-foros-mini">
@@ -390,6 +359,7 @@
       </div>
     </main>
 
+    <!-- Popover global -->
     <div
       id="popover-global-detalle"
       class="popover-emergente-tarjeta oculto-total"
@@ -405,147 +375,107 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const tarjetas = document.querySelectorAll(".enlace-serie-tarjeta");
+        // --- Popover de tarjetas ---
         const popover = document.getElementById("popover-global-detalle");
-
         const pTitulo = document.getElementById("popover-titulo");
         const pNota = document.getElementById("popover-nota");
         const pFecha = document.getElementById("popover-fecha");
         const pGeneros = document.getElementById("popover-generos");
 
-        tarjetas.forEach((tarjeta) => {
-          tarjeta.addEventListener("mouseenter", function () {
-            pTitulo.textContent = this.getAttribute("data-titulo");
-            pNota.textContent = `★ ${this.getAttribute("data-nota")}`;
+        document
+          .querySelectorAll(".enlace-serie-tarjeta")
+          .forEach(function (tarjeta) {
+            tarjeta.addEventListener("mouseenter", function () {
+              pTitulo.textContent = this.dataset.titulo;
+              pNota.textContent = `★ ${this.dataset.nota}`;
+              pFecha.textContent =
+                (this.dataset.fecha || "").substring(0, 4) || "----";
+              pGeneros.textContent = this.dataset.generos;
 
-            // SOLUCIÓN FECHA: Extrae solo los primeros 4 caracteres para mostrar el año limpio (ej: "1999")
-            const fechaRaw = this.getAttribute("data-fecha") || "";
-            pFecha.textContent = fechaRaw.substring(0, 4) || "----";
-
-            pGeneros.textContent = this.getAttribute("data-generos");
-
-            const rect = this.getBoundingClientRect();
-            popover.style.top = `${rect.top + window.scrollY}px`;
-            popover.style.left = `${rect.right + window.scrollX + 12}px`;
-
-            popover.classList.remove("oculto-total");
+              const rect = this.getBoundingClientRect();
+              popover.style.top = `${rect.top + window.scrollY}px`;
+              popover.style.left = `${rect.right + window.scrollX + 12}px`;
+              popover.classList.remove("oculto-total");
+            });
+            tarjeta.addEventListener("mouseleave", function () {
+              popover.classList.add("oculto-total");
+            });
           });
 
-          tarjeta.addEventListener("mouseleave", function () {
-            popover.classList.add("oculto-total");
+        // --- Visibilidad inicial de botones de carrusel ---
+        document
+          .querySelectorAll(".grid-cuatro-series")
+          .forEach(function (grid) {
+            const maxDesplazamiento = -(
+              grid.scrollWidth -
+              grid.parentElement.getBoundingClientRect().width
+            );
+            actualizarVisibilidadBotones(grid, 0, maxDesplazamiento);
           });
-        });
+
+        // --- Menú desplegable de perfil ---
+        const contenedorPerfil = document.querySelector(".profile-dropdown");
+        const menuDesplegable = document.querySelector(".dropdown-menu");
+        let temporizadorCierre;
+
+        if (contenedorPerfil && menuDesplegable) {
+          contenedorPerfil.addEventListener("click", function (e) {
+            e.stopPropagation();
+            menuDesplegable.classList.toggle("active");
+          });
+          document.addEventListener("click", function (e) {
+            if (!contenedorPerfil.contains(e.target)) {
+              menuDesplegable.classList.remove("active");
+            }
+          });
+          contenedorPerfil.addEventListener("mouseleave", function () {
+            if (menuDesplegable.classList.contains("active")) {
+              temporizadorCierre = setTimeout(function () {
+                menuDesplegable.classList.remove("active");
+              }, 750);
+            }
+          });
+          contenedorPerfil.addEventListener("mouseenter", function () {
+            clearTimeout(temporizadorCierre);
+          });
+        }
       });
 
       function scrollCarousel(gridId, direccion) {
         const grid = document.getElementById(gridId);
         if (!grid) return;
-
         const tarjeta = grid.querySelector(".mini-tarjeta-compacta");
         if (!tarjeta) return;
 
-        const tarjetaAncho = tarjeta.getBoundingClientRect().width + 20;
-        const contenedorAncho =
-          grid.parentElement.getBoundingClientRect().width;
-        const desplazamientoPorClic = tarjetaAncho * 4;
+        const desplazamiento = (tarjeta.getBoundingClientRect().width + 20) * 4;
+        const maxDesplazamiento = -(
+          grid.scrollWidth - grid.parentElement.getBoundingClientRect().width
+        );
+        let posicion = Math.min(
+          0,
+          Math.max(
+            parseFloat(grid.dataset.posicion || 0) - direccion * desplazamiento,
+            maxDesplazamiento,
+          ),
+        );
 
-        let posicionActual = parseFloat(grid.dataset.posicion || 0);
-        posicionActual -= direccion * desplazamientoPorClic;
-
-        const anchoTotalGrid = grid.scrollWidth;
-        const maxDesplazamiento = -(anchoTotalGrid - contenedorAncho);
-
-        if (posicionActual > 0) {
-          posicionActual = 0;
-        } else if (posicionActual < maxDesplazamiento) {
-          posicionActual = maxDesplazamiento;
-        }
-
-        grid.dataset.posicion = posicionActual;
-        grid.style.transform = `translateX(${posicionActual}px)`;
-
-        actualizarVisibilidadBotones(grid, posicionActual, maxDesplazamiento);
+        grid.dataset.posicion = posicion;
+        grid.style.transform = `translateX(${posicion}px)`;
+        actualizarVisibilidadBotones(grid, posicion, maxDesplazamiento);
       }
 
-      function actualizarVisibilidadBotones(
-        grid,
-        posicionActual,
-        maxDesplazamiento,
-      ) {
+      function actualizarVisibilidadBotones(grid, posicion, maxDesplazamiento) {
         const wrapper = grid.parentElement;
         const btnIzq = wrapper.querySelector(".btn-izq");
         const btnDer = wrapper.querySelector(".btn-der");
-
-        // Control de seguridad por si algún botón no se renderiza temporalmente
         if (!btnIzq || !btnDer) return;
 
-        if (posicionActual >= -5) {
-          btnIzq.classList.add("oculto-total");
-        } else {
-          btnIzq.classList.remove("oculto-total");
-        }
-
-        if (posicionActual <= maxDesplazamiento + 5) {
-          btnDer.classList.add("oculto-total");
-        } else {
-          btnDer.classList.remove("oculto-total");
-        }
+        btnIzq.classList.toggle("oculto-total", posicion >= -5);
+        btnDer.classList.toggle(
+          "oculto-total",
+          posicion <= maxDesplazamiento + 5,
+        );
       }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".grid-cuatro-series").forEach((grid) => {
-          const contenedorAncho =
-            grid.parentElement.getBoundingClientRect().width;
-          const maxDesplazamiento = -(grid.scrollWidth - contenedorAncho);
-          actualizarVisibilidadBotones(grid, 0, maxDesplazamiento);
-        });
-      });
-
-document.addEventListener("DOMContentLoaded", function () {
-    const contenedorPerfil = document.querySelector(".profile-dropdown");
-    const menuDesplegable = document.querySelector(".dropdown-menu");
-    
-    // NUEVA VARIABLE: Guardará el identificador del temporizador
-    let temporizadorCierre; 
-
-    if (contenedorPerfil && menuDesplegable) {
-        
-        // 1. Click para abrir/cerrar (Misma lógica de antes)
-        contenedorPerfil.addEventListener("click", function (evento) {
-            evento.stopPropagation(); 
-            menuDesplegable.classList.toggle("active");
-        });
-
-        // 2. Click afuera para cerrar (Misma lógica de antes)
-        document.addEventListener("click", function (evento) {
-            if (!contenedorPerfil.contains(evento.target)) {
-                menuDesplegable.classList.remove("active");
-            }
-        });
-
-        // ==========================================
-        // NUEVO: SISTEMA DE AUTO-CIERRE TEMPORIZADO
-        // ==========================================
-
-        // A. Cuando el mouse SALE del menú o de la foto
-        contenedorPerfil.addEventListener("mouseleave", function () {
-            // Solo iniciamos el temporizador si el menú está actualmente abierto
-            if (menuDesplegable.classList.contains("active")) {
-                // 1000 milisegundos = 1 segundos. Puedes cambiarlo a 1500 si lo quieres más rápido.
-                temporizadorCierre = setTimeout(function () {
-                    menuDesplegable.classList.remove("active");
-                }, 750); 
-            }
-        });
-
-        // B. Si el mouse REGRESA antes de los 2 segundos, cancelamos el cierre
-        contenedorPerfil.addEventListener("mouseenter", function () {
-            if (temporizadorCierre) {
-                clearTimeout(temporizadorCierre);
-            }
-        });
-    }
-});
     </script>
   </body>
 </html>

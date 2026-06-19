@@ -12,3 +12,5 @@ env/
 
 # Base de datos local (por si acaso)
 *.sqlite3
+
+.env

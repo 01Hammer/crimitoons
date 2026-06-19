@@ -1,167 +1,195 @@
-<div class="crimi-layout-home-modulo">
-  <div class="crimi-columna-principal">
-    <div class="home-seccion-bloque">
-      <h3 class="crimi-seccion-titulo">
-        <i class="fa-solid fa-tags"></i> Géneros Principales
-      </h3>
-      <div class="home-generos-lista">
-        {% for genero in generos_principales %}
-        <span class="crimi-tag-genero">{{ genero.nombre }}</span>
-        {% empty %}
-        <span class="crimi-tag-genero">Fantasía</span>
-        <span class="crimi-tag-genero">Aventura</span>
-        {% endfor %}
+<div class="crimi-home-wrapper">
+  <div class="crimi-layout-home-modulo">
+    
+    <div class="crimi-columna-principal">
+      
+      <div class="home-seccion-bloque">
+        <h3 class="crimi-seccion-titulo">
+          <i class="fa-solid fa-tags"></i> Géneros
+        </h3>
+        <div class="home-generos-lista">
+          {% for genero in generos_principales %}
+            <span class="crimi-tag-genero">{{ genero }}</span>
+          {% empty %}
+            <span class="crimi-tag-genero" style="background: none; border-style: dashed; color: #8c7a7d;">Sin géneros cargados</span>
+          {% endfor %}
+        </div>
       </div>
-    </div>
 
-    <div class="home-seccion-bloque" style="margin-top: 35px">
-      <h3 class="crimi-seccion-titulo">
-        <i class="fa-solid fa-users"></i> Personajes Principales
-      </h3>
+      <div class="home-seccion-bloque" style="margin-top: 35px">
+        <h3 class="crimi-seccion-titulo">
+          <i class="fa-solid fa-users"></i> Personajes
+        </h3>
+        
+        <div class="home-personajes-carrusel-wrapper">
+          <div class="home-personajes-lista" id="carrusel-personajes">
+            
+            {% for personaje in personajes %}
+            <div class="home-personajes-item" title="Foto aportada por: {{ personaje.aportado_por|default:'Crimitoons' }}">
+              <div class="home-personaje-foto-wrapper">
+                <img src="{{ personaje.foto_path }}" alt="{{ personaje.nombre }}" class="home-personaje-img" />
+              </div>
+              <div class="home-personaje-info">
+                <strong>{{ personaje.nombre }}</strong>
+              </div>
+            </div>
+            {% endfor %}
 
-      <div class="home-personajes-carrusel-wrapper">
-        <div class="home-personajes-lista" id="carrusel-personajes">
-          {% for personaje in personajes %}
-          <div class="home-personaje-item">
-            <div class="home-personaje-foto-wrapper">
-              {% if personaje.foto_path %}
-              <img
-                src="https://image.tmdb.org/t/p/w185{{ personaje.foto_path }}"
-                alt="{{ personaje.nombre }}"
-                class="home-personaje-img"
-              />
+            {% if not alcanzo_limite_personajes %}
+              {% if not personajes %}
+                <div class="crimi-aporte-vacio-bloque">
+                  <p class="aporte-vacio-texto">
+                    ¿Quieres apoyar la página? sube la foto de tu personaje favorito <a href="#" class="crimi-enlace-aporte">¡Aquí!</a>.
+                  </p>
+                </div>
               {% else %}
-              <div class="home-personaje-placeholder">🦉</div>
+                <div class="home-personajes-item item-subida-tarjeta">
+                  <a href="#" class="tarjeta-subida-enlace">
+                    <div class="home-personaje-foto-wrapper subida-icono-wrapper">
+                      <i class="fa-solid fa-plus-circle"></i>
+                    </div>
+                    <div class="home-personaje-info text-centro">
+                      <small class="texto-subida-mini">¡Sube un personaje!</small>
+                    </div>
+                  </a>
+                </div>
               {% endif %}
-            </div>
-            <div class="home-personaje-info">
-              <strong>{{ personaje.nombre }}</strong>
-              <span>{{ personaje.rol_en_serie }}</span>
-            </div>
+            {% endif %}
+
           </div>
-          {% empty %}
-          <div class="home-personaje-item">
-            <div class="home-personaje-placeholder">🦉</div>
-            <div class="home-personaje-info">
-              <strong>Luz Noceda</strong><span>Humana / Aprendiz</span>
-            </div>
-          </div>
-          <div class="home-personaje-item">
-            <div class="home-personaje-placeholder">🪄</div>
-            <div class="home-personaje-info">
-              <strong>Eda Clawthorne</strong><span>La Dama Búho</span>
-            </div>
-          </div>
-          {% endfor %}
         </div>
       </div>
-    </div>
 
-    <div class="home-seccion-bloque" style="margin-top: 35px">
-      <h3 class="crimi-seccion-titulo">
-        <i class="fa-solid fa-user-group"></i> Actividad de Amigos
-      </h3>
-      <div class="home-amigos-actividad-container">
-        <p class="home-amigos-subtexto">
-          Amigos que interactuaron con esta serie recientemente:
-        </p>
+      <div class="home-seccion-bloque" style="margin-top: 35px">
+        <h3 class="crimi-seccion-titulo">
+          <i class="fa-solid fa-user-group"></i> Amigos
+        </h3>
+        <div class="home-amigos-bloque-filas">
+          {% if amigos_con_estado %} 
+          
+            <div class="home-amigos-avatar-row fila-impar">
+              {% for amigo in amigos_con_estado %} 
+                {% if forloop.counter|divisibleby:2 == False %}
+                  <div class="home-amigo-avatar-item status-{{ amigo.estado }}" title="{{ amigo.usuario__username }}">
+                    <div class="home-amigo-avatar-placeholder">
+                      {% if amigo.foto_perfil %}
+                        <img src="{{ amigo.foto_perfil }}" alt="{{ amigo.usuario__username }}" />
+                      {% else %} 
+                        {{ amigo.usuario__username|first|upper }} 
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
 
-        <div class="home-amigos-avatar-reel">
-          {% for amigo in amigos_interaccion %}
-          <div
-            class="home-amigo-avatar-item"
-            title="{{ amigo.username }} interactuó con esta serie"
-          >
-            <img
-              src="{{ amigo.avatar_url }}"
-              alt="{{ amigo.username }}"
-              class="home-amigo-avatar-img"
-            />
-            <span class="home-amigo-indicador-status"></span>
-          </div>
-          {% empty %}
-          <div
-            class="home-amigo-avatar-item status-visto"
-            title="Nilson vio el último capítulo"
-          >
-            <div class="home-amigo-avatar-placeholder text-musical">N</div>
-          </div>
+            <div class="home-amigos-avatar-row fila-par">
+              {% for amigo in amigos_con_estado %} 
+                {% if forloop.counter|divisibleby:2 %}
+                  <div class="home-amigo-avatar-item status-{{ amigo.estado }}" title="{{ amigo.usuario__username }}">
+                    <div class="home-amigo-avatar-placeholder">
+                      {% if amigo.foto_perfil %}
+                        <img src="{{ amigo.foto_perfil }}" alt="{{ amigo.usuario__username }}" />
+                      {% else %} 
+                        {{ amigo.usuario__username|first|upper }} 
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
 
-          <div
-            class="home-amigo-avatar-item status-pendiente"
-            title="Yesid la añadió a pendientes"
-          >
-            <div class="home-amigo-avatar-placeholder text-taxi">Y</div>
-          </div>
-          {% endfor %}
+          {% else %} {# Placeholders mientras no hay amigos o modelo de seguimiento #}
+            <div class="home-amigos-avatar-row fila-impar">
+              <div class="home-amigo-avatar-item status-visto" title="Nilson">
+                <div class="home-amigo-avatar-placeholder text-musical">N</div>
+              </div>
+              <div class="home-amigo-avatar-item status-pendiente" title="Yesid">
+                <div class="home-amigo-avatar-placeholder text-taxi">Y</div>
+              </div>
+              <div class="home-amigo-avatar-item status-dropeado" title="Amigo de prueba 3">
+                <div class="home-amigo-avatar-placeholder bg-amigo-3">A3</div>
+              </div>
+              <div class="home-amigo-avatar-item status-visto" title="Amigo de prueba 4">
+                <div class="home-amigo-avatar-placeholder bg-amigo-4">A4</div>
+              </div>
+            </div>
+            <div class="home-amigos-avatar-row fila-par">
+              <div class="home-amigo-avatar-item status-pendiente" title="Amigo de prueba 5">
+                <div class="home-amigo-avatar-placeholder bg-amigo-5">A5</div>
+              </div>
+              <div class="home-amigo-avatar-item status-visto" title="Amigo de prueba 6">
+                <div class="home-amigo-avatar-placeholder bg-amigo-6">A6</div>
+              </div>
+              <div class="home-amigo-avatar-item status-pendiente" title="Amigo de prueba 7">
+                <div class="home-amigo-avatar-placeholder text-musical">A7</div>
+              </div>
+            </div>
+          {% endif %}
         </div>
       </div>
-    </div>
-  </div>
+    </div> <div class="crimi-columna-lateral-ancha">
+      <div class="caja-lateral-datos-unificada">
+        
+        <div class="subseccion-lateral-bloque">
+          <h4 class="caja-lateral-titulo-home">
+            <i class="fa-solid fa-circle-info"></i> Información
+          </h4>
+          <div class="info-clave-lista">
+            
+            <div class="crimi-doble-rating-contenedor">
+              
+              <div class="info-clave-item item-destacado-rating rating-global">
+                <span class="info-clave-etiqueta"><i class="fa-solid fa-globe"></i> Nota Global</span>
+                <div class="info-clave-valor-rating">
+                  <strong>{{ calificacion_real|floatformat:1|default:"N/D" }}</strong>
+                </div>
+              </div>
 
-  <div class="crimi-columna-lateral-ancha">
-    <div class="caja-lateral-datos caja-info-clave-solida">
-      <h4 class="caja-lateral-titulo-home">
-        <i class="fa-solid fa-circle-info"></i> Información Clave
-      </h4>
+              <div class="info-clave-item item-destacado-rating rating-local">
+                <span class="info-clave-etiqueta"><i class="fa-solid fa-heart"></i> Nota Comunidad (CT)</span>
+                <div class="info-clave-valor-rating">
+                  {% if serie.calificacion_local %}
+                    <strong>{{ serie.calificacion_local|floatformat:1 }}</strong>
+                  {% else %}
+                    <strong class="sin-votos-txt">★ 0.0</strong>
+                  {% endif %}
+                  <div class="crimi-votos-conteo">
+                    <small class="votos-cantidad">0 votos</small>
+                  </div>
+                </div>
+              </div>
 
-      <div class="info-clave-lista">
-        <div class="info-clave-item item-destacado-rating">
-          <span class="info-clave-etiqueta">Calificación General</span>
-          <div class="info-clave-valor-rating">
-            <strong>{{ serie.rating|default:"4.8" }}</strong>
-            <div class="crimi-estrellas">
-              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
-              ><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
-              ><i class="fa-solid fa-star"></i>
+            </div>
+
+            <div class="info-clave-item" style="margin-top: 5px;">
+              <span class="info-clave-etiqueta">Capítulos</span>
+              <span class="info-clave-valor">
+                {{ total_capitulos_serie|default:serie.total_capitulos|default:"N/D" }} Episodios
+                <small>({{ total_temporadas|default:"1" }} Temp.)</small>
+              </span>
+            </div>
+            
+            <div class="info-clave-item">
+              <span class="info-clave-etiqueta">Estreno</span>
+              <span class="info-clave-valor">{{ fecha_estreno_real|default:serie.fecha_estreno|default:"N/D" }}</span>
             </div>
           </div>
         </div>
 
-        <div class="info-clave-item">
-          <span class="info-clave-etiqueta">Total Capítulos</span>
-          <span class="info-clave-valor"
-            >{{ serie.total_episodios }} Episodios
-            <small>({{ serie.total_temporadas }} Temp.)</small></span
-          >
+        <hr class="divisor-lateral-sutil" />
+
+        <div class="subseccion-lateral-bloque">
+          <h4 class="caja-lateral-titulo-home">
+           Etiquetas
+          </h4>
+          <div class="home-nanogeneros-grilla">
+            {% for tag in nanogeneros %}
+              <span class="crimi-tag-nano">{{ tag }}</span>
+            {% empty %}
+              <span class="crimi-tag-nano" style="background: none; border-style: dashed; color: #8c7a7d;">#SinEtiquetas</span>
+            {% endfor %}
+          </div>
         </div>
 
-        <div class="info-clave-item">
-          <span class="info-clave-etiqueta">Fecha Estreno</span>
-          <span class="info-clave-valor">{{ serie.fecha_estreno }}</span>
-        </div>
-
-        <div class="info-clave-item">
-          <span class="info-clave-etiqueta">Finalización</span>
-          <span class="info-clave-valor"
-            >{{ serie.fecha_fin|default:"En emisión" }}</span
-          >
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="caja-lateral-datos caja-nanogeneros-bloque"
-      style="margin-top: 25px"
-    >
-      <h4 class="caja-lateral-titulo-home">
-        <i class="fa-solid fa-hashtag"></i> Etiquetas de la Serie
-      </h4>
-      <div class="home-nanogeneros-grilla">
-        {% for tag in nanogeneros %}
-        <span
-          class="crimi-tag-nano"
-          title="Votos de la comunidad: {{ tag.votos }}"
-          >#{{ tag.nombre }}</span
-        >
-        {% empty %}
-        <span class="crimi-tag-nano">#EscuelaDeMagia</span>
-        <span class="crimi-tag-nano">#FoundFamily</span>
-        <span class="crimi-tag-nano">#MonstruosLindos</span>
-        <span class="crimi-tag-nano">#MisteriosLore</span>
-        <span class="crimi-tag-nano">#DañoEmocional</span>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-</div>
+      </div> </div> </div> </div>

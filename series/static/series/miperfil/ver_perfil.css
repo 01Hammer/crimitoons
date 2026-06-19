@@ -1,0 +1,389 @@
+/* ============ CRIMITOONS: ESTILOS DE PERFIL ============ */
+
+body {
+    background: radial-gradient(circle at top left, #fff8ec 0%, #f7f3e3 48%, #e7d7c4 100%);
+    color: #2B2625;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
+
+/* 🌟 Banner Cinematográfico: Totalmente quieto e intacto */
+.perfil-banner-wrapper {
+    width: 100%;
+    height: 474px;
+    position: relative;
+    overflow: hidden;
+    background: #2B2625; 
+    border-bottom: 2px solid rgba(178, 94, 56, 0.15);
+}
+
+.perfil-banner-blur {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(25px) brightness(0.5);
+    transform: scale(1.05);
+    z-index: 1;
+}
+
+.perfil-banner-principal {
+    position: relative;
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 2;
+}
+
+.perfil-banner-vacio {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e7d7c4 0%, #b25e38 100%);
+}
+
+/* 🚨 CONTENEDOR SUPERIOR RIGIDAMENTE CONTROLADO A 1100px 
+   Esto mantiene el avatar, banner alineado, nombre y pines exactamente como en edited-image_16.jpg 
+*/
+.perfil-container {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 20px 0px 20px;
+    position: relative;
+}
+
+/* Encabezado superior del perfil */
+.perfil-header {
+    margin-left: 50px; /* Compensa el padding del contenedor para alinear con el borde del banner */
+    position: relative;
+    margin-top: -75px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 25px;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.perfil-identidad {
+    display: flex;
+    align-items: flex-end;
+    gap: 25px;
+}
+
+.perfil-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid #fff8ec;
+    object-fit: cover;
+    background: #f7f3e3;
+    box-shadow: 0 10px 28px rgba(43, 38, 37, 0.2);
+    position: relative;
+    z-index: 5;
+}
+
+.perfil-avatar-vacio {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid #fff8ec;
+    background: #e7d7c4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    box-shadow: 0 10px 28px rgba(43, 38, 37, 0.2);
+    position: relative;
+    z-index: 5;
+}
+
+.perfil-titulos {
+    padding-bottom: 12px;
+}
+
+.perfil-titulos h1 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 800;
+    color: #2B2625;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+}
+
+.perfil-pines-vitrina {
+    margin-right: 50px;
+    display: flex;
+    gap: 10px;
+    padding-bottom: 15px;
+}
+
+.pin-badge-vacio {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(178, 94, 56, 0.06);
+    border: 1px dashed rgba(178, 94, 56, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: rgba(178, 94, 56, 0.4);
+    cursor: help;
+    transition: all 0.2s ease;
+}
+
+.perfil-menu-tabs {
+    margin-top: 5px;
+    border-bottom: 2px solid rgba(178, 94, 56, 0.15);
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    font-size: 19px;
+}
+
+.perfil-menu-tabs .tab-btn {
+    background: none;
+    border: none;
+    padding: 12px 4px;
+    color: #887b78;
+    font-size: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.perfil-menu-tabs .tab-btn.active {
+    color: #b25e38;
+    font-weight: 700;
+    border-bottom: 3px solid #b25e38;
+}
+
+/* ==========================================================================
+   🚀 EXPANSIÓN RECALCULADA: EL BLOQUE DE ABAJO SE ABRE A 1300px
+   ========================================================================== */
+
+/* ==========================================================================
+   🚀 EXPANSIÓN RECALCULADA: EL BLOQUE DE ABAJO SE ABRE A 1300px
+   ========================================================================== */
+
+/* Centra el bloque de la biblioteca en la pantalla sin importar su anchura */
+.viewport-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.tab-content-viewport {
+    width: 1300px; /* 🔥 ¡Ahora sí responderá libremente al tamaño que elijas! */
+    max-width: 95vw;
+    margin: 25px 0 60px 0;
+    padding: 0 20px; /* Un padding lateral sutil para que no pegue al borde */
+    box-sizing: border-box !important;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* Grid de Dos Columnas Aprovechando el Espacio Gigante */
+.perfil-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr; 
+    gap: 30px; /* Ajustado de 45px a 30px para un balance perfecto en 1160px */
+}
+
+/* Columna Izquierda: Sobre mí y Amigos */
+.columna-bio-sandbox {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.columna-bio-sandbox h2 {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    color: #2b2625;
+}
+
+/* Sandbox Dinámico y Biografía con Mejoras de Espaciado */
+.sandbox-dinamico-wrapper {
+    width: 100%;
+    background: #ffffff; /* Fondo blanco limpio para contrastar con el beige */
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(43, 38, 37, 0.03);
+    border: 1px solid rgba(178, 94, 56, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
+}
+
+.sandbox-box-item {
+    height: 36px;
+    background: rgba(178, 94, 56, 0.06);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #b25e38;
+    border: 1px solid rgba(178, 94, 56, 0.05);
+}
+
+.bio-texto-wrapper {
+    font-size: 14.5px;
+    color: #514745;
+    line-height: 1.6;
+    padding: 5px 0 0 0;
+}
+
+/* Columna Derecha: Estadísticas y Actividad Reciente */
+.columna-datos-catalogo {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.columna-datos-catalogo h2 {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    color: #2b2625;
+}
+
+/* ✨ ARREGLO DE RESULTADOS: El bloque de estadísticas de arriba ahora se ve pro */
+.resumen-bio-stats {
+    display: grid;
+    grid-template-columns: 1fr 1.8fr;
+    gap: 0; /* Controlado mediante padding interno */
+    background: #ffffff; /* Pasado a blanco para limpiar la interfaz */
+    border-radius: 16px;
+    border: 1px solid rgba(178, 94, 56, 0.1);
+    box-shadow: 0 4px 15px rgba(43, 38, 37, 0.03);
+    overflow: hidden;
+}
+
+.stats-izq-border {
+    text-align: center;
+    border-right: 1px solid rgba(178, 94, 56, 0.12);
+    padding: 24px 15px;
+    background: #fff8ec; /* Toque sutil a la izquierda */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-numero-grande {
+    font-size: 36px; /* Más grande e imponente */
+    font-weight: 800;
+    color: #b25e38;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.stat-label-bold {
+    font-size: 12px;
+    color: #887b78;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stats-der-info {
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+}
+
+.top-tag-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2b2625;
+    margin: 0;
+}
+
+.tag-color-destacado {
+    color: #b25e38;
+    background: rgba(178, 94, 56, 0.08);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.genero-predilecto-text {
+    font-size: 13px;
+    color: #6b5e5c;
+    margin: 0;
+}
+
+/* 🔔 Historial de Actividad Reciente Limpio */
+.actividad-box {
+    background: #ffffff;
+    padding: 22px;
+    border-radius: 16px;
+    border: 1px solid rgba(178, 94, 56, 0.1);
+    box-shadow: 0 4px 15px rgba(43, 38, 37, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.actividad-item-row {
+    font-size: 14px;
+    color: #2b2625;
+    border-bottom: 1px dashed rgba(178, 94, 56, 0.08);
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.actividad-item-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.actividad-tiempo-label {
+    font-size: 11.5px;
+    color: #887b78;
+    font-weight: 600;
+}
+
+/* Amigos y Vistas del menú */
+.amigos-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* Subió a 6 columnas por el nuevo ancho */
+    gap: 12px;
+}
+
+.amigo-avatar-item {
+    width: 48px;
+    height: 48px;
+    background: #e7d7c4;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.amigo-avatar-item:hover { transform: scale(1.08); }
+
+.series-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}

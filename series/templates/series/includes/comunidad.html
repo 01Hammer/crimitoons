@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comunidad - CRIMITOONS</title>
+    <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1" />
+    <link rel="stylesheet" href="{% static 'series/comunidad.css' %}?v=1010" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  </head>
+  <body>
+    
+    {% include 'series/includes/barra_navegacion.html' %}
+    
+    <main class="contenedor-landing-ancho" style="margin-top: 30px;">
+      <div class="panel-dos-columnas-asimetrico">
+        
+        <div class="columna-izquierda-visual">
+          
+          <div class="tarjeta-publicar-container">
+            <div class="publicar-header">
+              <img src="https://via.placeholder.com/40" alt="Tu Avatar" class="avatar-mini" />
+              <input type="text" placeholder="¿De qué serie animada quieres hablar hoy, Hammer?" class="input-falso-publicar" />
+            </div>
+            <div class="publicar-opciones-rapidas">
+              <button class="btn-opcion-post"><span class="icono-post">📝</span> Reseña</button>
+              <button class="btn-opcion-post"><span class="icono-post">💬</span> Iniciar Foro</button>
+              <button class="btn-opcion-post"><span class="icono-post">🖼️</span> Imagen</button>
+              <button class="btn-publicar-principal">Publicar</button>
+            </div>
+          </div>
+
+          <div class="muro-comunidad-feed">
+            
+            <article class="tarjeta-feed-item tipo-log">
+              <div class="feed-item-header">
+                <span class="user-accion"><strong>Hammer</strong> completó <strong>Hilda</strong></span>
+                <span class="tiempo-post">Hace 10 min</span>
+              </div>
+              <div class="feed-item-cuerpo-complejo">
+                <img src="https://image.tmdb.org/t/p/w200/6vK67Wp1Vskd7UWe50m5Z0O9r01.jpg" alt="Hilda" class="poster-mini-feed" />
+                <div class="feed-contenido-texto">
+                  <span class="nota-sticker score-perfecto">★ 10.0</span>
+                  <p class="minireseña">Mi serie favorita, perfecta para relajarte después de un día estresante.</p>
+                </div>
+              </div>
+              <div class="feed-item-footer-interaccion">
+                <button class="btn-interact"><span class="icon-int">❤️</span> 12</button>
+                <button class="btn-interact"><span class="icon-int">💬</span> 4</button>
+              </div>
+            </article>
+
+            <article class="tarjeta-feed-item tipo-foro">
+              <div class="feed-item-header">
+                <span class="user-accion"><strong>Nilson</strong> creó un nuevo debate en <strong>Foros</strong></span>
+                <span class="tiempo-post">Hace 1 hora</span>
+              </div>
+              <div class="feed-item-cuerpo-simple">
+                <span class="categoria-tag font-debate">[Debates]</span>
+                <h3 class="titulo-hilo-feed">¿Las últimas temporadas de Gumball arruinaron la esencia de la serie?</h3>
+                <p class="extracto-hilo">Siento que los chistes se volvieron demasiado cringe y se perdió la genialidad de las primeras temporadas...</p>
+              </div>
+              <div class="feed-item-footer-interaccion">
+                <button class="btn-interact"><span class="icon-int">🔥</span> Ver Debate (18 respuestas)</button>
+              </div>
+            </article>
+
+          </div>
+        </div>
+
+        <aside class="columna-derecha-social">
+          
+          <div class="widget-comunidad">
+            <div class="encabezado-widget-limpio">
+              <h3>🎛️ Filtrar mi Muro</h3>
+            </div>
+            <div class="lista-filtros-acumulativos">
+              <button class="btn-filtro-toggle activo" data-filtro="log">👥 Actividad de Amigos</button>
+              <button class="btn-filtro-toggle activo" data-filtro="foro">💬 Foros Abiertos</button>
+              <button class="btn-filtro-toggle activo" data-filtro="chat">🌍 Chat Global</button>
+            </div>
+          </div>
+
+          <div class="widget-comunidad">
+            <div class="encabezado-widget-limpio">
+              <h3>🔥 Debates Calientes</h3>
+            </div>
+            <div class="lista-items-sidebar">
+              <a href="#" class="item-sidebar-enlace">
+                <span class="tag-sidebar">[Teorías]</span> El futuro de The Owl House
+              </a>
+              <a href="#" class="item-sidebar-enlace">
+                <span class="tag-sidebar">[Críticas]</span> ¿Valió la pena Jentry Chau?
+              </a>
+            </div>
+          </div>
+
+        </aside>
+
+      </div>
+    </main>
+  </body>
+</html>

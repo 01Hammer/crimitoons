@@ -11,15 +11,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   </head>
 
-  </head>
-
 <body class="page-with-banner">
 
     {% include 'series/includes/barra_navegacion.html' %}
 
     <header class="serie-hero-contenedor">
         {% if serie.backdrop_path %}
-            <img src="https://image.tmdb.org/t/p/original{{ serie.backdrop_path }}" alt="Banner de {{ serie.titulo }}" class="banner-img">
+            <img src="{{ serie.backdrop_path }}" alt="Banner de {{ serie.titulo }}" class="banner-img">
         {% else %}
             <div class="banner-placeholder"></div>
         {% endif %}
@@ -30,7 +28,7 @@
       <div class="serie-contenido-wrapper">
         <div class="serie-portada-wrapper">
           {% if serie.poster_path %}
-            <img src="https://image.tmdb.org/t/p/w500{{ serie.poster_path }}" alt="Portada {{ serie.titulo }}" class="portada-img" />
+            <img src="{{ serie.poster_path }}" alt="Portada {{ serie.titulo }}" class="portada-img" />
           {% else %}
             <div class="portada-placeholder">🎬</div>
           {% endif %}
@@ -50,14 +48,40 @@
           </div>
 
           <div class="serie-acciones">
-            <button class="btn-guardar-serie">
-              <i class="fa-regular fa-bookmark"></i> Guardar serie
-            </button>
+                {% if progreso_usuario %}
+                  {% if progreso_usuario.status == 'plan_to_watch' %}
+                    <button class="btn-guardar-serie btn-por-ver" id="open-modal-btn">
+                      <i class="fa-solid fa-bookmark"></i> Pendiente
+                    </button>
+                  {% elif progreso_usuario.status == 'watching' %}
+                    <button class="btn-guardar-serie btn-watching" id="open-modal-btn">
+                      <i class="fa-solid fa-eye"></i> Viendo
+                    </button>
+                  {% elif progreso_usuario.status == 'completed' %}
+                    <button class="btn-guardar-serie btn-completed" id="open-modal-btn">
+                      <i class="fa-solid fa-check"></i> Completada
+                    </button>
+                  {% elif progreso_usuario.status == 'paused' %}
+                    <button class="btn-guardar-serie btn-paused" id="open-modal-btn">
+                      <i class="fa-solid fa-pause"></i> Pausada
+                    </button>
+                  {% elif progreso_usuario.status == 'dropped' %}
+                    <button class="btn-guardar-serie btn-dropped" id="open-modal-btn">
+                      <i class="fa-solid fa-xmark"></i> Abandonada
+                    </button>
+                  {% else %}
+                    <button class="btn-guardar-serie" id="open-modal-btn">
+                      <i class="fa-regular fa-bookmark"></i> Guardar serie
+                    </button>
+                  {% endif %}
+                {% else %}
+                  <button class="btn-guardar-serie" id="open-modal-btn">
+                    <i class="fa-regular fa-bookmark"></i> Guardar serie
+                  </button>
+                {% endif %}
           </div>
         </div>
       </div>
-
-      <!-- El resto de tus pestañas se queda exactamente igual hacia abajo... --> 
 
       <div class="serie-menu-secciones">
         <div class="menu-secciones-wrapper">
@@ -99,14 +123,55 @@
       document.addEventListener('DOMContentLoaded', function() {
         const pestañas = document.querySelectorAll('.tab-enlace');
         const bloquesContenido = document.querySelectorAll('.tab-pantalla-bloque');
+        const modal = document.getElementById('save-series-modal');
+        const openBtn = document.getElementById('open-modal-btn');
+        const closeBtn = document.getElementById('close-modal-btn');
+        const cancelBtn = document.getElementById('cancel-modal-btn');
+        const progressForm = document.getElementById('form-guardar-progreso');
+
+        // CORRECCIÓN: Añadido plan_to_watch mapeado con el término "Pendiente" e icono de marcador sólido
+        const estadoMeta = {
+          plan_to_watch: { text: 'Pendiente', icon: 'fa-solid fa-bookmark', className: 'btn-por-ver' },
+          watching: { text: 'Viendo', icon: 'fa-solid fa-eye', className: 'btn-watching' },
+          completed: { text: 'Completada', icon: 'fa-solid fa-check', className: 'btn-completed' },
+          paused: { text: 'Pausada', icon: 'fa-solid fa-pause', className: 'btn-paused' },
+          dropped: { text: 'Abandonada', icon: 'fa-solid fa-xmark', className: 'btn-dropped' },
+        };
+
+        function actualizarBotonProgreso(estado) {
+          if (!openBtn) return;
+          const meta = estadoMeta[estado];
+          openBtn.classList.remove('btn-por-ver', 'btn-watching', 'btn-completed', 'btn-paused', 'btn-dropped');
+          if (meta) {
+            openBtn.classList.add(meta.className);
+            openBtn.innerHTML = `<i class="${meta.icon}"></i> ${meta.text}`;
+          } else {
+            openBtn.innerHTML = '<i class="fa-regular fa-bookmark"></i> Guardar serie';
+          }
+        }
+
+        function closeModal() {
+          if (modal) {
+            modal.classList.remove('active');
+          }
+        }
+
+        function getCookie(name) {
+          const cookies = document.cookie ? document.cookie.split(';') : [];
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+              return decodeURIComponent(cookie.substring(name.length + 1));
+            }
+          }
+          return null;
+        }
 
         pestañas.forEach(tab => {
           tab.addEventListener('click', function() {
             pestañas.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-
             bloquesContenido.forEach(bloque => bloque.classList.remove('active'));
-
             const targetTabId = 'tab-' + this.getAttribute('data-tab');
             const targetBloque = document.getElementById(targetTabId);
             if (targetBloque) {
@@ -114,7 +179,173 @@
             }
           });
         });
+
+        if (openBtn && modal) {
+          openBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            modal.classList.add('active');
+          });
+
+          if (closeBtn) {
+            closeBtn.addEventListener('click', closeModal);
+          }
+
+          if (cancelBtn) {
+            cancelBtn.addEventListener('click', closeModal);
+          }
+
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+              closeModal();
+            }
+          });
+        }
+
+        if (progressForm) {
+          progressForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const action = this.action;
+            const formData = new FormData(this);
+            const csrftoken = getCookie('csrftoken');
+
+            fetch(action, {
+              method: 'POST',
+              headers: {
+                'X-CSRFToken': csrftoken,
+                'Accept': 'application/json',
+              },
+              body: formData,
+            })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+                return response.json();
+              })
+              .then(data => {
+                if (data.status === 'success') {
+                  closeModal();
+                  actualizarBotonProgreso(data.nuevo_estado);
+                } else {
+                  alert('No se pudo guardar el progreso.');
+                }
+              })
+              .catch(() => {
+                alert('Error al guardar el progreso.');
+              });
+          });
+        }
       });
     </script>
-  </body>
+
+<div id="save-series-modal" class="modal-overlay">
+  <div class="modal-card">
+
+<header class="modal-header">
+  <h3>Guardar serie</h3>
+</header>
+
+<form id="form-guardar-progreso" action="{% url 'guardar_progreso' serie.id %}" method="post">
+  {% csrf_token %}
+
+  <div class="top-controls">
+
+    <div class="field">
+      <label for="series-status">Estado</label>
+      <select id="series-status" name="status">
+        <option value="plan_to_watch"{% if progreso_usuario and progreso_usuario.status == 'plan_to_watch' %} selected{% endif %}>Pendiente</option>
+        <option value="watching"{% if progreso_usuario and progreso_usuario.status == 'watching' %} selected{% endif %}>Viendo</option>
+        <option value="completed"{% if progreso_usuario and progreso_usuario.status == 'completed' %} selected{% endif %}>Completada</option>
+        <option value="paused"{% if progreso_usuario and progreso_usuario.status == 'paused' %} selected{% endif %}>Pausada</option>
+        <option value="dropped"{% if progreso_usuario and progreso_usuario.status == 'dropped' %} selected{% endif %}>Abandonada</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="series-score">Puntuación</label>
+      <input
+        type="number"
+        id="series-score"
+        name="score"
+        min="0"
+        max="10"
+        step="0.1"
+        value="{{ progreso_usuario.score|default_if_none:'' }}"
+        placeholder="Sin puntuar">
+    </div>
+
+    <div class="field">
+      <label for="current-season">Temporada</label>
+      <input
+        type="number"
+        id="current-season"
+        name="current_season"
+        min="1"
+        value="{{ progreso_usuario.current_season|default:1 }}">
+    </div>
+
+  </div>
+
+  <section class="progress-section">
+
+    <div class="season-tabs">
+      <button type="button" class="season-tab-btn active">Temp 1</button>
+      <button type="button" class="season-tab-btn">Temp 2</button>
+      <button type="button" class="season-tab-btn">Temp 3</button>
+    </div>
+
+    <div class="progress-header">
+      <span>Temporada {{ progreso_usuario.current_season|default:1 }}</span>
+
+      <div class="episode-stepper">
+        <input
+          type="number"
+          id="series-episodes"
+          name="current_episode"
+          min="0"
+          value="{{ progreso_usuario.current_episode|default:0 }}">
+
+        <span>/ 19</span>
+      </div>
+    </div>
+
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill"></div>
+    </div>
+
+  </section>
+
+  <section class="comment-section">
+
+    <label for="series-comment">
+      Comentario
+    </label>
+
+    <textarea
+      id="series-comment"
+      name="comment"
+      rows="4"
+      maxlength="400"
+      placeholder="Comparte tu opinión con la comunidad...">{% if progreso_usuario %}{{ progreso_usuario.comment }}{% endif %}</textarea>
+
+  </section>
+
+  <section style="margin-top: 10px; display: none;"></section>
+
+  <footer class="modal-actions">
+    <button type="button" id="cancel-modal-btn">
+      Cancelar
+    </button>
+
+    <button type="submit">
+      Guardar
+    </button>
+  </footer>
+
+</form>
+
+  </div>
+</div>
+
+</body>
 </html>

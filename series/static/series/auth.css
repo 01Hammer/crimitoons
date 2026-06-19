@@ -1,22 +1,19 @@
-/* ============ ESTILOS DE AUTENTICACIÓN ============ */
-
-* {
+/* ============ ESTILOS DE AUTENTICACIÓN (REPARADO) ============ */
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    /* 🌟 Tu degradado crema original */
     background: radial-gradient(circle at top left, #fff8ec 0%, #f7f3e3 48%, #e7d7c4 100%);
     color: #2B2625;
     overflow-x: hidden;
     position: relative;
 }
 
+/* Gradients decorativos de fondo */
 body::before {
     content: '';
     position: absolute;
@@ -26,8 +23,10 @@ body::before {
         radial-gradient(circle at 80% 18%, rgba(61, 38, 43, 0.10) 0%, transparent 12%),
         radial-gradient(circle at 90% 80%, rgba(178, 94, 56, 0.08) 0%, transparent 18%);
     pointer-events: none;
+    z-index: 1; /* Asegura que se quede atrás */
 }
 
+/* 🌟 Círculo decorativo reparado para evitar el bloque blanco abajo */
 body::after {
     content: '';
     position: absolute;
@@ -38,13 +37,45 @@ body::after {
     top: 55%;
     left: -100px;
     pointer-events: none;
+    z-index: 1;
 }
 
+/* 🌟 CONTROL DEL LOGOTIPO MINIMALISTA (Fijo para que no crezca) */
+.auth-header-minimalista {
+    width: 100%;
+    padding: 40px 0 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 10; /* Por encima de los círculos de fondo */
+}
+
+.auth-logo-centrado {
+    display: inline-block;
+}
+
+.auth-logo-centrado img {
+    height: 63px; /* 🌟 Forzamos al logo a tener un tamaño estético y controlado */
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.2s ease-in-out;
+}
+
+.auth-logo-centrado img:hover {
+    transform: scale(1.04);
+}
+
+/* Contenedor del Formulario */
 .contenedor-auth {
     flex: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center; /* Centra el cuadro del login verticalmente */
+    align-items: center;
     position: relative;
+    z-index: 10; /* Por encima de los círculos de fondo */
+    padding-bottom: 40px; /* Evita que el formulario toque el fondo de la pantalla */
 }
 
 .formulario-container {
@@ -52,7 +83,7 @@ body::after {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 60px 20px 30px;
+    padding: 1px 20px 30px;
 }
 
 .formulario-box {
@@ -61,7 +92,7 @@ body::after {
     background: rgba(247, 243, 227, 0.98);
     border: 1px solid #E8DDD0;
     border-radius: 38px;
-    padding: 34px 30px;
+    padding: 18px 80px 18px;
     box-shadow: 0 24px 58px rgba(43, 38, 37, 0.12);
     position: relative;
     overflow: hidden;

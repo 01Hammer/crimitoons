@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comunidad - CRIMITOONS</title>
+
+    <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1" />
+    <link rel="stylesheet" href="{% static 'series/comunidad.css' %}?v=1015" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+
+    {% include 'series/includes/barra_navegacion.html' %}
+
+    <main class="comunidad-wrapper">
+        <div class="comunidad-layout">
+
+            <!-- FILTROS -->
+            <aside class="col-filtros">
+                <div class="filtros-widget">
+                    <p class="widget-titulo">Mi muro</p>
+
+                    <div class="filtros-lista">
+                        <button class="filtro-btn activo" data-filtro="amigos">
+                            <i class="fa-solid fa-user-group"></i>
+                            <span class="filtro-label">Actividad Amigos</span>
+                        </button>
+                        <button class="filtro-btn activo" data-filtro="foros">
+                            <i class="fa-solid fa-comments"></i>
+                            <span class="filtro-label">Foros</span>
+                        </button>
+                        <button class="filtro-btn activo" data-filtro="publicaciones">
+                            <i class="fa-solid fa-newspaper"></i>
+                            <span class="filtro-label">Publicaciones</span>
+                        </button>
+                    </div>
+
+                    <div class="filtros-sep"></div>
+
+                    <button class="filtro-solo-amigos" data-filtro="solo-amigos">
+                        <i class="fa-solid fa-lock"></i>
+                        Solo amigos
+                    </button>
+                </div>
+            </aside>
+
+            <!-- FEED -->
+            <section class="col-feed">
+
+                <div class="publicar-caja">
+                    <div class="publicar-top">
+                        <img src="https://via.placeholder.com/42" alt="Tu Avatar" class="avatar-mini" />
+                        <div class="publicar-input-wrap">
+                            <input type="text" placeholder="¿De qué serie quieres hablar hoy?" class="publicar-input" />
+                            <button class="btn-foto" title="Subir foto o video">
+                                <i class="fa-regular fa-image"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="publicar-acciones">
+                        <button class="accion-btn"><i class="fa-solid fa-fire"></i> Foro</button>
+                        <button class="accion-btn"><i class="fa-solid fa-tv"></i> Serie</button>
+                        <button class="publicar-submit">Publicar</button>
+                    </div>
+                </div>
+
+                <div class="feed-lista">
+
+                    <article class="feed-card tipo-amigo">
+                        <div class="feed-card-header">
+                            <img src="https://via.placeholder.com/42" alt="Hammer" class="avatar-mini" />
+                            <div class="feed-meta">
+                                <span class="feed-usuario"><strong>Hammer</strong> completó <strong>Hilda</strong></span>
+                                <span class="feed-tiempo">Hace 10 min</span>
+                            </div>
+                            <span class="feed-badge amigo">Amigo</span>
+                        </div>
+                        <div class="feed-cuerpo-serie">
+                            <img src="https://image.tmdb.org/t/p/w200/6vK67Wp1Vskd7UWe50m5Z0O9r01.jpg" alt="Hilda" class="poster-mini" />
+                            <div class="serie-info">
+                                <span class="score-badge">★ 10.0</span>
+                                <p class="feed-texto">Mi serie favorita, perfecta para relajarte después de un día estresante.</p>
+                            </div>
+                        </div>
+                        <div class="feed-footer">
+                            <button class="interact-btn"><i class="fa-regular fa-heart"></i> 12</button>
+                            <button class="interact-btn"><i class="fa-regular fa-comment"></i> 4</button>
+                        </div>
+                    </article>
+
+                    <article class="feed-card tipo-foro">
+                        <div class="feed-card-header">
+                            <img src="https://via.placeholder.com/42" alt="Nilson" class="avatar-mini" />
+                            <div class="feed-meta">
+                                <span class="feed-usuario"><strong>Nilson</strong> abrió un debate</span>
+                                <span class="feed-tiempo">Hace 1 hora</span>
+                            </div>
+                            <span class="feed-badge foro">Foro</span>
+                        </div>
+                        <div class="feed-cuerpo-foro">
+                            <span class="cat-tag">Debates</span>
+                            <h4 class="foro-titulo">¿Las últimas temporadas de Gumball arruinaron la esencia de la serie?</h4>
+                            <p class="feed-texto">Siento que los chistes se volvieron demasiado cringe y se perdió la genialidad de las primeras temporadas...</p>
+                        </div>
+                        <div class="feed-footer">
+                            <button class="interact-btn"><i class="fa-solid fa-fire"></i> 18 respuestas</button>
+                            <button class="interact-btn"><i class="fa-regular fa-heart"></i> 7</button>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+
+            <!-- SIDEBAR -->
+            <aside class="col-sidebar">
+                <div class="sidebar-widget">
+                    <p class="widget-titulo">Foros calientes</p>
+
+                    <div class="foros-lista">
+
+                        <a href="#" class="foro-item">
+                            <span class="foro-rank">1</span>
+                            <div class="foro-item-info">
+                                <span class="cat-tag">Teorías</span>
+                                <span class="foro-item-titulo">El futuro de The Owl House</span>
+                                <span class="foro-actividad"><i class="fa-regular fa-comment"></i> 143 respuestas</span>
+                            </div>
+                        </a>
+
+                        <a href="#" class="foro-item">
+                            <span class="foro-rank">2</span>
+                            <div class="foro-item-info">
+                                <span class="cat-tag">Críticas</span>
+                                <span class="foro-item-titulo">¿Valió la pena Jentry Chau?</span>
+                                <span class="foro-actividad"><i class="fa-regular fa-comment"></i> 89 respuestas</span>
+                            </div>
+                        </a>
+
+                        <a href="#" class="foro-item">
+                            <span class="foro-rank">3</span>
+                            <div class="foro-item-info">
+                                <span class="cat-tag">Debates</span>
+                                <span class="foro-item-titulo">Gravity Falls merece una segunda temporada más larga</span>
+                                <span class="foro-actividad"><i class="fa-regular fa-comment"></i> 61 respuestas</span>
+                            </div>
+                        </a>
+
+                        <a href="#" class="foro-item">
+                            <span class="foro-rank">4</span>
+                            <div class="foro-item-info">
+                                <span class="cat-tag">Noticias</span>
+                                <span class="foro-item-titulo">Amphibia: ¿habrá película?</span>
+                                <span class="foro-actividad"><i class="fa-regular fa-comment"></i> 44 respuestas</span>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+</body>
+</html>

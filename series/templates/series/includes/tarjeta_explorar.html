@@ -1,0 +1,55 @@
+{% for serie in resultados %}
+<div class="explorar-item-card 
+    {% if serie.estado_biblioteca == 'plan_to_watch' %}estado-por-ver
+    {% elif serie.estado_biblioteca == 'watching' %}estado-viendo
+    {% elif serie.estado_biblioteca == 'completed' %}estado-completada
+    {% elif serie.estado_biblioteca == 'paused' %}estado-pausada
+    {% elif serie.estado_biblioteca == 'dropped' %}estado-abandonada{% endif %}">
+    
+    <a href="{% url 'detalle_serie' serie.id_tmdb %}" class="explorar-card-link">
+        
+        <div class="item-card-poster">
+            <button class="btn-guardado-rapido {% if serie.estado_biblioteca %}guardado-exito{% endif %}" 
+                    data-tooltip="{% if serie.estado_biblioteca %}¡Guardado!{% else %}Guardar{% endif %}" 
+                    data-serie-id="{{ serie.id_tmdb }}">
+                {% if serie.estado_biblioteca %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                    </svg>
+                {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                {% endif %}
+            </button>
+
+            {% if serie.poster_path and serie.poster_path != "" %}
+                <img src="{{ serie.poster_path }}" alt="{{ serie.titulo }}" loading="lazy">
+            {% else %}
+                <div class="item-poster-vacio">Sin póster</div>
+            {% endif %}
+        </div>
+
+        <div class="item-card-meta">
+            <h3>{{ serie.titulo }}</h3>
+        </div>
+    </a>
+
+    <div class="popover-emergente-tarjeta oculto-total">
+        <div class="preview-contenido-real">
+            <span class="preview-tag-nota">★ {{ serie.calificacion|floatformat:1|default:"—" }}</span>
+            <h4>{{ serie.titulo }}</h4>
+            <div class="preview-meta-datos">
+                {% if serie.total_temporadas %}
+                    <span>{{ serie.total_temporadas }} temps</span>
+                {% endif %}
+            </div>
+            <p class="preview-generos">{{ serie.generos|default:"" }}</p>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="explorar-no-data">
+    <p style="margin: 0; color: #887b78; font-weight: 600;">El catálogo de exploración está listo para recibir tus series.</p>
+</div>
+{% endfor %}

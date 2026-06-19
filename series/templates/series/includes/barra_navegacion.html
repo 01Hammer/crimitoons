@@ -21,7 +21,7 @@
 
     <div class="nav-enlaces">
       <a href="{% url 'buscar_series' %}" class="enlace-explorar">Explorar</a>
-      <a href="#" class="enlace-comunidad">Comunidad</a>
+      <a href="{% url 'comunidad' %}" class="enlace-comunidad {% if nav_url == 'comunidad' %}activo{% endif %}">Comunidad</a>
 
       <div class="nav-auth-zona">
         {% if request.resolver_match.url_name == 'index_invitado' and not user.is_authenticated %}
@@ -74,9 +74,12 @@
 {% endif %}
 
 {% if nav_url == 'detalle_serie' or nav_url == 'ver_perfil' or nav_url == 'ver_perfil_amigo' %}
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var barraWrapper = document.querySelector(".nav-barra-wrapper");
+    var profileDropdown = document.querySelector(".profile-dropdown");
+    var timerMenuFoto; // El contador para el desplegable de la foto
 
     if (barraWrapper) {
       // RADAR MATEMÁTICO DE VISIÓN CONTINUA
@@ -85,18 +88,21 @@
 
         // Verificamos si el dropdown de perfil está desplegado
         var isMenuOpen = barraWrapper.querySelector(".dropdown-menu.active");
-        if (isMenuOpen) return; // Si está abierto, bloqueamos el menú visible
 
-        /* EL OJO MATEMÁTICO:
-          - Si el mouse está en la zona superior (0 a 85 píxeles del techo): "VE" el menú y lo activa.
-          - Si el mouse baja de 85 píxeles, inmediatamente "VE" que está fuera y lo esconde.
+        /* Si el menú de la foto está abierto, el navbar se congela arriba pase lo que pase con cursorY,
+          PERO ya no usamos 'return;' para dejar que el mouse se mueva libremente y el hover funcione.
         */
-        if (cursorY <= 84) {
+        if (isMenuOpen) {
           barraWrapper.classList.add("nav-active");
         } else {
-          // Solo se cierra si el mouse bajó y no está físicamente sobre el dropdown extendido
-          if (!barraWrapper.matches(':hover')) {
-            barraWrapper.classList.remove("nav-active");
+          /* EL OJO MATEMÁTICO NORMAL: Solo corre si el mini-desplegable está cerrado */
+          if (cursorY <= 84) {
+            barraWrapper.classList.add("nav-active");
+          } else {
+            // Si el mouse bajó y no está físicamente sobre el wrapper extendido, se esconde normal
+            if (!barraWrapper.matches(':hover')) {
+              barraWrapper.classList.remove("nav-active");
+            }
           }
         }
       });
@@ -110,11 +116,44 @@
       });
     }
 
-    // CONTROL DEL DROPDOWN (Clicks en perfil)
+    /* ==========================================================================
+       EL CONTADOR AUTOMÁTICO (MOMENTO 1 Y MOMENTO 2)
+       ========================================================================== */
+    if (profileDropdown) {
+      var targetMenu = profileDropdown.querySelector(".dropdown-menu");
+
+      // Si el mouse entra al área del perfil o de su desplegable, limpiamos el contador
+      profileDropdown.addEventListener("mouseenter", function() {
+        if (timerMenuFoto) clearTimeout(timerMenuFoto);
+      });
+
+      // Cuando el mouse SALE del desplegable/perfil, arranca la cuenta regresiva
+      profileDropdown.addEventListener("mouseleave", function() {
+        if (targetMenu && targetMenu.classList.contains("active")) {
+          
+          // Guardamos el temporizador (ejemplo: 2 segundos = 2000ms)
+          timerMenuFoto = setTimeout(function() {
+            targetMenu.classList.remove("active");
+            
+            // Verificación post-cierre automática:
+            // Si tras cerrarse el menú el mouse ya no está en el navbar, este se esconde de inmediato (Momento 1)
+            // Si el mouse sigue dentro del navbar, el navbar se queda activo (Momento 2)
+            if (barraWrapper && !barraWrapper.matches(':hover')) {
+              barraWrapper.classList.remove("nav-active");
+            }
+          }, 1000); 
+        }
+      });
+    }
+
+    // CONTROL DEL DROPDOWN (Clicks opcionales en perfil)
     document.addEventListener("click", function (event) {
       var targetProfile = event.target.closest(".profile-dropdown");
       
       if (targetProfile) {
+        if (event.target.closest(".dropdown-menu a")) {
+          return;
+        }
         event.preventDefault();
         event.stopPropagation();
         
@@ -123,12 +162,11 @@
           targetMenu.classList.toggle("active");
         }
       } else {
-        // Cerrar si se hace click fuera
+        // Cerrar inmediatamente si se hace click fuera
         document.querySelectorAll(".dropdown-menu.active").forEach(function (openMenu) {
           openMenu.classList.remove("active");
         });
 
-        // Verificación de radar post-click
         if (barraWrapper && !barraWrapper.matches(':hover')) {
           barraWrapper.classList.remove("nav-active");
         }
@@ -136,6 +174,6 @@
     });
   });
 </script>
-{% endif %}
 
+{% endif %}
 {% endwith %}

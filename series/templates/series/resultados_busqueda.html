@@ -1,38 +1,293 @@
-{% load static %}
-<!DOCTYPE html>
+{% load static %}<!doctype html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Resultados para: {{ busqueda }}</title>
+    <title>Explorar - CRIMITOONS</title>
     <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1">
     <link rel="stylesheet" href="{% static 'series/index.css' %}?v=1009">
+    <link rel="stylesheet" href="{% static 'series/resultados_busqueda.css' %}?v=1020">
 </head>
 <body>
+{% include 'series/includes/barra_navegacion.html' %}
 
-    {% include 'series/includes/barra_navegacion.html' %}
-
-    <main class="contenedor-landing-ancho">
-        <h2 class="titulo-vitrina">Resultados para de búsqueda: "{{ busqueda }}"</h2>
-
-        {% if resultados %}
-            <div class="grid-series-horizontal">
-                {% for serie in resultados %}
-                    <div class="mini-tarjeta">
-                        {% if serie.poster_path %}
-                            <img src="https://image.tmdb.org/t/p/w300{{ serie.poster_path }}" alt="{{ serie.name }}" class="mini-poster">
-                        {% else %}
-                            <div class="mini-poster" style="background-color: #14171c; display: flex; align-items: center; justify-content: center; color: #9ab0c1;">Sin póster</div>
-                        {% endif %}
-                        <div class="mini-info">
-                            <h3>{{ serie.name }}</h3>
-                            <span>Lanzamiento: {{ serie.first_air_date|slice:":4" }}</span> </div>
-                    </div>
-                {% endfor %}
+<div class="explorar-interface-wrapper">
+    <form action="" method="GET" class="explorar-form-dinamico" id="explorar-form">
+        
+        <!-- Línea 1: Buscador + Selectores Rápidos Redondeados -->
+        <div class="explorar-linea-superior">
+            <div class="search-bar-container">
+                <span class="search-bar-icon">🔍</span>
+                <input type="text" name="q" value="{{ busqueda|default:'' }}" placeholder="Buscar por título, personajes..." class="input-busqueda-minimal" id="input-busqueda">
             </div>
-        {% else %}
-            <p style="color: #9ab0c1; font-size: 1.1rem; margin-top: 20px;">No se encontraron series de animación que coincidan con tu búsqueda. Recuerda que este espacio es exclusivo para series animadas.</p>
-        {% endif %}
-    </main>
 
+            <div class="selectores-rapidos-inline">
+                <select name="genero" class="select-redondeado" id="filtro-genero">
+                    <option value="">Todos los géneros</option>
+                    <option value="Animation"{% if request.GET.genero == 'Animation' %} selected{% endif %}>Animación</option>
+                    <option value="Action"{% if request.GET.genero == 'Action' %} selected{% endif %}>Acción</option>
+                    <option value="Adventure"{% if request.GET.genero == 'Adventure' %} selected{% endif %}>Aventura</option>
+                    <option value="Comedy"{% if request.GET.genero == 'Comedy' %} selected{% endif %}>Comedia</option>
+                    <option value="Drama"{% if request.GET.genero == 'Drama' %} selected{% endif %}>Drama</option>
+                    <option value="Sci-Fi"{% if request.GET.genero == 'Sci-Fi' %} selected{% endif %}>Ciencia Ficción</option>
+                    <option value="Fantasy"{% if request.GET.genero == 'Fantasy' %} selected{% endif %}>Fantasía</option>
+                    <option value="Family"{% if request.GET.genero == 'Family' %} selected{% endif %}>Familiar</option>
+                    <option value="Mystery"{% if request.GET.genero == 'Mystery' %} selected{% endif %}>Misterio</option>
+                    <option value="Music"{% if request.GET.genero == 'Music' %} selected{% endif %}>Musical</option>
+                </select>
+
+                <select name="estado" class="select-redondeado" id="filtro-estado">
+                    <option value="">Cualquier estado</option>
+                    <option value="airing"{% if request.GET.estado == 'airing' %} selected{% endif %}>En Emisión</option>
+                    <option value="ended"{% if request.GET.estado == 'ended' %} selected{% endif %}>Finalizada</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Línea 2: Ordenar por a la izquierda // Ajustes Quirúrgicos y Compilación a la derecha -->
+        <div class="explorar-linea-inferior">
+            <div class="ordenar-por-container">
+                <span class="label-ordenar">ORDENAR POR:</span>
+                <select name="orden" class="select-orden-texto" id="filtro-orden">
+                    <option value="populares"{% if request.GET.orden == 'populares' or not request.GET.orden %} selected{% endif %}>Más Populares</option>
+                    <option value="recientes"{% if request.GET.orden == 'recientes' %} selected{% endif %}>Añadidos Recientes</option>
+                    <option value="puntuacion"{% if request.GET.orden == 'puntuacion' %} selected{% endif %}>Mejor Valorados</option>
+                </select>
+            </div>
+
+            <div class="zona-ajustes-compilacion">
+                <!-- Aquí se irán compilando visualmente los filtros activos -->
+                <div class="tags-filtros-compilados" id="contenedor-tags"></div>
+                
+                <button type="button" class="btn-ajustes-quirurgicos" id="btn-toggle-ajustes">
+                    Avanzados</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Panel Desplegable (Cerrado por defecto, empuja el contenido al abrirse) -->
+        <div class="panel-ajustes-quirurgicos oculto-panel" id="panel-quirurgico">
+            <div class="panel-contenido-interno">
+                <!-- Aquí meteremos los filtros más profundos (Rango de años, país, etc.) -->
+                <p style="margin:0; color:#887b78; font-size:0.9rem;">Opciones de Filtro avanzado (Próximamente)...</p>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<div class="viewport-wrapper-explorar">
+    <main class="tab-content-viewport">
+        <h2 class="explorar-render-titulo" style="display: none;">Descubrir Series Animadas</h2>
+
+        <div class="explorar-clean-grid" id="explorar-grid">
+            {% include "series/includes/tarjeta_explorar.html" %}
+        </div>
+
+        <div id="scroll-sentinel" style="height:1px;width:100%"></div>
+        <div class="explorar-loading" id="explorar-loading" style="display:none;text-align:center;padding:20px; color: #887b78; font-weight: 600;">
+            <span>Cargando...</span>
+        </div>
+    </main>
+</div>
+
+<script>
+(function(){
+    var form = document.getElementById('explorar-form');
+    var grid = document.getElementById('explorar-grid');
+    var sentinel = document.getElementById('scroll-sentinel');
+    var loading = document.getElementById('explorar-loading');
+    var btnAjustes = document.getElementById('btn-toggle-ajustes');
+    var panelQuirurgico = document.getElementById('panel-quirurgico');
+    
+    var currentPage = 1;
+    var loadingData = false;
+    
+    var hasMore = {{ has_next|yesno:"true,false" }};
+    console.log("=== DIAGNÓSTICO INICIAL ===");
+    console.log("¿Django dice que hay más páginas?:", hasMore);
+
+    if(btnAjustes && panelQuirurgico) {
+        btnAjustes.addEventListener('click', function() {
+            panelQuirurgico.classList.toggle('oculto-panel');
+        });
+    }
+
+    function buildUrl(page){
+        var params = new URLSearchParams(new FormData(form));
+        params.set('page', page);
+        params.set('format', 'json');
+        return window.location.pathname + '?' + params.toString();
+    }
+
+    function loadPage(page){
+        if(loadingData || !hasMore) {
+            console.log("Carga cancelada. ¿Ya está cargando?:", loadingData, "| ¿Tiene más páginas?:", hasMore);
+            return;
+        }
+        loadingData = true;
+        
+        if(loading) loading.style.display = 'block';
+        
+        var url = buildUrl(page);
+        console.log("Disparando Fetch a la URL:", url);
+        
+        fetch(url)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                console.log("Respuesta cruda del Backend:", data);
+                
+                if(data.html && data.html.trim() !== "") {
+                    grid.insertAdjacentHTML('beforeend', data.html);
+                    console.log("¡Tarjetas insertadas con éxito!");
+                } else {
+                    console.warn("¡Atención! El backend no envió HTML o llegó vacío.");
+                }
+                
+                hasMore = data.has_next;
+                currentPage = data.page;
+                
+                console.log("Nuevos estados -> ¿Hay más?:", hasMore, "| Página actual:", currentPage);
+                
+                if(!hasMore && sentinel) {
+                    sentinel.style.display = 'none';
+                }
+                
+                loadingData = false;
+                if(loading) loading.style.display = 'none';
+            })
+            .catch(function(error) {
+                console.error("Error crítico en la petición Fetch:", error);
+                loadingData = false; 
+                if(loading) loading.style.display = 'none';
+            });
+    }
+
+    if(sentinel){
+        console.log("Sentinel detectado en el DOM. Configurando IntersectionObserver...");
+        var obs = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){
+                console.log("¿Sentinel visible en pantalla?:", e.isIntersecting);
+                if(e.isIntersecting && hasMore && !loadingData) {
+                    loadPage(currentPage + 1);
+                }
+            });
+        },{ rootMargin: '300px' });
+        obs.observe(sentinel);
+    } else {
+        console.error("Error: No se encontró el elemento #scroll-sentinel en el HTML.");
+    }
+
+    form.addEventListener('change', function(e){ 
+        if(e.target.id !== 'btn-toggle-ajustes') {
+            currentPage = 1;
+            hasMore = true;
+            if(sentinel) sentinel.style.display = 'block';
+            if(loading) loading.style.display = 'block';
+            
+            fetch(buildUrl(1))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if(grid) grid.innerHTML = data.html;
+                    hasMore = data.has_next;
+                    if(!hasMore && sentinel) sentinel.style.display = 'none';
+                    if(loading) loading.style.display = 'none';
+                    
+                    var urlPublica = buildUrl(1).replace('&format=json', '');
+                    window.history.pushState({}, '', urlPublica);
+                })
+                .catch(function() {
+                    if(loading) loading.style.display = 'none';
+                });
+        }
+    });
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+    const contenedorTarjetas = document.querySelector('.explorar-grid-resultados') || document.body;
+
+    contenedorTarjetas.addEventListener('click', function(e) {
+        const boton = e.target.closest('.btn-guardado-rapido');
+        if (!boton) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const tarjeta = boton.closest('.explorar-item-card');
+        const idTmdb = boton.getAttribute('data-serie-id');
+        const tituloSerie = tarjeta.querySelector('h3') ? tarjeta.querySelector('h3').innerText : 'Serie';
+        const imagenNode = tarjeta.querySelector('.item-card-poster img');
+        const posterPath = imagenNode ? imagenNode.getAttribute('src') : null;
+
+        if (boton.classList.contains('guardado-exito')) {
+            return;
+        }
+
+        boton.style.pointerEvents = 'none';
+        boton.style.opacity = '0.6';
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        fetch('/guardar-rapido/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                id_tmdb: idTmdb,
+                titulo: tituloSerie,
+                poster_path: posterPath
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                boton.classList.add('guardado-exito');
+                boton.setAttribute('data-tooltip', '¡Guardado por ver!');
+                
+                // CORRECCIÓN 1: Se había cortado la letra "b" en "boton.innerHTML"
+                boton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                    </svg>
+                `;
+                
+                // CORRECCIÓN 2: Pintar la tarjeta completa con el degradado amatista
+                tarjeta.classList.add('estado-por-ver');
+    
+                boton.style.pointerEvents = 'auto';
+                boton.style.opacity = '1';
+                
+                // CORRECCIÓN 3: Quitar el foco activo para que el navegador no lo mantenga seleccionado
+                boton.blur();
+
+            } else {
+                alert('Error al guardar: ' + data.message);
+                boton.style.pointerEvents = 'auto';
+                boton.style.opacity = '1';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            boton.style.pointerEvents = 'auto';
+            boton.style.opacity = '1';
+        });
+    });
+});
+</script>
 </body>
 </html>
