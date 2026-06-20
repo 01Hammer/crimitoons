@@ -37,14 +37,29 @@
 
     <div class="popover-emergente-tarjeta oculto-total">
         <div class="preview-contenido-real">
-            <span class="preview-tag-nota">★ {{ serie.calificacion|floatformat:1|default:"—" }}</span>
-            <h4>{{ serie.titulo }}</h4>
-            <div class="preview-meta-datos">
-                {% if serie.total_temporadas %}
-                    <span>{{ serie.total_temporadas }} temps</span>
-                {% endif %}
+            
+            <div class="preview-bloque-nota" style="margin-bottom: 6px;">
+                <span class="preview-tag-nota" style="font-weight: bold; color: #ff9500; font-size: 0.95em;">
+                    ★ {{ serie.calificacion|floatformat:1|default:"—" }}
+                </span>
             </div>
-            <p class="preview-generos">{{ serie.generos|default:"" }}</p>
+            
+            {% if serie.total_temporadas %}
+                <div class="preview-bloque-temps" style="margin-bottom: 6px;">
+                    <span class="preview-tag-temps" style="color: #e0dcdb; font-weight: 500; font-size: 0.85em;">
+                        {{ serie.total_temporadas }} {% if serie.total_temporadas == 1 %}temp{% else %}temps{% endif %}
+                    </span>
+                </div>
+            {% endif %}
+            
+            {% if serie.generos %}
+                <div class="preview-bloque-generos">
+                    <p class="preview-generos" style="margin: 0; font-size: 0.85em; color: #bfaea8; line-height: 1.4;">
+                        {{ serie.generos }}
+                    </p>
+                </div>
+            {% endif %}
+            
         </div>
     </div>
 </div>

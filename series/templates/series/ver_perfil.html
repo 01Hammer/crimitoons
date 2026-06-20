@@ -6,8 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Perfil de {{ usuario.username }} - CRIMITOONS</title>
     <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1" />
-    <link rel="stylesheet" href="{% static 'series/miperfil/ver_perfil.css' %}" />
-    <link rel="stylesheet" href="{% static 'series/miperfil/menus_perfil.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'series/miperfil/ver_perfil.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'series/miperfil/menus_perfil.css' %}"
+    />
   </head>
   <body>
     {% include 'series/includes/barra_navegacion.html' %}
@@ -15,7 +21,6 @@
     <div class="perfil-banner-wrapper">
       {% if perfil.banner %}
       <img src="{{ perfil.banner.url }}" class="perfil-banner-blur" />
-
       <img
         src="{{ perfil.banner.url }}"
         alt="Banner"
@@ -62,13 +67,11 @@
           {% if perfil.bio %}
           <div>
             <h2>Sobre mí</h2>
-
             <div class="sandbox-dinamico-wrapper">
               <div class="sandbox-box-item">
                 🎯 Box 1: Viendo actualmente...
               </div>
               <div class="sandbox-box-item">⭐ Serie Favorita: Hilda</div>
-
               <div class="bio-texto-wrapper">{{ perfil.bio }}</div>
             </div>
           </div>
@@ -132,87 +135,86 @@
           </div>
           {% endif %}
 
-          <div class="seccion-actividad">
-            <h2>Actividad Reciente</h2>
-            <div class="actividad-box">
-              {% if actividad %} {% for item in actividad %}
-              <div class="actividad-item-row">
-                <span>{{ item.texto }}</span>
-                <span class="actividad-tiempo-label">{{ item.tiempo }}</span>
-              </div>
-              {% endfor %} {% else %}
-              <p class="sin-actividad-text">
-                Este usuario aún no tiene actividad reciente...
-              </p>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-<!-- ... (Todo el código anterior del grid se mantiene exactamente igual) ... -->
-      </div> <!-- Cierre de .perfil-layout-grid -->
-
-      <!-- El menú horizontal es lo último que se queda en el contenedor estrecho -->
-      <nav class="perfil-menu-tabs">
-          <button class="tab-btn active" data-tab="actividad">Actividad</button>
-          <button class="tab-btn" data-tab="biblioteca">Biblioteca</button>
-          <button class="tab-btn" data-tab="favoritos">Favoritos</button>
-          <button class="tab-btn" data-tab="estadisticas">Estadísticas</button>
-          <button class="tab-btn" data-tab="aportes">Aportes</button>
-      </nav>
-
-    </div> <!-- 🌟 ¡MUEVE ESTE CIERRE AQUÍ! Cierra el .perfil-container justo debajo del menú -->
-
-    <!-- Ahora el viewport-wrapper está suelto en el body y puede expandirse de forma natural -->
-    <div class="viewport-wrapper">
-      <div class="tab-content-viewport">
-
-        <div id="tab-actividad" class="tab-content-section" style="display: block;">
-            {% include "series/Mi_perfil/actividad.html" %}
-        </div>
-
-        <div id="tab-biblioteca" class="tab-content-section" style="display: none;">
-            {% include "series/Mi_perfil/biblioteca.html" %}
-        </div>
-
-        <div id="tab-favoritos" class="tab-content-section" style="display: none;">
-            {% include "series/Mi_perfil/favoritos.html" %}
-        </div>
-
-        <div id="tab-estadisticas" class="tab-content-section" style="display: none;">
-            <p>Aquí irán tus Gráficos y Estadísticas detalladas.</p>
-        </div>
-
-        <div id="tab-aportes" class="tab-content-section" style="display: none;">
-            {% include "series/Mi_perfil/aportes.html" %}
+          <div class="bloque-espacio-auxiliar"></div>
         </div>
       </div>
-    </div> <!-- Cierre de .viewport-wrapper -->
+      <nav class="perfil-menu-tabs">
+        <button class="tab-btn active" data-tab="actividad">Actividad</button>
+        <button class="tab-btn" data-tab="biblioteca">Biblioteca</button>
+        <button class="tab-btn" data-tab="favoritos">Favoritos</button>
+        <button class="tab-btn" data-tab="estadisticas">Estadísticas</button>
+        <button class="tab-btn" data-tab="aportes">Aportes</button>
+      </nav>
+    </div>
+    <div class="viewport-wrapper">
+      <div class="tab-content-viewport">
+        <div
+          id="tab-actividad"
+          class="tab-content-section"
+          style="display: block"
+        >
+          {% include "series/Mi_perfil/actividad.html" %}
+        </div>
 
-</body>
-  <!-- Script: navegar entre páginas -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const tabs = document.querySelectorAll(".perfil-menu-tabs .tab-btn");
-        const contents = document.querySelectorAll(".tab-content-viewport .tab-content-section");
+        <div
+          id="tab-biblioteca"
+          class="tab-content-section"
+          style="display: none"
+        >
+          {% include "series/Mi_perfil/biblioteca.html" %}
+        </div>
 
-        tabs.forEach(tab => {
-            tab.addEventListener("click", function () {
-                const targetTab = this.getAttribute("data-tab");
+        <div
+          id="tab-favoritos"
+          class="tab-content-section"
+          style="display: none"
+        >
+          {% include "series/Mi_perfil/favoritos.html" %}
+        </div>
 
-                // 1. Cambiar el estado activo en los botones visuales
-                tabs.forEach(t => t.classList.remove("active"));
-                this.classList.add("active");
+        <div
+          id="tab-estadisticas"
+          class="tab-content-section"
+          style="display: none"
+        >
+          <p>Aquí irán tus Gráficos y Estadísticas detalladas.</p>
+        </div>
 
-                // 2. Recorrer los contenedores y alternar visibilidad de forma automática
-                contents.forEach(content => {
-                    if (content.id === `tab-${targetTab}`) {
-                        content.style.display = "block";
-                    } else {
-                        content.style.display = "none";
-                    }
-                });
-            });
-        });
+        <div id="tab-aportes" class="tab-content-section" style="display: none">
+          {% include "series/Mi_perfil/aportes.html" %}
+        </div>
+      </div>
+    </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const tabs = document.querySelectorAll(".perfil-menu-tabs .tab-btn");
+    const contents = document.querySelectorAll(".tab-content-viewport .tab-content-section");
+
+    function activarTab(targetTab) {
+      tabs.forEach((tab) => {
+        tab.classList.toggle("active", tab.getAttribute("data-tab") === targetTab);
+      });
+
+      contents.forEach((content) => {
+        const esContenidoActivo = content.id === `tab-${targetTab}`;
+        content.style.display = esContenidoActivo ? "block" : "none";
+
+        if (esContenidoActivo && targetTab === "biblioteca") {
+          const btnPendiente = content.querySelector('.tab-biblioteca-enlace[data-tab="plan_to_watch"]');
+          if (btnPendiente) {
+            btnPendiente.click();
+          }
+        }
+      });
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", function () {
+        activarTab(this.getAttribute("data-tab"));
+      });
     });
+  });
 </script>
+  </body>
 </html>

@@ -245,79 +245,79 @@
    🟢 CONTROL DE ESTADOS (SISTEMA DE COLORES VIDRIOSOS LISTO)
    ========================================================================== */
 
-/* 1. MORADO AMATISTA: Por Ver (Guardado Rápido) */
+/* 1. MORADO AMATISTA: Pendiente (Guardado Rápido) */
 .explorar-item-card.estado-por-ver {
     background: linear-gradient(
         135deg, 
-        rgba(155, 89, 182, 0.22) 0%, 
-        rgba(155, 89, 182, 0.05) 100%
+        rgba(155, 89, 182, 0.32) 0%, 
+        rgba(155, 89, 182, 0.10) 100%
     ) !important;
-    border-color: rgba(155, 89, 182, 0.40) !important;
+    border-color: rgba(155, 89, 182, 0.58) !important;
 }
 .explorar-item-card.estado-por-ver:hover {
-    background: linear-gradient(135deg, rgba(155, 89, 182, 0.32) 0%, rgba(155, 89, 182, 0.10) 100%) !important;
-    border-color: rgba(155, 89, 182, 0.55) !important;
-    box-shadow: 0 12px 30px rgba(155, 89, 182, 0.12);
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.42) 0%, rgba(155, 89, 182, 0.16) 100%) !important;
+    border-color: rgba(155, 89, 182, 0.75) !important;
+    box-shadow: 0 10px 25px rgba(40, 30, 25, 0.08);
 }
 
 /* 2. AZUL ZAFIRO: Viendo */
 .explorar-item-card.estado-viendo {
     background: linear-gradient(
         135deg, 
-        rgba(0, 122, 255, 0.20) 0%, 
-        rgba(0, 122, 255, 0.05) 100%
+        rgba(0, 122, 255, 0.30) 0%, 
+        rgba(0, 122, 255, 0.10) 100%
     ) !important;
-    border-color: rgba(0, 122, 255, 0.35) !important;
+    border-color: rgba(0, 122, 255, 0.55) !important;
 }
 .explorar-item-card.estado-viendo:hover {
-    background: linear-gradient(135deg, rgba(0, 122, 255, 0.30) 0%, rgba(0, 122, 255, 0.10) 100%) !important;
-    border-color: rgba(0, 122, 255, 0.50) !important;
-    box-shadow: 0 12px 30px rgba(0, 122, 255, 0.12);
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.40) 0%, rgba(0, 122, 255, 0.16) 100%) !important;
+    border-color: rgba(0, 122, 255, 0.75) !important;
+    box-shadow: 0 10px 25px rgba(40, 30, 25, 0.08);
 }
 
 /* 3. VERDE ESMERALDA: Completada */
 .explorar-item-card.estado-completada {
     background: linear-gradient(
         135deg, 
-        rgba(52, 199, 89, 0.18) 0%, 
-        rgba(52, 199, 89, 0.04) 100%
+        rgba(52, 199, 89, 0.28) 0%, 
+        rgba(52, 199, 89, 0.08) 100%
     ) !important;
-    border-color: rgba(52, 199, 89, 0.35) !important;
+    border-color: rgba(52, 199, 89, 0.55) !important;
 }
 .explorar-item-card.estado-completada:hover {
-    background: linear-gradient(135deg, rgba(52, 199, 89, 0.28) 0%, rgba(52, 199, 89, 0.08) 100%) !important;
-    border-color: rgba(52, 199, 89, 0.50) !important;
-    box-shadow: 0 12px 30px rgba(52, 199, 89, 0.10);
+    background: linear-gradient(135deg, rgba(52, 199, 89, 0.38) 0%, rgba(52, 199, 89, 0.14) 100%) !important;
+    border-color: rgba(52, 199, 89, 0.75) !important;
+    box-shadow: 0 10px 25px rgba(40, 30, 25, 0.08);
 }
 
 /* 4. AMARILLO/NARANJA TOPACIO: Pausada */
 .explorar-item-card.estado-pausada {
     background: linear-gradient(
         135deg, 
-        rgba(255, 149, 0, 0.16) 0%, 
-        rgba(255, 149, 0, 0.04) 100%
+        rgba(255, 149, 0, 0.28) 0%, 
+        rgba(255, 149, 0, 0.08) 100%
     ) !important;
-    border-color: rgba(255, 149, 0, 0.38) !important;
+    border-color: rgba(255, 149, 0, 0.58) !important;
 }
 .explorar-item-card.estado-pausada:hover {
-    background: linear-gradient(135deg, rgba(255, 149, 0, 0.26) 0%, rgba(255, 149, 0, 0.08) 100%) !important;
-    border-color: rgba(255, 149, 0, 0.52) !important;
-    box-shadow: 0 12px 30px rgba(255, 149, 0, 0.08);
+    background: linear-gradient(135deg, rgba(255, 149, 0, 0.38) 0%, rgba(255, 149, 0, 0.14) 100%) !important;
+    border-color: rgba(255, 149, 0, 0.75) !important;
+    box-shadow: 0 10px 25px rgba(40, 30, 25, 0.08);
 }
 
 /* 5. ROJO RUBÍ: Abandonada */
 .explorar-item-card.estado-abandonada {
     background: linear-gradient(
         135deg, 
-        rgba(255, 59, 48, 0.18) 0%, 
-        rgba(255, 59, 48, 0.04) 100%
+        rgba(255, 59, 48, 0.28) 0%, 
+        rgba(255, 59, 48, 0.08) 100%
     ) !important;
-    border-color: rgba(255, 59, 48, 0.35) !important;
+    border-color: rgba(255, 59, 48, 0.55) !important;
 }
 .explorar-item-card.estado-abandonada:hover {
-    background: linear-gradient(135deg, rgba(255, 59, 48, 0.28) 0%, rgba(255, 59, 48, 0.08) 100%) !important;
-    border-color: rgba(255, 59, 48, 0.50) !important;
-    box-shadow: 0 12px 30px rgba(255, 59, 48, 0.12);
+    background: linear-gradient(135deg, rgba(255, 59, 48, 0.38) 0%, rgba(255, 59, 48, 0.14) 100%) !important;
+    border-color: rgba(255, 59, 48, 0.75) !important;
+    box-shadow: 0 10px 25px rgba(40, 30, 25, 0.08);
 }
 
 .btn-guardado-rapido.guardado-exito {
@@ -518,10 +518,18 @@
     border: 1px solid #3d262b;
     border-radius: 10px;
     padding: 12px;
+    color: #f7f3e3;                /* Color de texto base claro por defecto */
 }
 
 /* Comportamiento al pasar el mouse */
 .explorar-item-card:hover .popover-emergente-tarjeta {
     display: block !important;
     opacity: 1;
+}
+
+/* Invierte la orientación del popover exclusivamente en la tarjeta número 6, 12, 18... */
+.explorar-item-card:nth-child(6n) .popover-emergente-tarjeta,
+.explorar-item-card.tarjeta-borde-derecho .popover-emergente-tarjeta {
+    left: auto !important;
+    right: calc(100% + 6px) !important;
 }

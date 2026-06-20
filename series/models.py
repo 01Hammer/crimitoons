@@ -167,3 +167,36 @@ class CustomEpisodeListEntry(models.Model):
 
     def __str__(self):
         return f"{self.custom_episode_list.name} - {self.serie.titulo} S{self.season_number}E{self.episode_number}"
+
+class HistorialActividad(models.Model):
+    class TipoAccion(models.TextChoices):
+        PLAN_TO_WATCH = 'plan_to_watch', 'Por Ver'
+        WATCHING = 'watching', 'Viendo'
+        COMPLETED = 'completed', 'Completada'
+        PAUSED = 'paused', 'Pausada'
+        DROPPED = 'dropped', 'Abandonada'
+
+    perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name='historial_actividades')
+    serie = models.ForeignKey(Serie, on_delete=models.CASCADE, related_name='historial_eventos')
+    
+    # Guarda qué hizo el usuario
+    accion = models.CharField(max_length=20, choices=TipoAccion.choices)
+    
+    # Capturas del momento exacto en que se creó la tarjeta
+    score_momento = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    comment_momento = models.TextField(blank=True, null=True, max_length=1000)
+    
+    # Tu decisión final: 1 Imagen opcional para la captura favorita
+    captura_favorita = models.ImageField(upload_to='capturas_actividad/', null=True, blank=True)
+    
+    # REGLA 1: Guardado silencioso (para ocultarlo del muro si da vergüenza)
+    es_silencioso = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Historial de actividades'
+
+    def __str__(self):
+        return f"{self.perfil.usuario.username} - {self.get_accion_display()} - {self.serie.titulo}"

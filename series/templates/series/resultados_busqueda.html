@@ -203,7 +203,22 @@
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
-    const contenedorTarjetas = document.querySelector('.explorar-grid-resultados') || document.body;
+    const contenedorTarjetas = document.getElementById('explorar-grid') || document.body;
+
+    // El popover va a la derecha salvo en la sexta tarjeta de cada fila.
+    contenedorTarjetas.addEventListener('mouseenter', function(e) {
+        const tarjeta = e.target.closest('.explorar-item-card');
+        if (!tarjeta) return;
+
+        const tarjetas = Array.from(contenedorTarjetas.querySelectorAll('.explorar-item-card'));
+        const posicion = tarjetas.indexOf(tarjeta) + 1;
+
+        if (posicion % 6 === 0) {
+            tarjeta.classList.add('tarjeta-borde-derecho');
+        } else {
+            tarjeta.classList.remove('tarjeta-borde-derecho');
+        }
+    }, true);
 
     contenedorTarjetas.addEventListener('click', function(e) {
         const boton = e.target.closest('.btn-guardado-rapido');
@@ -259,20 +274,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 boton.classList.add('guardado-exito');
                 boton.setAttribute('data-tooltip', '¡Guardado por ver!');
                 
-                // CORRECCIÓN 1: Se había cortado la letra "b" en "boton.innerHTML"
                 boton.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
                     </svg>
                 `;
                 
-                // CORRECCIÓN 2: Pintar la tarjeta completa con el degradado amatista
                 tarjeta.classList.add('estado-por-ver');
     
                 boton.style.pointerEvents = 'auto';
                 boton.style.opacity = '1';
                 
-                // CORRECCIÓN 3: Quitar el foco activo para que el navegador no lo mantenga seleccionado
                 boton.blur();
 
             } else {

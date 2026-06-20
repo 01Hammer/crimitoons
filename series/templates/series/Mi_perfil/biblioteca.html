@@ -163,25 +163,29 @@
   {% endfor %}
 </div>
 
+  </main>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const botonesTab = document.querySelectorAll('.tab-biblioteca-enlace');
-    const tarjetas = document.querySelectorAll('.serie-card');
-    const tituloDinamico = document.getElementById('titulo-biblioteca-dinamico');
-    const mensajeVacio = document.getElementById('mensaje-pestaña-vacia');
+    const biblioteca = document.getElementById('tab-biblioteca');
+    if (!biblioteca) return;
+
+    const botonesTab = biblioteca.querySelectorAll('.tab-biblioteca-enlace');
+    const tarjetas = biblioteca.querySelectorAll('.serie-card');
+    const tituloDinamico = biblioteca.querySelector('#titulo-biblioteca-dinamico');
+    const mensajeVacio = biblioteca.querySelector('#mensaje-pestaña-vacia');
 
     function filtrarBiblioteca(estadoObjetivo, textoTitulo) {
         let contadorVisibles = 0;
-        
-        tituloDinamico.textContent = textoTitulo;
+        if (tituloDinamico) tituloDinamico.textContent = textoTitulo;
 
         tarjetas.forEach(tarjeta => {
             if (tarjeta.getAttribute('data-estado') === estadoObjetivo) {
-                tarjeta.style.display = '';
+                tarjeta.style.setProperty('display', 'block', 'important');
                 contadorVisibles++;
             } else {
-                tarjeta.style.display = 'none';
+                tarjeta.style.setProperty('display', 'none', 'important');
             }
         });
 
@@ -193,7 +197,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     botonesTab.forEach(boton => {
-        boton.addEventListener('click', function() {
+        boton.addEventListener('click', function(e) {
+            e.preventDefault(); // Evitar que interfiera con el menú del perfil general
             botonesTab.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
 
@@ -204,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // MODIFICADO: Arrancar mostrando por defecto "Por ver" (plan_to_watch) al cargar la biblioteca
-    filtrarBiblioteca('plan_to_watch', 'Series Por ver');
+    // Quitamos la línea que ejecutaba el filtro automáticamente al cargar
+    // para que no rompa el flujo de ver_perfil.html al inicio.
 });
 </script>

@@ -13,4 +13,5 @@ env/
 # Base de datos local (por si acaso)
 *.sqlite3
 
+#perfecto, asi que son 3 pasos los que debo hacer cada dia: git add . para recopilar todo y tenerlo empaquetado. git commit -m "" es como la explicacion de lo que hicimos hoy. git push origin main, sube todos los archivos a la nube.
 .env

@@ -1,76 +1,95 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crimitoons - Actividad de Perfil</title>
-    <!-- Enlace al nuevo archivo de estilos dedicado -->
-    <link rel="stylesheet" href="{% static 'series/miperfil/menus_perfil.css' %}" />
-</head>
-<body>
 
-    <!-- Contenedor del Layout en dos columnas calibrado (70% / 30%) -->
-    <div class="actividad-layout-grid">
-
-        <!-- ================= COLUMNA IZQUIERDA (70%): HISTORIAL COMENTADO ================= -->
-        <section class="actividad-col-principal">
+<!-- ================= COLUMNA IZQUIERDA (70%): HISTORIAL COMENTADO ================= -->
+<div class="actividad-layout-grid">
+<section class="actividad-col-principal">
+    
+    {% for registro in actividades %}
+        <!-- Tarjeta de Historial Dinámica -->
+        <div class="historial-card {% if registro.accion == 'completed' %}terminada{% elif registro.accion == 'paused' %}pausada{% elif registro.accion == 'dropped' %}abandonada{% else %}viendo{% endif %}">
             
-            <!-- Tarjeta de Historial: Estado Terminada -->
-            <div class="historial-card terminada">
-                <div class="historial-poster-wrapper">
-                    <!-- Placeholder del póster (En Django usarías tu tag <img>) -->
+            <!-- Botón de Opciones (Tres Puntitos): Solo visible para el dueño del perfil -->
+            {% if es_propietario %}
+                <div class="historial-opciones-dropdown">
+                    <button class="btn-historial-opciones" aria-label="Opciones de actividad">•••</button>
+                    <div class="historial-dropdown-menu">
+                        <a href="#" class="dropdown-item item-editar">Editar</a>
+                        <a href="#" class="dropdown-item item-eliminar">Eliminar tarjeta</a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="historial-poster-wrapper">
+                <!-- Imagen real del póster de la serie vinculada -->
+                {% if registro.serie.poster_path %}
+                    <img src="{{ registro.serie.poster_path }}" alt="{{ registro.serie.titulo }}" class="historial-poster-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />
+                {% else %}
                     <div class="historial-poster-placeholder"></div> 
-                </div>
-                <div class="historial-contenido">
-                    <div class="historial-header-card">
-                        <span class="status-badge status-terminada">Terminada</span>
-                        <span class="historial-nota text-terminada">10.0</span>
-                        <span class="historial-fecha">Hace 2 días</span>
-                    </div>
-                    <h3 class="historial-serie-titulo">Hilda</h3>
-                    <p class="historial-comentario">
-                        El final es una obra maestra absoluta. La atmósfera que maneja la serie y cómo cierra el arco de los personajes es perfecto. Tenía que dejar mi argumento de por qué se lleva un 10 definitivo.
-                    </p>
-                </div>
+                {% endif %}
             </div>
 
-            <!-- Tarjeta de Historial: Estado Pausada -->
-            <div class="historial-card pausada">
-                <div class="historial-poster-wrapper">
-                    <div class="historial-poster-placeholder"></div>
+            <div class="historial-contenido">
+                <!-- Cabecera de la Tarjeta -->
+                <div class="historial-header-card">
+                    <span class="status-badge {% if registro.accion == 'completed' %}status-terminada{% elif registro.accion == 'paused' %}status-pausada{% elif registro.accion == 'dropped' %}status-abandonada{% else %}status-viendo{% endif %}">
+                        {{ registro.get_accion_display }}
+                    </span>
+                    <span class="historial-fecha">Hace {{ registro.created_at|timesince }}</span>
                 </div>
-                <div class="historial-contenido">
-                    <div class="historial-header-card">
-                        <span class="status-badge status-pausada">Pausada</span>
-                        <span class="historial-fecha">Hace 1 semana</span>
-                    </div>
-                    <h3 class="historial-serie-titulo">The Owl House</h3>
-                    <p class="historial-comentario">
-                        La dejé en el inicio de la segunda temporada por falta de tiempo, pero el desarrollo de la magia y Luz me está fascinando. Volveré pronto.
-                    </p>
-                </div>
-            </div>
 
-            <!-- Tarjeta de Historial: Estado Abandonada -->
-            <div class="historial-card abandonada">
-                <div class="historial-poster-wrapper">
-                    <div class="historial-poster-placeholder"></div>
-                </div>
-                <div class="historial-contenido">
-                    <div class="historial-header-card">
-                        <span class="status-badge status-abandonada">Abandonada</span>
-                        <span class="historial-nota text-terminada">2.0</span>
-                        <span class="historial-fecha">Hace 3 semanas</span>
-                    </div>
-                    <h3 class="historial-serie-titulo">Amphibia</h3>
+                <h3 class="historial-serie-titulo">{{ registro.serie.titulo }}</h3>
+                
+                <!-- Comentario de la Reseña -->
+                {% if registro.comment_momento %}
                     <p class="historial-comentario">
-                        No me terminó de enganchar el ritmo de los primeros episodios. Sé que se pone mejor más adelante, pero de momento la suelto.
+                        {{ registro.comment_momento }}
                     </p>
-                </div>
-            </div>
+                {% endif %}
 
-        </section>
+                <!-- Tu decisión: Imagen Opcional de Captura Favorita -->
+                {% if registro.captura_favorita %}
+                    <div class="historial-captura-wrapper" style="margin-top: 12px; max-width: 100%; max-height: 280px; overflow: hidden; border-radius: 6px;">
+                        <img src="{{ registro.captura_favorita.url }}" alt="Captura favorita de {{ registro.serie.titulo }}" style="width: 100%; height: 100%; object-fit: cover;" />
+                    </div>
+                {% endif %}
+
+                <!-- Footer de la Tarjeta: Botonera Interactiva y Calificación Reubicada -->
+                <div class="historial-footer-card" style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.04);">
+                    
+                    <!-- Zona Izquierda o Derecha: Nota numérica si existe -->
+                    <div class="historial-footer-nota">
+                        {% if registro.score_momento %}
+                            <span class="historial-nota-final" style="font-weight: 700; font-size: 1.1rem; color: #2c2c2c;">
+                                ⭐ {{ registro.score_momento|floatformat:1 }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Botonera Interactiva (Ubicación según edited-image_47.png) -->
+                    <div class="historial-acciones-interaccion" style="display: flex; gap: 14px; align-items: center;">
+                        <!-- Botón Comentarios Secundarios -->
+                        <button class="btn-interact-comentario" style="background: none; border: none; cursor: pointer; padding: 4px;" title="Comentar actividad">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        </button>
+                        
+                        <!-- Botón de Like -->
+                        <button class="btn-interact-like" style="background: none; border: none; cursor: pointer; padding: 4px;" title="Me gusta">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    {% empty %}
+        <!-- Estado Vacío si no hay logs del usuario -->
+        <div class="historial-vacio-box" style="text-align: center; padding: 3rem 1rem; color: #8a8a8a; background: #fff; border-radius: 8px; border: 1px dashed rgba(0,0,0,0.1);">
+            <p style="font-size: 1rem; margin: 0;">Aún no tienes movimientos registrados en tu muro de actividad.</p>
+        </div>
+    {% endfor %}
+
+</section>
 
         <!-- ================= COLUMNA DERECHA (30%): VITRINA Y ESTADÍSTICAS ================= -->
         <aside class="actividad-col-lateral">
@@ -157,6 +176,3 @@
         </aside>
 
     </div>
-
-</body>
-</html>
