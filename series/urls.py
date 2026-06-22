@@ -22,4 +22,9 @@ urlpatterns = [
     
     # Acción asíncrona para el botón de guardado rápido
     path('guardar-rapido/', views.guardar_serie_rapido, name='guardar_serie_rapido'),
+    path('actividad/<int:actividad_id>/votar/', views.votar_actividad, name='votar_actividad'),
+
+    # comentarios para las series
+    path('actividad/<int:actividad_id>/comentarios/', views.obtener_comentarios, name='obtener_comentarios'),
+    path('actividad/<int:actividad_id>/comentar/', views.agregar_comentario, name='agregar_comentario'),
 ]

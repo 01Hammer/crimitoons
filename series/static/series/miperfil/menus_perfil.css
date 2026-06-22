@@ -1,141 +1,687 @@
 /* ============ CRIMITOONS: MENUS Y PESTAÑA ACTIVIDAD ============ */
 
-/* Layout Base de Dos Columnas Inteligente (Proporción Áurea 70% / 30%) */
 .actividad-layout-grid {
     display: grid;
-    grid-template-columns: 7fr 3fr;
+    /* CAMBIO CLAVE: Subimos la columna principal a 960px para que las tarjetas sean más anchas */
+    grid-template-columns: minmax(0, 960px) 348px;
     gap: 32px;
     align-items: start;
+    justify-content: center; 
+    max-width: 1230px;       /* Emparejado con el max-width del padre */
+    margin: 0 auto;          
+    width: 100%;
 }
 
 /* ==========================================================================
-   COLUMNA IZQUIERDA: TARJETAS DEL HISTORIAL (70%)
+   COLUMNA IZQUIERDA: TARJETAS DEL HISTORIAL
    ========================================================================== */
 
+   /* ==========================================================================
+   BARRA DE PUBLICACIÓN RÁPIDA
+   ========================================================================== */
+
+.quick-publish-bar {
+    background: rgba(255, 255, 255, 0.45); /* Fondo translúcido sutil */
+    backdrop-filter: blur(4px); /* Suaviza el fondo que pasa por detrás */
+    border-radius: 100px; /* 100% de redondeado para extremos completamente ovalados */
+    border: 1.5px dashed rgba(81, 71, 69, 0.25); /* Línea de borde punteada/discontinua sutil */
+    padding: 10px 24px; /* Más espacio a los lados para acompañar la curvatura */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 5px; /* Separación limpia con la primera tarjeta */
+}
+
+/* Contenedor del campo de texto */
+.publish-input-wrapper {
+    flex-grow: 1;
+}
+
+.publish-input-field {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px; /* Texto más grande */
+    color: rgba(43, 38, 37, 0.9);
+    background: transparent;
+    font-family: inherit;
+}
+
+/* Estilo para el placeholder: más grande y transparente */
+.publish-input-field::placeholder {
+    font-size: 16px; /* Tamaño del texto aumentado */
+    color: rgba(81, 71, 69, 0.5); /* Tono marrón/oscuro con transparencia */
+}
+
+/* Grupo de botones de acción a la derecha */
+.publish-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Botón discreto para Multimedia (Icono lineal) */
+.btn-publish-media {
+    background: none;
+    border: none;
+    color: rgba(81, 71, 69, 0.6);
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-publish-media:hover {
+    color: #b25e38;
+    background-color: rgba(255, 248, 236, 0.8);
+}
+
+/* Botón Sólido de Publicar (Estilo ovalado a juego) */
+.btn-publish-submit {
+    background: #b25e38;
+    color: #ffffff;
+    border: none;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 100px; /* Bordes completamente redondeados también en el botón */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-publish-submit:hover {
+    background: #964e2e;
+}
+
+/* ACTIVITY LOG*/
 .actividad-col-principal {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
+    width: 100%;
 }
 
-/* Tarjeta del historial hablado */
+/* Tarjeta base del historial unificada - ALTURA REDUCIDA Y SIN LUCES */
 .historial-card {
     background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 4px 18px rgba(43, 38, 37, 0.05);
-    padding: 20px;
+    border-radius: 14px;
     display: flex;
-    gap: 22px;
-    border-left: 5px solid transparent;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    min-height: 110px; /* Reducido drásticamente de 155px a 110px */
+    box-shadow: 0 2px 8px rgba(43, 38, 37, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.06); /* Borde plano, limpio y uniforme */
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* Hover general */
 .historial-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(43, 38, 37, 0.09);
+    box-shadow: 0 6px 18px rgba(43, 38, 37, 0.12);
 }
 
-/* Bordes dinámicos según el estado de la serie */
-.historial-card.terminada { border-left-color: #2e7d32; }
-.historial-card.pausada { border-left-color: #b25e38; }
-.historial-card.abandonada { border-left-color: #c62828; }
+/* --- ELIMINADOS LOS BORDES DE COLORES Y EFECTOS LED --- */
+.historial-card.terminada,
+.historial-card.abandonada { 
+    border: 1px solid rgba(0, 0, 0, 0.06); 
+}
 
-/* Contenedor del póster en la tarjeta */
+.historial-card.terminada:hover,
+.historial-card.abandonada:hover,
+.historial-card.pausada:hover,
+.historial-card.viendo:hover {
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* ==========================================================================
+   CONTENEDOR DEL PÓSTER (Se escala con la nueva altura)
+   ========================================================================== */
 .historial-poster-wrapper {
-    width: 90px;
-    height: 130px;
+    width: 82px; /* Reducido de 110px a 82px para mantener la proporción vertical */
+    position: relative;
     flex-shrink: 0;
+    align-self: stretch;
+}
+
+.historial-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    display: block;
 }
 
 .historial-poster-placeholder {
     width: 100%;
     height: 100%;
-    border-radius: 8px;
     background: linear-gradient(135deg, #e7d7c4 0%, #f7f3e3 100%);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* Contenido textual */
+/* ==========================================================================
+   TRES PUNTOS FLOTANTES (Diseño Ultra Discreto y Compacto)
+   ========================================================================== */
+.historial-opciones-dropdown {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* El botón flotante se asoma al hacer hover en la tarjeta */
+.historial-card:hover .historial-opciones-dropdown {
+    opacity: 1;
+}
+
+/* Botón estilizado: Se redujo SOLO el width (y el height para mantenerlo circular) */
+.btn-historial-opciones {
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(4px);
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px; /* Reducido de 20px a 16px para que sea más estrecho y discreto */
+    height: 16px;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.btn-historial-opciones:hover {
+    background: rgba(178, 94, 56, 0.85);
+    color: #ffffff;
+}
+
+/* Menú flotante: Preparado para transición fluida.
+   Cambiamos display: none por opacity y visibility para que soporte la animación.
+*/
+.historial-dropdown-menu {
+    position: absolute;
+    left: 0;
+    top: 22px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    min-width: 84px; /* Ligero ajuste para acompañar el nuevo tamaño de letra */
+    overflow: hidden;
+    
+    /* Estado inicial oculto y desplazado hacia abajo */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+/* CLASE ACTIVA (Controlada suavemente por JavaScript) */
+.historial-dropdown-menu.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+}
+
+/* Mantiene el botón visible si el menú está activo transicionando */
+.historial-opciones-dropdown:has(.historial-dropdown-menu.show) {
+    opacity: 1 !important;
+}
+
+/* Opciones del menú compactas con texto ligeramente mayor */
+.dropdown-item {
+    display: block;
+    padding: 5px 10px;
+    font-size: 12px; /* Incrementado ligeramente de 11px a 12px */
+    color: #514745;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background: #fff8ec;
+    color: #b25e38;
+}
+
+/* Estilo de alerta sutil para la acción de eliminar */
+.dropdown-item.item-eliminar:hover {
+    background: rgba(198, 40, 40, 0.05);
+    color: #c62828;
+}
+
+/* ==========================================================================
+   BLOQUE DE CONTENIDO TEXTUAL
+   ========================================================================== */
 .historial-contenido {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between; /* Fuerza al header arriba y al footer abajo */
+    padding: 12px 18px;             /* Ajustado para el nuevo tamaño compacto */
 }
 
 .historial-header-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 2px;
 }
 
 .header-status-meta {
     display: flex;
     align-items: center;
-    gap: 16px; /* Espaciado entre el badge y el número */
+    gap: 12px;
 }
 
-/* Estilos de la nota gigante y limpia */
-.historial-nota {
-    font-size: 24px;
+/* Calificación Inline al lado del badge */
+.historial-nota-inline {
+    font-size: 13.5px;
     font-weight: 700;
-    line-height: 1;
-}
-
-/* Colores dinámicos para las notas basados en tus estados */
-.text-terminada { color: black; }
-.text-pausada { color: #b25e38; }
-.text-abandonada { color: #c62828; }
-
-/* Badges de estado estilizados */
-.status-badge {
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 20px;
-    letter-spacing: 0.4px;
-}
-
-.status-terminada { background: rgba(46, 125, 50, 0.1); color: #2e7d32; }
-.status-pausada { background: rgba(178, 94, 56, 0.1); color: #b25e38; }
-.status-abandonada { background: rgba(198, 40, 40, 0.1); color: #c62828; }
-
-.historial-fecha {
-    font-size: 12px;
-    color: #887b78;
-}
-
-.historial-serie-titulo {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0 0 10px 0;
     color: #2B2625;
 }
 
-.historial-comentario {
-    font-size: 14.5px;
-    line-height: 1.6;
-    color: #514745;
+/* Badges de estado */
+.status-badge {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.4px;
+}
+
+.status-terminada { background: rgba(46, 125, 50, 0.08); color: #2e7d32; }
+.status-pausada { background: rgba(178, 94, 56, 0.08); color: #b25e38; }
+.status-abandonada { background: rgba(198, 40, 40, 0.08); color: #c62828; }
+.status-viendo { background: rgba(0, 0, 0, 0.05); color: #514745; }
+
+.historial-fecha {
+    font-size: 11.5px;
+    color: #887b78;
+}
+
+/* Título de la Serie - Reducido levemente */
+.historial-serie-titulo {
+    font-size: 17.5px; /* Un poco más pequeño pero sigue resaltando */
+    font-weight: 800; 
     margin: 0;
+    color: #2B2625;
+    line-height: 1.2;
+}
+
+/* 
+   LOGICA DE CENTRADO PARA LOGS RÁPIDOS:
+   Si la tarjeta NO tiene la clase ".tarjeta-detallada", el título se expande
+   con márgenes automáticos verticales, forzándolo a centrarse perfectamente.
+*/
+:not(.tarjeta-detallada) .historial-serie-titulo {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+/* Comentario o Crítica */
+.historial-comentario {
+    font-size: 14px;
+    line-height: 1.5; 
+    color: #514745;
+    margin: 4px 0 6px 0;
+}
+
+/* Estilización de captura opcional */
+.historial-captura-wrapper {
+    margin: 4px 0 6px 0;
+    max-width: 100%;
+    max-height: 140px;
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.historial-captura-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Footer Elástico Interactivo */
+.historial-footer-card {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 2px;
+}
+
+/* 
+    Si la tarjeta cuenta con la clase ".tarjeta-detallada",
+    obligamos al footer a empujarse al fondo de la estructura.
+*/
+.tarjeta-detallada .historial-footer-card {
+    margin-top: auto; 
+}
+
+.historial-acciones-interaccion {
+    display: flex;
+    gap: 17px;
+    align-items: center;
+}
+
+.btn-interact-comentario,
+.btn-interact-like {
+    background: none;
+    border: none;
+    color: #887b78;
+    cursor: pointer;
+    padding: 2px;
+    transition: color 0.2s ease;
+}
+
+.btn-interact-comentario:hover,
+.btn-interact-like:hover {
+    color: #b25e38;
+}
+
+/* ============================================= */
+/* NUEVAS REGLAS AÑADIDAS */
+/* ============================================= */
+
+.btn-interact-dislike {
+    background: none;
+    border: none;
+    color: #887b78;
+    cursor: pointer;
+    padding: 2px;
+    transition: color 0.2s ease;
+}
+
+.btn-interact-dislike:hover {
+    color: #b25e38;
+}
+
+/* Ajuste de espaciado: like y dislike más cercanos, comentario más separado */
+/* Contenedor general: Mantenemos tu distancia compacta exacta */
+.vote-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Distancia corta original entre botones que se ve genial */
+}
+
+/* El botón de comentario mantiene su separación original */
+.btn-interact-comentario {
+    margin-left: 16px; 
+    margin-right: 5px;
+}
+
+/* Aseguramos tamaño, alineación nativa y añadimos posición relativa */
+.btn-interact-like,
+.btn-interact-dislike,
+.btn-interact-comentario {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    position: relative; /* Necesario para que el contador flote sin empujar */
+}
+
+/* --- CONTROL EXCLUSIVO DEL CONTADOR FLOTANTE --- */
+/* El número aparecerá a la derecha del botón de forma absoluta sin empujar a los vecinos */
+.interact-counter {
+    position: absolute;
+    left: 100%; /* Se coloca justo donde termina el botón actual */
+    margin-left: 1px; /* Un mini espacio de separación del icono */
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none; /* El clic pasa directo al botón */
+}
+
+/* --- ESTADOS ACTIVOS (Sin alterar el tamaño ni hacer scale) --- */
+.btn-interact-like.activo-like {
+    color: #B25E38;
+    /* Eliminado el transform: scale para que no se agrande */
+}
+
+.btn-interact-like.activo-like svg {
+    color: #B25E38;
+    fill: #B25E38;
+    stroke: #B25E38;
+    stroke-width: 1px;
+}
+
+.btn-interact-dislike.activo-dislike {
+    color: #b25e38;
+    /* Eliminado el transform: scale para que no se agrande */
+}
+
+.btn-interact-dislike.activo-dislike svg {
+    color: #b25e38;
+    fill: #b25e38;
+    stroke: #b25e38;
+    stroke-width: 1px;
+}
+
+/* Transiciones (Corregida la sintaxis añadiendo 'transition:') */
+.btn-interact-like svg,
+.btn-interact-dislike svg {
+    transition: color 0.2s ease, fill 0.2s ease, stroke 0.2s ease;
+}
+
+/* Contenedor Vacío */
+.historial-vacio-box {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #887b78;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px dashed rgba(0,0,0,0.12);
+}
+
+/* Overlay: Fondo oscuro con un sutil desenfoque glassmorphism */
+.debate-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Oscurecido de 0.45 a 0.6 */      /* Reducido el desenfoque de 4px a 1.5px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+
+/* Estado activo del overlay */
+.debate-modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Contenedor del Modal: Cuadrado limpio y perfecto por defecto */
+.debate-modal-container {
+    background: #ffffff;
+    width: 760px;
+    height: 640px; /* Forzamos tamaño cuadrado base */
+    border-radius: 45px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.92);
+    transition: transform 0.25s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.debate-modal-overlay.show .debate-modal-container {
+    transform: scale(1);
+}
+
+/* Cabecera del modal */
+.debate-modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f0ee;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Cambiado de space-between a center */
+}
+
+.debate-modal-header h4 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: #3D262B;
+    text-align: center;
+}
+
+/* Ocultamos por completo el botón de cerrar tradicional */
+.btn-close-modal {
+    display: none;
+}
+
+/* Vista previa de la tarjeta sobre la que se debate */
+.debate-modal-post-preview {
+    padding: 14px 20px;
+    background: #faf8f7;
+    border-bottom: 1px solid #f3f0ee;
+    font-size: 13px;
+    color: #615551;
+}
+
+/* Listado de Comentarios: Activará el slider de forma interna si sobrepasa la altura */
+.debate-modal-comments-list {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto; /* Habilita el slider automáticamente */
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Diseño de cada comentario individual dentro de la lista */
+.modal-comment-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 12px;
+    border-bottom: 1px id #f8f6f5;
+}
+
+.modal-comment-user-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.modal-comment-username {
+    font-weight: 600;
+    color: #b25e38; /* Combinando con tu paleta de colores activa */
+}
+
+.modal-comment-date {
+    color: #a39692;
+}
+
+.modal-comment-text {
+    font-size: 14px;
+    color: #3d3330;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+/* Estado de lista vacía */
+.modal-comments-empty {
+    text-align: center;
+    color: #a39692;
+    margin: auto;
+    font-size: 14px;
+}
+
+/* Footer: Siempre pegado abajo */
+.debate-modal-footer {
+    padding: 16px 10px;
+    border-top: 1px solid #f3f0ee;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* El input de texto */
+.modal-comment-input {
+    flex: 1; /* Mágico: Absorbe absolutamente todo el espacio restante del contenedor */
+    padding: 11px 40px; 
+    border: 1px solid #dcd5d1;
+    border-radius: 45px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #faf8f7;
+}
+
+.btn-modal-comment-submit {
+    /* Eliminado flex: 1 para que deje de estirarse artificialmente */
+    padding: 11px 24px; /* Cambiado de 0px a 24px en los lados para darle un tamaño promedio y simétrico */
+    min-width: max-content; 
+    background: #b25e38;
+    color: #ffffff;
+    border: none;
+    border-radius: 45px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.modal-comment-input:focus {
+    border-color: #b25e38;
+    background: #ffffff;
+}
+
+/* Botón Responder */
+.btn-modal-comment-submit {
+    /* Eliminado flex: 1 para que deje de estirarse artificialmente */
+    padding: 11px 24px; /* Cambiado de 0px a 24px en los lados para darle un tamaño promedio y simétrico */
+    min-width: max-content; 
+    background: #b25e38;
+    color: #ffffff;
+    border: none;
+    border-radius: 45px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-modal-comment-submit:hover {
+    background: #964f2e;
 }
 
 /* ==========================================================================
-   COLUMNA DERECHA: BARRA LATERAL DE WIDGETS (30%)
+   COLUMNA DERECHA: BARRA LATERAL DE WIDGETS (Ampliada Proporcionalmente)
    ========================================================================== */
-
 .actividad-col-lateral {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    width: 100%; /* Asegura que rellene los 348px asignados en la grilla */
 }
 
 /* Contenedor base de cada bloque de la derecha */
 .lateral-widget {
     background: #ffffff;
     border-radius: 16px;
-    padding: 20px;
+    padding: 24px; /* Incrementado de 20px a 24px para mejor presencia */
     box-shadow: 0 4px 18px rgba(43, 38, 37, 0.04);
     border: 1px solid rgba(178, 94, 56, 0.08);
 }
@@ -154,21 +700,21 @@
 /* 1. Ajuste de Insignias */
 .perfil-pines-vitrina-lateral {
     display: flex;
-    gap: 12px;
+    gap: 14px; /* Un poco más de separación física */
     flex-wrap: wrap;
     margin-bottom: 14px;
 }
 
 .pin-badge-lateral {
-    width: 42px;
-    height: 42px;
+    width: 46px; /* Escaladas ligeramente para acompañar la expansión */
+    height: 46px;
     border-radius: 50%;
     background: #fff8ec;
     border: 1px solid rgba(178, 94, 56, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
     box-shadow: 0 3px 8px rgba(178, 94, 56, 0.05);
 }
 
@@ -177,8 +723,8 @@
     background: rgba(178, 94, 56, 0.06);
     border: none;
     color: #b25e38;
-    padding: 8px;
-    font-size: 13px;
+    padding: 10px; /* Más cómodo al click */
+    font-size: 13.5px;
     font-weight: 700;
     border-radius: 8px;
     cursor: pointer;
@@ -197,9 +743,9 @@
 }
 
 .rank-item {
-    padding: 10px 14px;
+    padding: 12px 16px; /* Ajuste premium */
     border-radius: 10px;
-    font-size: 13.5px;
+    font-size: 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -213,7 +759,7 @@
 
 /* Estado Vacío de Paz: Summer Camp Island */
 .semanal-vacio-campamento {
-    padding: 12px;
+    padding: 14px;
     text-align: center;
     background: linear-gradient(135deg, rgba(255, 248, 236, 0.6) 0%, rgba(231, 215, 196, 0.3) 100%);
     border-radius: 12px;
@@ -239,24 +785,24 @@
     display: flex;
     flex-direction: column;
     background: #fff8ec;
-    padding: 10px 14px;
+    padding: 12px 16px;
     border-radius: 10px;
 }
 
 .stat-number {
-    font-size: 22px;
+    font-size: 24px; /* Un poco más grande */
     font-weight: 800;
     color: #b25e38;
 }
 
 .stat-title-long {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     color: #b25e38;
 }
 
 .stat-label {
-    font-size: 12px;
+    font-size: 12.5px;
     color: #887b78;
     font-weight: 550;
     margin-top: 2px;
@@ -270,7 +816,7 @@
 .balance-labels {
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
     color: #514745;
     margin-bottom: 6px;
@@ -300,7 +846,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 13px;
+    font-size: 13.5px;
     color: #514745;
 }
 

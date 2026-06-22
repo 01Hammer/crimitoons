@@ -180,10 +180,10 @@ body {
 }
 
 .tab-content-viewport {
-    width: 1300px; /* 🔥 ¡Ahora sí responderá libremente al tamaño que elijas! */
-    max-width: 95vw;
-    margin: 25px 0 60px 0;
-    padding: 0 20px; /* Un padding lateral sutil para que no pegue al borde */
+    width: 100%;
+    max-width: 1340px; /* Ampliado para dar soporte al nuevo ancho */
+    margin: 25px auto 60px auto; /* Centramos el viewport principal */
+    padding: 0 20px; 
     box-sizing: border-box !important;
     background: transparent;
     border: none;

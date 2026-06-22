@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Serie, Perfil
+from .models import Serie, Perfil, ComentarioActividad
 
 admin.site.register(Serie)
+admin.site.register(ComentarioActividad)
 
 @admin.register(Perfil)
 class PerfilAdmin(admin.ModelAdmin):

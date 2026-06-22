@@ -200,3 +200,53 @@ class HistorialActividad(models.Model):
 
     def __str__(self):
         return f"{self.perfil.usuario.username} - {self.get_accion_display()} - {self.serie.titulo}"
+
+class VotoActividad(models.Model):
+    class TipoVoto(models.TextChoices):
+        LIKE = 'like', 'Me gusta'
+        DISLIKE = 'dislike', 'Discrepo'
+
+    perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name='mis_votos')
+    actividad = models.ForeignKey(HistorialActividad, on_delete=models.CASCADE, related_name='votos')
+    tipo = models.CharField(max_length=10, choices=TipoVoto.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Esto impide estrictamente que un perfil vote más de una vez la misma actividad
+        unique_together = ('perfil', 'actividad')
+
+    def __str__(self):
+        return f"{self.perfil.usuario.username} - {self.tipo} -> {self.actividad.id}"
+    
+    @property
+    def total_likes(self):
+        return self.votos.filter(tipo='like').count()
+
+    @property
+    def total_dislikes(self):
+        return self.votos.filter(tipo='dislike').count()
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class ComentarioActividad(models.Model):
+    actividad = models.ForeignKey(
+        'UserSeriesProgress', 
+        on_delete=models.CASCADE, 
+        related_name='comentarios'
+    )
+    usuario = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='comentarios_actividad'
+    )
+    texto = models.TextField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Comentario de actividad'
+        verbose_name_plural = 'Comentarios de actividad'
+
+    def __str__(self):
+        return f"Comentario de {self.usuario.username} en actividad #{self.actividad.id}"

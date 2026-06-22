@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-from .models import Serie, Perfil, UserSeriesProgress, HistorialActividad
+from .models import Serie, Perfil, UserSeriesProgress, HistorialActividad, VotoActividad, ComentarioActividad
 from .forms import RegistroForm, LoginForm, ActualizarPerfilForm
 from django.http import JsonResponse, Http404
 from django.template.loader import render_to_string
@@ -657,39 +657,61 @@ def ver_perfil(request, username):
     usuario = get_object_or_404(User, username=username)
     perfil_usuario = usuario.perfil
 
-    # Consulta para la pestaña Actividad
+    # Consulta limpia para la pestaña Actividad (sin el filtro incompleto de es_silencioso)
     actividades_reales = HistorialActividad.objects.filter(
-        perfil=perfil_usuario, 
-        es_silencioso=False
-    ).select_related('serie')
+        perfil=perfil_usuario
+    ).select_related('serie').order_by('-id') # Añadido un ordenamiento por si acaso para mantener las recientes arriba
+
+    # Determinamos el perfil del usuario autenticado de forma segura
+    perfil_actual = None
+    if request.user.is_authenticated:
+        try:
+            perfil_actual = request.user.perfil
+        except Perfil.DoesNotExist:
+            perfil_actual = None
+
+    # Procesamos todas las tarjetas en un único bucle limpio
+    for act in actividades_reales:
+        # 1. Guardamos los contadores en atributos limpios
+        act.total_likes = act.votos.filter(tipo='like').count()
+        act.total_dislikes = act.votos.filter(tipo='dislike').count()
+        
+        # 2. Averiguamos si el usuario actual ya votó esta tarjeta
+        if perfil_actual:
+            voto = act.votos.filter(perfil=perfil_actual).first()
+            act.voto_usuario = voto.tipo if voto else 'ninguno'
+        else:
+            act.voto_usuario = 'ninguno'
 
     # Consulta base de seguimiento de series para las pestañas Biblioteca, Favoritos y Aportes
-    progresos_usuario = UserSeriesProgress.objects.filter(perfil=perfil_usuario).select_related('serie')
+    progresos_usuario = UserSeriesProgress.objects.filter(
+        perfil=perfil_usuario
+    ).select_related('serie')
 
     return render(request, "series/ver_perfil.html", {
         "usuario": usuario,
         "perfil": perfil_usuario,
         "es_propietario": request.user == usuario if request.user.is_authenticated else False,
-        
-        # --- NUEVO CONTEXTO DE ACTIVIDAD ---
+
+        # Actividad
         "actividades": actividades_reales,
-        
-        # --- RED DE SEGURIDAD PARA BIBLIOTECA, FAVORITOS Y APORTES ---
-        # Enviamos múltiples nombres comunes para asegurar que los archivos {% include %} encuentren su variable
+
+        # Biblioteca, favoritos y aportes
         "progresos": progresos_usuario,
         "progresos_usuario": progresos_usuario,
         "biblioteca": progresos_usuario,
         "favoritos": progresos_usuario,
         "aportes": progresos_usuario,
-        
-        # --- ESTADÍSTICAS Y CONTENEDORES ---
+
+        # Estadísticas
         "stats": {
-            "total_vistas": 24, 
-            "genero_top": "Aventura / Ciencia Ficción", 
+            "total_vistas": 24,
+            "genero_top": "Aventura / Ciencia Ficción",
             "tag_top": "#AnimaciónOccidental"
         },
-        "listas_personalizadas": [], 
-        "listas_episodios": [], 
+
+        "listas_personalizadas": [],
+        "listas_episodios": [],
         "generos_disponibles": []
     })
 
@@ -724,3 +746,115 @@ def guardar_serie_rapido(request):
         })
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_POST
+def votar_actividad(request, actividad_id):
+    try:
+        # Obtenemos el perfil del usuario autenticado
+        perfil_usuario = request.user.perfil  
+        actividad = HistorialActividad.objects.get(id=actividad_id)
+    except (Perfil.DoesNotExist, HistorialActividad.DoesNotExist):
+        return JsonResponse({'error': 'Recurso no encontrado'}, status=404)
+
+    # Obtenemos el tipo de voto enviado desde el frontend ('like' o 'dislike')
+    tipo_voto = request.POST.get('tipo')
+    if tipo_voto not in [VotoActividad.TipoVoto.LIKE, VotoActividad.TipoVoto.DISLIKE]:
+        return JsonResponse({'error': 'Tipo de voto inválido'}, status=400)
+
+    # Buscamos si ya existe un voto previo de este usuario en esta actividad
+    voto_existente = VotoActividad.objects.filter(perfil=perfil_usuario, actividad=actividad).first()
+
+    if voto_existente:
+        if voto_existente.tipo == tipo_voto:
+            # Regla: Si presiona el mismo botón que ya tenía activo, el voto se cancela (quita el voto)
+            voto_existente.delete()
+            estado_voto = 'removido'
+        else:
+            # Regla: Si cambia de opinión (de like a dislike o viceversa), se actualiza el tipo
+            voto_existente.tipo = tipo_voto
+            voto_existente.save()
+            estado_voto = 'cambiado'
+    else:
+        # Regla: Si no había votado antes, se crea el nuevo registro
+        VotoActividad.objects.create(perfil=perfil_usuario, actividad=actividad, tipo=tipo_voto)
+        estado_voto = 'creado'
+
+    # Calculamos los totales actualizados de la actividad para mandarlos de vuelta
+    total_likes = actividad.votos.filter(tipo=VotoActividad.TipoVoto.LIKE).count()
+    total_dislikes = actividad.votos.filter(tipo=VotoActividad.TipoVoto.DISLIKE).count()
+
+    # Averiguamos qué voto tiene activo el usuario justo ahora para mandarlo al front-end
+    voto_final = VotoActividad.objects.filter(perfil=perfil_usuario, actividad=actividad).first()
+    voto_actual = voto_final.tipo if voto_final else 'ninguno'
+
+    return JsonResponse({
+        'status': 'success',
+        'estado_voto': estado_voto,
+        'likes': total_likes,
+        'dislikes': total_dislikes,
+        'voto_actual': voto_actual  # Devuelve: 'like', 'dislike' o 'ninguno'
+    })
+
+def obtener_comentarios(request, actividad_id):
+    """
+    Devuelve los comentarios asociados a una tarjeta de actividad en formato JSON.
+    """
+    if request.method == 'GET':
+        try:
+            # Reemplaza 'Registro' por el nombre real de tu modelo de tarjetas si fuera necesario
+            actividad = Registro.objects.get(id=actividad_id)
+            comentarios = actividad.comentarios.all().select_related('usuario')
+            
+            lista_comentarios = []
+            for c in comentarios:
+                lista_comentarios.append({
+                    'id': c.id,
+                    'usuario': c.usuario.username,
+                    # Aquí podrías mapear un avatar a futuro si lo implementas
+                    'texto': c.texto,
+                    'fecha': c.created_at.strftime('%d/%m/%Y %H:%M'),
+                })
+                
+            return JsonResponse({'status': 'success', 'comentarios': lista_comentarios})
+        except Registro.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Actividad no encontrada'}, status=404)
+
+@login_required
+def agregar_comentario(request, actividad_id):
+    """
+    Recibe el texto de un comentario vía POST y lo guarda en la base de datos.
+    """
+    if request.method == 'POST':
+        texto = request.POST.get('texto', '').strip()
+        
+        if not texto:
+            return JsonResponse({'status': 'error', 'message': 'El comentario no puede estar vacío'}, status=400)
+            
+        try:
+            actividad = Registro.objects.get(id=actividad_id)
+            
+            # Creamos el registro en la base de datos vinculado al usuario logueado
+            nuevo_comentario = ComentarioActividad.objects.create(
+                actividad=actividad,
+                usuario=request.user,
+                texto=texto
+            )
+            
+            return JsonResponse({
+                'status': 'success',
+                'comentario': {
+                    'id': nuevo_comentario.id,
+                    'usuario': nuevo_comentario.usuario.username,
+                    'texto': nuevo_comentario.texto,
+                    'fecha': nuevo_comentario.created_at.strftime('%d/%m/%Y %H:%M'),
+                },
+                # Devolvemos el total actualizado para refrescar el contador de la tarjeta en tiempo real
+                'total_comentarios': actividad.comentarios.count()
+            })
+            
+        except Registro.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Actividad no encontrada'}, status=404)
+            
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
