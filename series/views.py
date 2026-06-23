@@ -803,8 +803,7 @@ def obtener_comentarios(request, actividad_id):
     """
     if request.method == 'GET':
         try:
-            # Reemplaza 'Registro' por el nombre real de tu modelo de tarjetas si fuera necesario
-            actividad = Registro.objects.get(id=actividad_id)
+            actividad = HistorialActividad.objects.get(id=actividad_id)
             comentarios = actividad.comentarios.all().select_related('usuario')
             
             lista_comentarios = []
@@ -818,7 +817,7 @@ def obtener_comentarios(request, actividad_id):
                 })
                 
             return JsonResponse({'status': 'success', 'comentarios': lista_comentarios})
-        except Registro.DoesNotExist:
+        except HistorialActividad.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Actividad no encontrada'}, status=404)
 
 @login_required
@@ -833,7 +832,7 @@ def agregar_comentario(request, actividad_id):
             return JsonResponse({'status': 'error', 'message': 'El comentario no puede estar vacío'}, status=400)
             
         try:
-            actividad = Registro.objects.get(id=actividad_id)
+            actividad = HistorialActividad.objects.get(id=actividad_id)
             
             # Creamos el registro en la base de datos vinculado al usuario logueado
             nuevo_comentario = ComentarioActividad.objects.create(
@@ -854,7 +853,7 @@ def agregar_comentario(request, actividad_id):
                 'total_comentarios': actividad.comentarios.count()
             })
             
-        except Registro.DoesNotExist:
+        except HistorialActividad.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Actividad no encontrada'}, status=404)
             
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)

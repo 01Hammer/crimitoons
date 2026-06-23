@@ -483,13 +483,16 @@
 }
 
 /* Overlay: Fondo oscuro con un sutil desenfoque glassmorphism */
+
+/*CONFIGURACIÓN DEL MODAL*/
 .debate-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4); /* Oscurecido de 0.45 a 0.6 */      /* Reducido el desenfoque de 4px a 1.5px */
+    background-color: rgba(0, 0, 0, 0.6); /* Modificado de 0.4 a 0.6 según tu nota */
+    backdrop-filter: blur(1.5px);         /* Añadido el desenfoque de 1.5px que tenías anotado */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -508,9 +511,9 @@
 
 /* Contenedor del Modal: Cuadrado limpio y perfecto por defecto */
 .debate-modal-container {
-    background: #ffffff;
+    background: #fff8ec;
     width: 760px;
-    height: 640px; /* Forzamos tamaño cuadrado base */
+    height: 690px; /* Forzamos tamaño cuadrado base */
     border-radius: 45px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
     display: flex;
@@ -527,8 +530,9 @@
 
 /* Cabecera del modal */
 .debate-modal-header {
+    background-color: #fff8ec;
     padding: 16px 20px;
-    border-bottom: 1px solid #f3f0ee;
+    border-bottom: 1px solid #fff8ec;
     display: flex;
     align-items: center;
     justify-content: center; /* Cambiado de space-between a center */
@@ -547,21 +551,176 @@
     display: none;
 }
 
-/* Vista previa de la tarjeta sobre la que se debate */
+/* --- MODIFICADO: Vista previa estructurada para la miniatura con póster --- */
+./* Mantenemos esta clase en el CSS para centrar la tarjeta flotante y limpiar el fondo */
 .debate-modal-post-preview {
-    padding: 14px 20px;
-    background: #faf8f7;
-    border-bottom: 1px solid #f3f0ee;
-    font-size: 13px;
-    color: #615551;
+    display: flex;
+    justify-content: center; /* Centra la tarjeta horizontalmente a la perfección */
+    align-items: center;
+    padding: 24px 0 12px 0;  /* Espaciado limpio para que respire arriba y abajo */
+    background: transparent;  /* Asegura que no tenga ningún fondo gris u oscuro */
+    border-bottom: none;
+    width: 100%;
 }
+
+/* Tarjeta flotante: Altura incrementada y centrada automáticamente */
+.modal-preview-mini-card {
+    display: flex;
+    background: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    height: 128px;
+    width: 93%;
+    border: 1px solid #f3f0ee;
+    margin: 0 auto;
+}
+
+/* Póster: Crece proporcionalmente para cubrir los 118px de altura */
+.mini-card-poster {
+    width: 78px;         /* Ajustado de 85px a 78px para respetar la proporción real del póster */
+    height: 100%;        
+    flex-shrink: 0;
+}
+
+.mini-card-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;      
+}
+
+.mini-card-content {
+    flex: 1;
+    display: flex;
+    padding: 14px 18px; /* Un pelín más de aire interno para las letras más grandes */
+    justify-content: space-between; 
+}
+
+/* Columna Izquierda: Título arriba fijo y comentario abajo */
+.mini-card-left-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 17px;
+    max-width: 65%;
+}
+
+.mini-card-title {
+    margin: 0 !important;
+    font-size: 18px !important;
+    font-weight: 700;
+    color: #3D262B;
+    line-height: 1.0;
+    padding-top: 6px;
+}
+
+.mini-card-comment {
+    margin: 0;
+    font-size: 15px; /* Aumentado de 13px a 15px para que sea mucho más notorio */
+    color: #4a3e3b;  /* Un tono sutilmente más oscuro para mejorar la legibilidad */
+    line-height: 1.4;
+    font-style: normal; /* Quitada la fuente cursiva/italic */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Columna Derecha: Contendrá las puntuaciones arriba y las interacciones abajo */
+.mini-card-right-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.mini-card-header-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Estilos limpios para el texto plano de puntuación y estado dentro del modal */
+.modal-mini-score {
+    font-size: 12px;
+    font-weight: 700;
+    color: #3D262B;
+    background: #fdfcfb;
+    border: 1px solid #eaddd7;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+/* Estilo base para el estado (sin colores específicos de fondo) */
+.modal-mini-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+/* Pendiente / Por ver -> Púrpura */
+.modal-mini-status.status-pendiente,
+.modal-mini-status.status-por-ver {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+/* Viendo -> Azul */
+.modal-mini-status.status-viendo {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+/* Completado -> Verde */
+.modal-mini-status.status-completado,
+.modal-mini-status.status-completada {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* Pausada -> Amarillo / Naranja */
+.modal-mini-status.status-pausada,
+.modal-mini-status.status-pausado {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+/* Abandonada / Dropeada -> Rojo */
+.modal-mini-status.status-abandonada,
+.modal-mini-status.status-abandonado,
+.modal-mini-status.status-dropeada,
+.modal-mini-status.status-dropeado {
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* Contenedor inferior de votación */
+.mini-card-actions-row {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-mini-vote-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #887b78;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+/* ------------------------------------------------------------------------- */
 
 /* Listado de Comentarios: Activará el slider de forma interna si sobrepasa la altura */
 .debate-modal-comments-list {
     flex: 1;
     padding: 20px;
     overflow-y: auto; /* Habilita el slider automáticamente */
-    background: #ffffff;
+    background: #fff8ec;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -573,7 +732,7 @@
     flex-direction: column;
     gap: 4px;
     padding-bottom: 12px;
-    border-bottom: 1px id #f8f6f5;
+    border-bottom: 1px solid #f8f6f5;
 }
 
 .modal-comment-user-info {
@@ -610,8 +769,8 @@
 /* Footer: Siempre pegado abajo */
 .debate-modal-footer {
     padding: 16px 10px;
-    border-top: 1px solid #f3f0ee;
-    background: #ffffff;
+    border-top: 1px solid #fff8ec;
+    background-color: #fff8ec; 
     display: flex;
     align-items: center;
     gap: 12px;
@@ -620,7 +779,7 @@
 /* El input de texto */
 .modal-comment-input {
     flex: 1; /* Mágico: Absorbe absolutamente todo el espacio restante del contenedor */
-    padding: 11px 40px; 
+    padding: 11px 20px; 
     border: 1px solid #dcd5d1;
     border-radius: 45px;
     font-size: 16px;
@@ -629,29 +788,14 @@
     background: #faf8f7;
 }
 
-.btn-modal-comment-submit {
-    /* Eliminado flex: 1 para que deje de estirarse artificialmente */
-    padding: 11px 24px; /* Cambiado de 0px a 24px en los lados para darle un tamaño promedio y simétrico */
-    min-width: max-content; 
-    background: #b25e38;
-    color: #ffffff;
-    border: none;
-    border-radius: 45px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
 .modal-comment-input:focus {
     border-color: #b25e38;
     background: #ffffff;
 }
 
-/* Botón Responder */
+/* Botón Responder (Unificado y limpio) */
 .btn-modal-comment-submit {
-    /* Eliminado flex: 1 para que deje de estirarse artificialmente */
-    padding: 11px 24px; /* Cambiado de 0px a 24px en los lados para darle un tamaño promedio y simétrico */
+    padding: 11px 24px; 
     min-width: max-content; 
     background: #b25e38;
     color: #ffffff;
@@ -666,7 +810,6 @@
 .btn-modal-comment-submit:hover {
     background: #964f2e;
 }
-
 /* ==========================================================================
    COLUMNA DERECHA: BARRA LATERAL DE WIDGETS (Ampliada Proporcionalmente)
    ========================================================================== */

@@ -231,7 +231,7 @@ from django.contrib.auth.models import User
 
 class ComentarioActividad(models.Model):
     actividad = models.ForeignKey(
-        'UserSeriesProgress', 
+        'HistorialActividad', 
         on_delete=models.CASCADE, 
         related_name='comentarios'
     )

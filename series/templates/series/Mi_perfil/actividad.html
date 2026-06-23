@@ -340,35 +340,125 @@ let actividadActivaId = null;
 let botonComentarioActivo = null;
 
 // Abrir el modal al hacer click en el botón de comentario de cualquier tarjeta
+// Abrir el modal al hacer click en el botón de comentario de cualquier tarjeta
 btnComentarios.forEach(btn => {
     btn.addEventListener('click', async (e) => {
         e.preventDefault();
         
-        // Buscamos el botón de voto hermano para extraer el ID de la actividad
         const contenedorAcciones = btn.closest('.historial-acciones-interaccion');
         const btnVotoAsociado = contenedorAcciones.querySelector('[data-id]');
         actividadActivaId = btnVotoAsociado.getAttribute('data-id');
-        botonComentarioActivo = btn; // Guardamos la referencia para actualizar el contador luego
+        botonComentarioActivo = btn; 
 
-        // Extraer los datos de la publicación original de la tarjeta actual para la vista previa superior
+        // 1. Extraemos la tarjeta contenedora
         const tarjetaPadre = btn.closest('.historial-card');
-        const tituloSerie = tarjetaPadre.querySelector('h3, .series-title')?.textContent || 'Publicación';
+        if (!tarjetaPadre) return;
+        
+        // 2. Extraemos los datos puros básicos
+        const posterSrc = tarjetaPadre.querySelector('.historial-poster img, img')?.getAttribute('src') || '';
+        const tituloSerie = tarjetaPadre.querySelector('h3, .series-title')?.textContent || '';
         const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario, p')?.textContent || '';
-        
-        modalPostPreview.innerHTML = `<strong>Debatiendo sobre:</strong> ${tituloSerie} <span style="display:block; font-style:italic; margin-top:4px; color:#887b78;">"${comentarioUsuario}"</span>`;
-        
-        // Limpiamos la lista e input antes de cargar
+
+        // 3. Extracción ultra-precisa con la clase real del HTML
+        const scoreElement = tarjetaPadre.querySelector('.historial-nota-inline');
+        let scoreText = '';
+
+        if (scoreElement) {
+            // Extrae solo el número (ej: "10" o "9.5") ignorando la estrella o espacios
+            scoreText = scoreElement.textContent.replace('⭐', '').trim();
+        }
+
+        // 4. Extracción limpia del Estado y creación de su clase dinámica
+        const estadoElement = tarjetaPadre.querySelector('.badge-estado, .estado-badge, [class*="badge"], [class*="estado"]');
+        const estadoText = estadoElement ? estadoElement.textContent.trim() : '';
+        const estadoClase = estadoText.toLowerCase().replace(/\s+/g, '-');
+
+        // 5. Ubicamos los botones de interacciones originales de la tarjeta exterior
+        const btnLikeFuera = tarjetaPadre.querySelector('.historial-acciones-interaccion button:nth-child(1), [class*="like"]');
+        const btnDislikeFuera = tarjetaPadre.querySelector('.historial-acciones-interaccion button:nth-child(2), [class*="dislike"]');
+
+        // Extraemos los números actuales de fuera
+        const likesCount = parseInt(btnLikeFuera?.textContent.trim()) || 0;
+        const dislikesCount = parseInt(btnDislikeFuera?.textContent.trim()) || 0;
+
+        // [Aquí se inyecta tu modalPostPreview.innerHTML de la misma forma que ya tienes]
+        modalPostPreview.innerHTML = `
+            <div class="modal-preview-mini-card">
+                ${posterSrc ? `<div class="mini-card-poster"><img src="${posterSrc}" alt="${tituloSerie}"></div>` : ''}
+                <div class="mini-card-content">
+                    <div class="mini-card-left-column">
+                        <h4 class="mini-card-title">${tituloSerie}</h4>
+                        <p class="mini-card-comment">${comentarioUsuario}</p>
+                    </div>
+                    <div class="mini-card-right-column">
+                        <div class="mini-card-header-row">
+                            ${scoreText ? `<span class="modal-mini-score">${scoreText}</span>` : ''}
+                            ${estadoText ? `<span class="modal-mini-status status-${estadoClase}">${estadoText}</span>` : ''}
+                        </div>
+                        <div class="mini-card-actions-row">
+                            <button class="modal-mini-vote-btn btn-modal-like" aria-label="Like">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                                </svg>
+                                <span class="like-count">${likesCount > 0 ? likesCount : ''}</span>
+                            </button>
+                            <button class="modal-mini-vote-btn btn-modal-dislike" aria-label="Dislike">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                                </svg>
+                                <span class="dislike-count">${dislikesCount > 0 ? dislikesCount : ''}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // 6. CONTROLADORES DE VOTOS CON ACTUALIZACIÓN COLECTIVA DIRECTA
+        const btnLikeModal = modalPostPreview.querySelector('.btn-modal-like');
+        const btnDislikeModal = modalPostPreview.querySelector('.btn-modal-dislike');
+
+        // Función auxiliar para traer los números exactos de fuera de forma limpia
+        const sincronizarAmbosContadores = () => {
+            if (!btnLikeFuera || !btnDislikeFuera) return;
+            
+            const lCount = parseInt(btnLikeFuera.textContent.trim()) || 0;
+            const dCount = parseInt(btnDislikeFuera.textContent.trim()) || 0;
+            
+            btnLikeModal.querySelector('.like-count').textContent = lCount > 0 ? lCount : '';
+            btnDislikeModal.querySelector('.dislike-count').textContent = dCount > 0 ? dCount : '';
+        };
+
+        if (btnLikeModal && btnLikeFuera) {
+            btnLikeModal.addEventListener('click', () => {
+                btnLikeFuera.click();
+                // Hacemos múltiples lecturas rápidas para capturar el cambio exacto tras la mutación del DOM exterior
+                setTimeout(sincronizarAmbosContadores, 50);
+                setTimeout(sincronizarAmbosContadores, 150);
+                setTimeout(sincronizarAmbosContadores, 300);
+            });
+        }
+
+        if (btnDislikeModal && btnDislikeFuera) {
+            btnDislikeModal.addEventListener('click', () => {
+                btnDislikeFuera.click();
+                setTimeout(sincronizarAmbosContadores, 50);
+                setTimeout(sincronizarAmbosContadores, 150);
+                setTimeout(sincronizarAmbosContadores, 300);
+            });
+        }
+
+        // Limpiamos la lista e input antes de cargar el flujo AJAX
         modalCommentsList.innerHTML = '<div class="modal-comments-empty">Cargando debate...</div>';
         modalInput.value = '';
-        
-        // Mostrar el modal agregando la clase
+
+        // Mostrar el modal
         modalOverlay.classList.add('show');
-        
-        // Petición AJAX al backend para recuperar los comentarios guardados
+
+        // Petición AJAX (se mantiene igual...)
         try {
             const response = await fetch(`/actividad/${actividadActivaId}/comentarios/`);
             const data = await response.json();
-            
             if (data.status === 'success') {
                 renderizarComentarios(data.comentarios);
             } else {
