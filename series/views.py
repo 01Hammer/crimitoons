@@ -13,6 +13,8 @@ from .forms import RegistroForm, LoginForm, ActualizarPerfilForm
 from django.http import JsonResponse, Http404
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
+from django.utils.timesince import timesince
+from django.utils import timezone
 
 DEFAULT_POSTER = "https://placehold.co/500x750/3D262B/F7F3E3?text=No+Poster"
 API_KEY_TMDB = "ea735303fe1aa8a04e298b1f9c130e6c"
@@ -345,7 +347,8 @@ def guardar_progreso(request, serie_id):
     if status not in {choice[0] for choice in UserSeriesProgress.Status.choices}:
         status = UserSeriesProgress.Status.WATCHING
 
-    progreso, _ = UserSeriesProgress.objects.update_or_create(
+    # 1. Guardamos o actualizamos en la biblioteca del usuario
+    progreso, creado = UserSeriesProgress.objects.update_or_create(
         perfil=request.user.perfil,
         serie=serie,
         defaults={
@@ -356,8 +359,17 @@ def guardar_progreso(request, serie_id):
             "current_episode": current_episode,
         },
     )
-    return JsonResponse({"status": "success", "nuevo_estado": progreso.status, "texto_estado": progreso.get_status_display()})
 
+    # 2. Sincronizamos y guardamos los datos exactos en la tarjeta de actividad
+    HistorialActividad.objects.create(
+        perfil=request.user.perfil,
+        serie=serie,
+        accion=status,                       # Pasa el estado (watching, completed, etc.)
+        score_momento=score,                 # Pasa la puntuación decimal o None
+        comment_momento=progreso.comment     # Pasa el comentario limpio
+    )
+
+    return JsonResponse({"status": "success", "nuevo_estado": progreso.status, "texto_estado": progreso.get_status_display()})
 
 # ============================================================
 # 2. EXPLORACIÓN Y CATÁLOGO PRINCIPAL (INDEX / BUSCADOR)
@@ -798,22 +810,29 @@ def votar_actividad(request, actividad_id):
     })
 
 def obtener_comentarios(request, actividad_id):
-    """
-    Devuelve los comentarios asociados a una tarjeta de actividad en formato JSON.
-    """
     if request.method == 'GET':
         try:
             actividad = HistorialActividad.objects.get(id=actividad_id)
-            comentarios = actividad.comentarios.all().select_related('usuario')
+            comentarios = actividad.comentarios.all().select_related('usuario').order_by('-created_at')
             
             lista_comentarios = []
             for c in comentarios:
+                usuario_foto = None
+                if hasattr(c.usuario, 'perfil') and hasattr(c.usuario.perfil, 'foto_perfil') and c.usuario.perfil.foto_perfil:
+                    usuario_foto = c.usuario.perfil.foto_perfil.url
+
+                # Calculamos el tiempo transcurrido (ej: "5 minutes" o "1 day")
+                tiempo_transcurrido = timesince(c.created_at, timezone.now())
+                # Tomamos solo el primer componente para evitar cosas como "1 semana, 2 días"
+                tiempo_limpio = tiempo_transcurrido.split(',')[0]
+                fecha_relativa = f"hace {tiempo_limpio}"
+
                 lista_comentarios.append({
                     'id': c.id,
                     'usuario': c.usuario.username,
-                    # Aquí podrías mapear un avatar a futuro si lo implementas
+                    'usuario_foto': usuario_foto,
                     'texto': c.texto,
-                    'fecha': c.created_at.strftime('%d/%m/%Y %H:%M'),
+                    'fecha': fecha_relativa, # Pasamos el formato corto y limpio
                 })
                 
             return JsonResponse({'status': 'success', 'comentarios': lista_comentarios})
@@ -822,38 +841,34 @@ def obtener_comentarios(request, actividad_id):
 
 @login_required
 def agregar_comentario(request, actividad_id):
-    """
-    Recibe el texto de un comentario vía POST y lo guarda en la base de datos.
-    """
     if request.method == 'POST':
         texto = request.POST.get('texto', '').strip()
-        
         if not texto:
             return JsonResponse({'status': 'error', 'message': 'El comentario no puede estar vacío'}, status=400)
             
         try:
             actividad = HistorialActividad.objects.get(id=actividad_id)
-            
-            # Creamos el registro en la base de datos vinculado al usuario logueado
             nuevo_comentario = ComentarioActividad.objects.create(
                 actividad=actividad,
                 usuario=request.user,
                 texto=texto
             )
             
+            # Buscamos la foto directamente usando la relación del comentario recién guardado
+            usuario_foto = None
+            if hasattr(nuevo_comentario.usuario, 'perfil') and hasattr(nuevo_comentario.usuario.perfil, 'foto_perfil') and nuevo_comentario.usuario.perfil.foto_perfil:
+                usuario_foto = nuevo_comentario.usuario.perfil.foto_perfil.url
+            
             return JsonResponse({
                 'status': 'success',
                 'comentario': {
                     'id': nuevo_comentario.id,
                     'usuario': nuevo_comentario.usuario.username,
+                    'usuario_foto': usuario_foto, # Enviamos la URL comprobada
                     'texto': nuevo_comentario.texto,
-                    'fecha': nuevo_comentario.created_at.strftime('%d/%m/%Y %H:%M'),
+                    'fecha': f"hace {timesince(nuevo_comentario.created_at, timezone.now()).split(',')[0]}",
                 },
-                # Devolvemos el total actualizado para refrescar el contador de la tarjeta en tiempo real
                 'total_comentarios': actividad.comentarios.count()
             })
-            
         except HistorialActividad.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Actividad no encontrada'}, status=404)
-            
-    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)

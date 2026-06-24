@@ -52,12 +52,12 @@
                             
                             {% if registro.score_momento %}
                                 <span class="historial-nota-inline">
-                                    ⭐ {{ registro.score_momento|floatformat:1 }}
+                                    {{ registro.score_momento|floatformat:1 }}
                                 </span>
                             {% endif %}
                         </div>
                         
-                        <span class="historial-fecha">Hace {{ registro.created_at|timesince }}</span>
+                        <span class="historial-fecha">{{ registro.created_at|timesince }}</span>
                     </div>
 
                     <h3 class="historial-serie-titulo">{{ registro.serie.titulo }}</h3>
@@ -108,10 +108,7 @@
                                 <span class="interact-counter counter-comentario">{% if registro.total_comentarios > 0 %}{{ registro.total_comentarios }}{% endif %}</span>
                             </button>
                         </div>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
+                    </div> </div> </div> {% empty %}
             <div class="historial-vacio-box">
                 <p>Aún no tienes movimientos registrados en tu muro de actividad.</p>
             </div>
@@ -126,10 +123,16 @@
                 
                 <div class="debate-modal-post-preview"></div>
                 
+                <div class="modal-divider-container">
+                    <span class="divider-line"></span>
+                    <span class="divider-dot">•</span>
+                    <span class="divider-line"></span>
+                </div>
+                
                 <div class="debate-modal-comments-list"></div>
                 
                 <div class="debate-modal-footer">
-                    <input type="text" placeholder="Escribe un comentario" class="modal-comment-input" />
+                    <input type="text" placeholder="Escribe un comentario..." class="modal-comment-input" />
                     <button class="btn-modal-comment-submit">Enviar</button>
                 </div>
             </div>
@@ -329,21 +332,38 @@
     });
 
 // --- LÓGICA PARA EL MODAL DE DEBATES ---
-const modalOverlay = document.getElementById('comments-modal');
 const btnComentarios = document.querySelectorAll('.btn-interact-comentario');
-const modalCommentsList = modalOverlay.querySelector('.debate-modal-comments-list');
-const modalPostPreview = modalOverlay.querySelector('.debate-modal-post-preview');
-const modalInput = modalOverlay.querySelector('.modal-comment-input');
-const btnSubmitComment = modalOverlay.querySelector('.btn-modal-comment-submit');
 
 let actividadActivaId = null;
 let botonComentarioActivo = null;
 
 // Abrir el modal al hacer click en el botón de comentario de cualquier tarjeta
-// Abrir el modal al hacer click en el botón de comentario de cualquier tarjeta
 btnComentarios.forEach(btn => {
     btn.addEventListener('click', async (e) => {
         e.preventDefault();
+        
+        // Buscamos el modal EN TIEMPO REAL al hacer clic
+        const modalOverlay = document.getElementById('comments-modal');
+        
+        console.log("¡Clic detectado en el botón de comentarios!");
+        console.log("Estado del modalOverlay en el clic:", modalOverlay);
+        
+        if (!modalOverlay) {
+            console.error("ERROR CRÍTICO: El elemento HTML con id 'comments-modal' NO EXISTE en el DOM de la página.");
+            alert("No se pudo abrir el modal porque no se encuentra el contenedor en la plantilla HTML.");
+            return;
+        }
+
+        // Una vez asegurado el modal, declaramos sus elementos internos
+        const modalCommentsList = modalOverlay.querySelector('.debate-modal-comments-list');
+        const modalPostPreview = modalOverlay.querySelector('.debate-modal-post-preview');
+        const modalInput = modalOverlay.querySelector('.modal-comment-input');
+        const btnSubmitComment = modalOverlay.querySelector('.btn-modal-comment-submit');
+
+        if (!modalCommentsList || !modalPostPreview || !modalInput) {
+            console.warn("Faltan sub-elementos internos dentro del modal.");
+            return;
+        }
         
         const contenedorAcciones = btn.closest('.historial-acciones-interaccion');
         const btnVotoAsociado = contenedorAcciones.querySelector('[data-id]');
@@ -359,29 +379,29 @@ btnComentarios.forEach(btn => {
         const tituloSerie = tarjetaPadre.querySelector('h3, .series-title')?.textContent || '';
         const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario, p')?.textContent || '';
 
-        // 3. Extracción ultra-precisa con la clase real del HTML
+        // 3. Extracción de la nota
         const scoreElement = tarjetaPadre.querySelector('.historial-nota-inline');
         let scoreText = '';
-
         if (scoreElement) {
-            // Extrae solo el número (ej: "10" o "9.5") ignorando la estrella o espacios
             scoreText = scoreElement.textContent.replace('⭐', '').trim();
         }
 
-        // 4. Extracción limpia del Estado y creación de su clase dinámica
+        // 4. Extracción limpia del Estado
         const estadoElement = tarjetaPadre.querySelector('.badge-estado, .estado-badge, [class*="badge"], [class*="estado"]');
         const estadoText = estadoElement ? estadoElement.textContent.trim() : '';
         const estadoClase = estadoText.toLowerCase().replace(/\s+/g, '-');
 
-        // 5. Ubicamos los botones de interacciones originales de la tarjeta exterior
+        // 5. Ubicamos los botones de interacciones originales
         const btnLikeFuera = tarjetaPadre.querySelector('.historial-acciones-interaccion button:nth-child(1), [class*="like"]');
         const btnDislikeFuera = tarjetaPadre.querySelector('.historial-acciones-interaccion button:nth-child(2), [class*="dislike"]');
 
-        // Extraemos los números actuales de fuera
         const likesCount = parseInt(btnLikeFuera?.textContent.trim()) || 0;
         const dislikesCount = parseInt(btnDislikeFuera?.textContent.trim()) || 0;
 
-        // [Aquí se inyecta tu modalPostPreview.innerHTML de la misma forma que ya tienes]
+        const likeActivo = btnLikeFuera?.classList.contains('activo-like') ? 'activo-like' : '';
+        const dislikeActivo = btnDislikeFuera?.classList.contains('activo-dislike') ? 'activo-dislike' : '';
+
+        // Inyectamos la mini tarjeta dinámica
         modalPostPreview.innerHTML = `
             <div class="modal-preview-mini-card">
                 ${posterSrc ? `<div class="mini-card-poster"><img src="${posterSrc}" alt="${tituloSerie}"></div>` : ''}
@@ -396,16 +416,15 @@ btnComentarios.forEach(btn => {
                             ${estadoText ? `<span class="modal-mini-status status-${estadoClase}">${estadoText}</span>` : ''}
                         </div>
                         <div class="mini-card-actions-row">
-                            <button class="modal-mini-vote-btn btn-modal-like" aria-label="Like">
+                            <button class="modal-mini-vote-btn btn-modal-like ${likeActivo}" aria-label="Like">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                                 </svg>
                                 <span class="like-count">${likesCount > 0 ? likesCount : ''}</span>
                             </button>
-                            <button class="modal-mini-vote-btn btn-modal-dislike" aria-label="Dislike">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
-                                </svg>
+                            
+                            <button class="modal-mini-vote-btn btn-modal-dislike ${dislikeActivo}" aria-label="Dislike">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H9zM21 2h3v9h-3z"></path></svg>
                                 <span class="dislike-count">${dislikesCount > 0 ? dislikesCount : ''}</span>
                             </button>
                         </div>
@@ -414,28 +433,36 @@ btnComentarios.forEach(btn => {
             </div>
         `;
 
-        // 6. CONTROLADORES DE VOTOS CON ACTUALIZACIÓN COLECTIVA DIRECTA
+        // 6. CONTROLADORES DE VOTOS INTERNOS DEL MODAL
         const btnLikeModal = modalPostPreview.querySelector('.btn-modal-like');
         const btnDislikeModal = modalPostPreview.querySelector('.btn-modal-dislike');
 
-        // Función auxiliar para traer los números exactos de fuera de forma limpia
         const sincronizarAmbosContadores = () => {
-            if (!btnLikeFuera || !btnDislikeFuera) return;
-            
+            if (!btnLikeFuera || !btnDislikeFuera || !btnLikeModal || !btnDislikeModal) return;
             const lCount = parseInt(btnLikeFuera.textContent.trim()) || 0;
             const dCount = parseInt(btnDislikeFuera.textContent.trim()) || 0;
             
             btnLikeModal.querySelector('.like-count').textContent = lCount > 0 ? lCount : '';
             btnDislikeModal.querySelector('.dislike-count').textContent = dCount > 0 ? dCount : '';
+
+            if (btnLikeFuera.classList.contains('activo-like')) {
+                btnLikeModal.classList.add('activo-like');
+            } else {
+                btnLikeModal.classList.remove('activo-like');
+            }
+
+            if (btnDislikeFuera.classList.contains('activo-dislike')) {
+                btnDislikeModal.classList.add('activo-dislike');
+            } else {
+                btnDislikeModal.classList.remove('activo-dislike');
+            }
         };
 
         if (btnLikeModal && btnLikeFuera) {
             btnLikeModal.addEventListener('click', () => {
                 btnLikeFuera.click();
-                // Hacemos múltiples lecturas rápidas para capturar el cambio exacto tras la mutación del DOM exterior
                 setTimeout(sincronizarAmbosContadores, 50);
-                setTimeout(sincronizarAmbosContadores, 150);
-                setTimeout(sincronizarAmbosContadores, 300);
+                setTimeout(sincronizarAmwasContadores, 150);
             });
         }
 
@@ -444,18 +471,18 @@ btnComentarios.forEach(btn => {
                 btnDislikeFuera.click();
                 setTimeout(sincronizarAmbosContadores, 50);
                 setTimeout(sincronizarAmbosContadores, 150);
-                setTimeout(sincronizarAmbosContadores, 300);
             });
         }
 
-        // Limpiamos la lista e input antes de cargar el flujo AJAX
-        modalCommentsList.innerHTML = '<div class="modal-comments-empty">Cargando debate...</div>';
+        // Limpiamos la lista e input
+        modalCommentsList.innerHTML = '<div class="modal-comments-empty">Cargando comentarios...</div>';
         modalInput.value = '';
 
         // Mostrar el modal
         modalOverlay.classList.add('show');
+        modalOverlay.classList.add('active');
 
-        // Petición AJAX (se mantiene igual...)
+        // Petición AJAX para traer comentarios existentes
         try {
             const response = await fetch(`/actividad/${actividadActivaId}/comentarios/`);
             const data = await response.json();
@@ -471,8 +498,13 @@ btnComentarios.forEach(btn => {
     });
 });
 
-// Función para pintar los comentarios en la lista
+// Función para pintar los comentarios en la lista usando la estructura de burbujas
 function renderizarComentarios(comentarios) {
+    const modalOverlay = document.getElementById('comments-modal');
+    if (!modalOverlay) return;
+    const modalCommentsList = modalOverlay.querySelector('.debate-modal-comments-list');
+    if (!modalCommentsList) return;
+    
     modalCommentsList.innerHTML = '';
     
     if (comentarios.length === 0) {
@@ -483,48 +515,143 @@ function renderizarComentarios(comentarios) {
     comentarios.forEach(c => {
         const item = document.createElement('div');
         item.classList.add('modal-comment-item');
+        
+        const fotoAvatar = c.usuario_foto ? c.usuario_foto : '/static/images/default-avatar.png';
+        
         item.innerHTML = `
-            <div class="modal-comment-user-info">
-                <span class="modal-comment-username">@${c.usuario}</span>
-                <span class="modal-comment-date">${c.fecha}</span>
+            <div class="modal-comment-main-row">
+                <div class="modal-comment-avatar-wrapper">
+                    <img src="${fotoAvatar}" alt="Avatar" class="modal-comment-user-avatar">
+                </div>
+                
+                <div class="modal-comment-body">
+                    <div class="modal-comment-top-line">
+                        <div class="modal-comment-user-info">
+                            <span class="modal-comment-username">${c.usuario}</span>
+                            <span class="modal-comment-divider">•</span>
+                            <span class="modal-comment-date">${c.fecha}</span>
+                        </div>
+                        
+                        <div class="modal-comment-options-wrapper">
+                            <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${c.id});">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="comment-options-menu" id="options-menu-${c.id}">
+                                <button onclick="event.stopPropagation(); editarComentario(${c.id});">Editar</button>
+                                <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${c.id});">Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-comment-text">${c.texto}</div>
+                    
+                    <div class="modal-comment-actions">
+                        <button class="btn-comment-reply" onclick="event.stopPropagation(); conmutarCascada(${c.id});">
+                            <i class="far fa-comment"></i>
+                        </button>
+                        <button class="btn-comment-like" onclick="event.stopPropagation(); darLikeComentario(${c.id});" data-id="${c.id}">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-comment-text">${c.texto}</div>
+            
+            <div class="modal-comment-replies-container" id="replies-${c.id}">
+                <div class="modal-comment-replies-list" id="replies-list-${c.id}"></div>
+                <div class="modal-comment-reply-box" onclick="event.stopPropagation();">
+                    <input type="text" placeholder="Escribe una respuesta..." class="modal-comment-reply-input" id="reply-input-${c.id}" />
+                    <button class="btn-modal-reply-submit" onclick="enviarRespuesta(${c.id})">Responder</button>
+                </div>
+            </div>
         `;
         modalCommentsList.appendChild(item);
     });
     
-    // Auto-scroll hacia el final para ver las últimas respuestas añadidas
-    modalCommentsList.scrollTop = modalCommentsList.scrollHeight;
+    // Forzamos el scroll arriba en la cola de ejecución del navegador
+    setTimeout(() => {
+        modalCommentsList.scrollTop = 0;
+    }, 50);
 }
 
-// Cierre del modal haciendo click exclusivamente fuera del contenedor (en el overlay)
-modalOverlay.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) {
+// 2. CORRECCIÓN DEL CIERRE DEL MODAL (Seguro ante clics externos)
+document.addEventListener('click', (e) => {
+    const modalOverlay = document.getElementById('comments-modal');
+    if (!modalOverlay || !modalOverlay.classList.contains('show')) return;
+
+    // Si hace clic exactamente en el fondo oscuro (overlay) o en el botón de cerrar X
+    if (e.target === modalOverlay || e.target.classList.contains('btn-close-modal') || e.target.closest('.btn-close-modal')) {
         modalOverlay.classList.remove('show');
+        modalOverlay.classList.remove('active');
         actividadActivaId = null;
         botonComentarioActivo = null;
     }
 });
 
-// Enviar un nuevo comentario al hacer click en Responder
-btnSubmitComment.addEventListener('click', enviarComentario);
-
-// Permitir enviar el comentario también al presionar Enter en el input
-modalInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+// 3. RECONEXIÓN SEGURA PARA ENVIAR COMENTARIOS PRINCIPALES (Evita bloqueos)
+document.addEventListener('click', (e) => {
+    if (e.target && (e.target.classList.contains('btn-modal-comment-submit') || e.target.closest('.btn-modal-comment-submit'))) {
+        console.log("¡Clic seguro detectado para enviar comentario!");
         enviarComentario();
     }
 });
 
+document.addEventListener('keydown', (e) => {
+    // Escucha el Enter global solo si viene de la caja de comentarios principal
+    if (e.key === 'Enter' && e.target && e.target.classList.contains('modal-comment-input')) {
+        e.preventDefault();
+        console.log("¡Enter seguro detectado!");
+        enviarComentario();
+    }
+});
+
+
+// --- FUNCIONES TEMPORALES PARA EVITAR ERRORES (PASO A PASO) ---
+function conmutarCascada(id) { console.log("Click en tarjeta para abrir respuestas:", id); }
+function mostrarMenuOpciones(id) { console.log("Click en 3 puntos:", id); }
+function editarComentario(id) { console.log("Editar:", id); }
+function eliminarComentario(id) { console.log("Eliminar:", id); }
+function darLikeComentario(id) { console.log("Dar like:", id); }
+function enviarRespuesta(id) { console.log("Enviar respuesta para:", id); }
+
+// Función asíncrona para guardar el comentario
 async function enviarComentario() {
-    const texto = modalInput.value.trim();
-    if (!texto || !actividadActivaId) return;
+    const modalOverlay = document.getElementById('comments-modal');
+    if (!modalOverlay) {
+        console.error("No se encontró el #comments-modal al intentar enviar.");
+        return;
+    }
     
+    const modalInput = modalOverlay.querySelector('.modal-comment-input');
+    const modalCommentsList = modalOverlay.querySelector('.debate-modal-comments-list');
+    
+    if (!modalInput || !modalCommentsList) {
+        console.error("No se encontró el input o la lista de comentarios dentro del modal.");
+        return;
+    }
+    
+    const texto = modalInput.value.trim();
+    console.log("Texto a enviar:", texto);
+    console.log("ID de la actividad activa:", actividadActivaId);
+
+    if (!texto) {
+        console.warn("El texto está vacío, se cancela el envío.");
+        return;
+    }
+    
+    if (!actividadActivaId) {
+        console.error("ERROR: 'actividadActivaId' es null. El script perdió el ID de la tarjeta.");
+        alert("Error interno: No se pudo identificar la tarjeta de actividad.");
+        return;
+    }
+    
+    // Obtención del CSRF Token de Django
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+    
     const formData = new FormData();
     formData.append('texto', texto);
     
     try {
+        console.log("Enviando petición fetch a:", `/actividad/${actividadActivaId}/comentar/`);
         const response = await fetch(`/actividad/${actividadActivaId}/comentar/`, {
             method: 'POST',
             headers: {
@@ -534,30 +661,72 @@ async function enviarComentario() {
         });
         
         const data = await response.json();
+        console.log("Respuesta del servidor recibida:", data);
         
         if (data.status === 'success') {
-            modalInput.value = '';
+            modalInput.value = ''; // Limpiamos la caja de texto
             
-            // Si la lista tenía el mensaje de estar vacía, lo removemos antes de inyectar el nuevo elemento
             const emptyMsg = modalCommentsList.querySelector('.modal-comments-empty');
             if (emptyMsg) emptyMsg.remove();
             
-            // Inyectamos el nuevo comentario en tiempo real a la vista actual
             const item = document.createElement('div');
             item.classList.add('modal-comment-item');
+            
+            const fotoAvatar = data.comentario.usuario_foto ? data.comentario.usuario_foto : '/static/images/default-avatar.png';
+            
+            // Inyectamos la estructura corregida y nivelada
             item.innerHTML = `
-                <div class="modal-comment-user-info">
-                    <span class="modal-comment-username">@${data.comentario.usuario}</span>
-                    <span class="modal-comment-date">${data.comentario.fecha}</span>
+                <div class="modal-comment-main-row">
+                    <div class="modal-comment-avatar-wrapper">
+                        <img src="${fotoAvatar}" alt="Avatar" class="modal-comment-user-avatar">
+                    </div>
+                    
+                    <div class="modal-comment-body">
+                        <div class="modal-comment-top-line">
+                            <div class="modal-comment-user-info">
+                                <span class="modal-comment-username">${data.comentario.usuario}</span>
+                                <span class="modal-comment-divider">•</span>
+                                <span class="modal-comment-date">${data.comentario.fecha}</span>
+                            </div>
+                            
+                            <div class="modal-comment-options-wrapper">
+                                <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${data.comentario.id});">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="comment-options-menu" id="options-menu-${data.comentario.id}">
+                                    <button onclick="event.stopPropagation(); editarComentario(${data.comentario.id});">Editar</button>
+                                    <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${data.comentario.id});">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-comment-text">${data.comentario.texto}</div>
+                        
+                        <div class="modal-comment-actions">
+                            <button class="btn-comment-reply" onclick="event.stopPropagation(); conmutarCascada(${data.comentario.id});">
+                                <i class="far fa-comment"></i>
+                            </button>
+                            <button class="btn-comment-like" onclick="event.stopPropagation(); darLikeComentario(${data.comentario.id});" data-id="${data.comentario.id}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-comment-text">${data.comentario.texto}</div>
+                
+                <div class="modal-comment-replies-container" id="replies-${data.comentario.id}">
+                    <div class="modal-comment-replies-list" id="replies-list-${data.comentario.id}"></div>
+                    <div class="modal-comment-reply-box" onclick="event.stopPropagation();">
+                        <input type="text" placeholder="Escribe una respuesta..." class="modal-comment-reply-input" id="reply-input-${data.comentario.id}" />
+                        <button class="btn-modal-reply-submit" onclick="enviarRespuesta(${data.comentario.id})">Responder</button>
+                    </div>
+                </div>
             `;
-            modalCommentsList.appendChild(item);
             
-            // Hacemos scroll abajo tras añadir el nuevo elemento
-            modalCommentsList.scrollTop = modalCommentsList.scrollHeight;
+            // Insertamos arriba del todo e igualamos el scroll al inicio
+            modalCommentsList.prepend(item);
+            modalCommentsList.scrollTop = 0;
             
-            // Actualizamos dinámicamente el contador de comentarios en la tarjeta de fondo usando nuestra regla de ceros
+            // Actualizar el contador de comentarios exterior en la tarjeta flotante
             if (botonComentarioActivo) {
                 const spanCounter = botonComentarioActivo.querySelector('.interact-counter');
                 if (spanCounter) {
@@ -568,7 +737,23 @@ async function enviarComentario() {
             alert(data.message || 'Ocurrió un error al enviar el comentario.');
         }
     } catch (error) {
-        console.error('Error al enviar el comentario:', error);
+        console.error('Error crítico al enviar el comentario vía fetch:', error);
     }
+}
+
+// Función auxiliar para obtener el token CSRF desde las cookies del navegador
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 </script>
