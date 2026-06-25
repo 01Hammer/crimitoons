@@ -743,8 +743,8 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 0;
-    /* Quitamos cualquier propiedad que estire verticalmente el bloque */
+    gap: 4px;
+    position: relative; /* Referencia sutil para el espacio interno */
 }
 
 /* Estado de lista vacía */
@@ -758,6 +758,20 @@
 /* Contenedor del Avatar - ¡AGRANDADO! */
 .modal-comment-avatar-wrapper {
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.modal-comment-avatar-wrapper::after {
+    content: '';
+    flex: 1; /* Se estira dinámicamente según la altura que tome el texto del comentario */
+    width: 2px; /* Un trazo fino pero definido */
+    background-color: #ebdcc5; /* El mismo tono beige sutil de tu divisor superior */
+    margin-top: 8px; /* Pequeño respiro debajo del círculo del avatar */
+    border-radius: 1px;
+    opacity: 0.8; /* Le da un acabado más sedoso y menos tosco */
 }
 
 .modal-comment-user-avatar {
@@ -785,15 +799,16 @@
 /* Cabecera interna (Nombre de usuario e información) */
 .modal-comment-user-info {
     display: flex;
-    align-items: center;       /* Cambiado de baseline a center para que se alineen perfecto */
-    justify-content: flex-start; /* Forzamos a que la fecha se pegue al nombre en lugar de irse al extremo */
-    gap: 8px;                  /* Espaciado corto entre nombre y fecha */
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px; /* Espaciado corto y uniforme entre cada elemento */
+    width: 100%;
 }
 
 .modal-comment-username {
     font-size: 14.5px;         /* Ajustamos sutilmente el tamaño al ser una línea limpia */
     font-weight: 700;
-    color: #b25e38; 
+    color: black; 
 }
 
 .modal-comment-date {
@@ -803,11 +818,15 @@
 
 /* Texto del comentario */
 .modal-comment-text {
-    font-size: 13.5px;
+    font-size: 14.5px;
     color: #3d3330;
     line-height: 1.4;
     word-break: break-word;
-    white-space: pre-line; 
+    white-space: pre-line;
+    
+    font-weight: 480; /* Le da cuerpo intermedio, ideal para comentarios */
+    -webkit-font-smoothing: antialiased; /* Suaviza los bordes en navegadores basados en WebKit (Chrome, Edge, Safari) */
+    -moz-osx-font-smoothing: grayscale; /* Suaviza los bordes en Firefox para Mac */
 }
 
 /* Línea divisoria superior del modal */
@@ -834,38 +853,36 @@
     line-height: 1;
 }
 
+/* --- CONTENEDOR PRINCIPAL DEL COMENTARIO --- */
 .modal-comment-item {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    background: #ffffff;
-    border: 1px solid #ebdcc5;
-    border-radius: 12px;         /* Un poco menos redondeado para diferenciarlo de la de arriba */
-    padding: 10px 14px;          /* Reducido de 16px a un colchón más ajustado */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
-    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    padding: 10px 4px;
+    margin: 0;
 }
 
-/* Quitamos la manita de toda la tarjeta ya que tiene botón propio */
 .modal-comment-main-row {
     display: flex;
+    gap: 14px; 
     align-items: flex-start;
-    gap: 14px;
     width: 100%;
-    cursor: default; 
 }
 
-/* Contenedor interno para alinear el nombre y los tres puntos */
+/* --- CABECERA (NOMBRE, FECHA Y 3 PUNTOS) --- */
 .modal-comment-top-line {
     display: flex;
-    justify-content: space-between; 
+    justify-content: flex-start; /* Forzamos a que todo se agrupe a la izquierda */
     align-items: center;
     width: 100%;
 }
 
 /* --- BOTÓN DE 3 PUNTOS Y MENÚ FLOTANTE --- */
 .modal-comment-options-wrapper {
-    position: relative; /* Base para posicionar el menú desplegable */
+    position: relative;
+    display: inline-flex;
+    align-items: center;
 }
 
 .btn-comment-options {
@@ -873,21 +890,41 @@
     border: none;
     color: #a39692;
     cursor: pointer;
-    padding: 4px 8px;
-    font-size: 14px;
+    padding: 0 2px; /* Espaciado mínimo para que actúe como un separador más */
+    font-size: 11px; /* Lo achicamos un pelo para que nivele con la fecha */
+    display: flex;
+    align-items: center;
     transition: color 0.2s ease;
 }
 
 .btn-comment-options:hover {
-    color: #b25e38; /* Resalta con tu color café/naranja al pasar el mouse */
+    color: #b25e38;
 }
 
-/* Menú oculto por defecto */
+/* 1. Por defecto, ocultamos el botón de opciones de forma suave */
+.modal-comment-options-wrapper .btn-comment-options {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, color 0.2s ease;
+}
+
+/* 2. Cuando el usuario pasa el mouse por cualquier parte del comentario, se muestran los puntos */
+.modal-comment-item:hover .btn-comment-options {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 3. Aseguramos que si el menú desplegable está abierto (.show), los puntos no se borren al quitar el mouse */
+.modal-comment-options-wrapper:has(.comment-options-menu.show) .btn-comment-options {
+    opacity: 1;
+    visibility: visible;
+}
+
 .comment-options-menu {
     display: none; 
     position: absolute;
     top: 100%;
-    right: 0;
+    left: 0; /* Cambiado a left para que se despliegue hacia adelante al estar pegado a la izquierda */
     background: #ffffff;
     border: 1px solid #eaddd7;
     border-radius: 8px;
@@ -897,7 +934,6 @@
     overflow: hidden;
 }
 
-/* Estado activo del menú de opciones */
 .comment-options-menu.show {
     display: flex;
     flex-direction: column;
@@ -919,69 +955,85 @@
 }
 
 .comment-options-menu button.delete-opt {
-    color: #e05858; /* Color rojo sutil para la acción de eliminar */
+    color: #e05858;
 }
 
-/* --- BOTÓN DE LIKE (ABAJO A LA DERECHA) --- */
+/* --- TEXTO Y ACCIONES DEBAJO DEL COMENTARIO --- */
 .modal-comment-actions {
     display: flex;
-    justify-content: flex-end; 
-    gap: 14px;
-    width: 100%;
-    margin-top: 4px;  /* Espacio mínimo para que se pegue al texto del comentario */
-    align-self: flex-end; /* Alineación segura al fondo derecho */
-}
-
-.btn-comment-like {
-    background: none;
-    border: none;
-    color: #a39692;
-    font-size: 17px;
-    cursor: pointer;
-    display: flex;
     align-items: center;
-    gap: 4px;
-    transition: transform 0.2s ease, color 0.2s ease;
+    width: 100%;
+    margin-top: 7px;
 }
-
-.btn-comment-like:hover {
-    color: #e05858;
-    transform: scale(1.05); /* Un sutil efecto de pulsación */
-}
-
-/* --- CASCADA DE RESPUESTAS (CHAT INTERNO) --- */
-.modal-comment-replies-container {
-    margin-left: 62px; /* Alineado justo donde empieza el texto (48px avatar + 14px gap) */
-    margin-top: 4px;
-    margin-bottom: 12px;
-    border-left: 2px solid #eaddd7;
-    padding-left: 14px;
-    display: none; /* Oculto por defecto: se activará al clickear la tarjeta */
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* Estado activo para desplegar la cascada */
-.modal-comment-replies-container.show {
-    display: flex;
-}
-
 
 .btn-comment-reply {
     background: none;
     border: none;
     color: #a39692;
-    font-size: 17px;
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    padding: 0;
+    text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .btn-comment-reply:hover {
     color: #b25e38;
 }
+
+.btn-comment-reply::before,
+.btn-comment-reply::after,
+.btn-comment-reply i {
+    display: none !important;
+}
+
+/* Botón de Like: Icono flotando al extremo derecho */
+.btn-comment-like {
+    background: none;
+    border: none;
+    color: #a39692;
+    font-size: 16px; /* Ajustado: un punto intermedio, ni muy grande ni muy invisible */
+    cursor: pointer;
+    padding: 4px;
+    
+    /* Lo sacamos del flujo vertical para centrarlo verticalmente respecto al bloque de texto */
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%); /* Lo centra matemáticamente en el eje vertical del cuerpo del comentario */
+    
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn-comment-like:hover {
+    color: #e05858;
+    transform: translateY(-50%) scale(1.1); /* Mantiene el centrado durante el efecto hover */
+}
+
+.modal-comment-text,
+.modal-comment-actions {
+    margin-right: 32px; 
+}
+
+/* --- CASCADA DE RESPUESTAS (CHAT INTERNO) --- */
+.modal-comment-replies-container {
+    margin-left: 62px; /* 48px avatar + 14px gap */
+    margin-top: 6px;
+    margin-bottom: 8px;
+    border-left: 2px solid #eaddd7;
+    padding-left: 14px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-comment-replies-container.show {
+    display: flex;
+}
+
 .modal-comment-reply-box {
     display: flex;
     gap: 8px;

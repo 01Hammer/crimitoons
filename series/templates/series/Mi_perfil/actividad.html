@@ -99,7 +99,7 @@
                                 <span class="interact-counter counter-dislike">{% if registro.total_dislikes > 0 %}{{ registro.total_dislikes }}{% endif %}</span>
                             </button>
                             
-                            <button class="btn-interact-comentario" title="Ver comentarios y debatir">
+                            <button class="btn-interact-comentario" title="comentarios">
                                 <div class="icon-container">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -516,7 +516,8 @@ function renderizarComentarios(comentarios) {
         const item = document.createElement('div');
         item.classList.add('modal-comment-item');
         
-        const fotoAvatar = c.usuario_foto ? c.usuario_foto : '/static/images/default-avatar.png';
+        // Si hay foto en la base de datos la usa, si no, usa el avatar gris de internet
+        const fotoAvatar = c.usuario_foto ? c.usuario_foto : 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
         
         item.innerHTML = `
             <div class="modal-comment-main-row">
@@ -530,15 +531,16 @@ function renderizarComentarios(comentarios) {
                             <span class="modal-comment-username">${c.usuario}</span>
                             <span class="modal-comment-divider">•</span>
                             <span class="modal-comment-date">${c.fecha}</span>
-                        </div>
-                        
-                        <div class="modal-comment-options-wrapper">
-                            <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${c.id});">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <div class="comment-options-menu" id="options-menu-${c.id}">
-                                <button onclick="event.stopPropagation(); editarComentario(${c.id});">Editar</button>
-                                <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${c.id});">Eliminar</button>
+                            <span class="modal-comment-divider"></span>
+                            
+                            <div class="modal-comment-options-wrapper">
+                                <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${c.id});">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="comment-options-menu" id="options-menu-${c.id}">
+                                    <button onclick="event.stopPropagation(); editarComentario(${c.id});">Editar</button>
+                                    <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${c.id});">Eliminar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -547,7 +549,7 @@ function renderizarComentarios(comentarios) {
                     
                     <div class="modal-comment-actions">
                         <button class="btn-comment-reply" onclick="event.stopPropagation(); conmutarCascada(${c.id});">
-                            <i class="far fa-comment"></i>
+                            Responder
                         </button>
                         <button class="btn-comment-like" onclick="event.stopPropagation(); darLikeComentario(${c.id});" data-id="${c.id}">
                             <i class="far fa-heart"></i>
@@ -659,7 +661,6 @@ async function enviarComentario() {
             },
             body: formData
         });
-        
         const data = await response.json();
         console.log("Respuesta del servidor recibida:", data);
         
@@ -672,9 +673,18 @@ async function enviarComentario() {
             const item = document.createElement('div');
             item.classList.add('modal-comment-item');
             
-            const fotoAvatar = data.comentario.usuario_foto ? data.comentario.usuario_foto : '/static/images/default-avatar.png';
-            
-            // Inyectamos la estructura corregida y nivelada
+            // Evaluamos la ruta recibida del servidor
+            let fotoAvatar = '';
+            if (data.comentario && data.comentario.usuario_foto && data.comentario.usuario_foto.trim() !== '') {
+                fotoAvatar = data.comentario.usuario_foto.trim();
+                if (!fotoAvatar.startsWith('/') && !fotoAvatar.startsWith('http')) {
+                    fotoAvatar = '/' + fotoAvatar;
+                }
+            } else {
+                // Si el servidor no manda foto, usamos la imagen de respaldo de internet
+                fotoAvatar = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+            }
+                
             item.innerHTML = `
                 <div class="modal-comment-main-row">
                     <div class="modal-comment-avatar-wrapper">
@@ -687,15 +697,16 @@ async function enviarComentario() {
                                 <span class="modal-comment-username">${data.comentario.usuario}</span>
                                 <span class="modal-comment-divider">•</span>
                                 <span class="modal-comment-date">${data.comentario.fecha}</span>
-                            </div>
-                            
-                            <div class="modal-comment-options-wrapper">
-                                <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${data.comentario.id});">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <div class="comment-options-menu" id="options-menu-${data.comentario.id}">
-                                    <button onclick="event.stopPropagation(); editarComentario(${data.comentario.id});">Editar</button>
-                                    <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${data.comentario.id});">Eliminar</button>
+                                <span class="modal-comment-divider"></span>
+                                
+                                <div class="modal-comment-options-wrapper">
+                                    <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${data.comentario.id});">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <div class="comment-options-menu" id="options-menu-${data.comentario.id}">
+                                        <button onclick="event.stopPropagation(); editarComentario(${data.comentario.id});">Editar</button>
+                                        <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${data.comentario.id});">Eliminar</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -704,7 +715,7 @@ async function enviarComentario() {
                         
                         <div class="modal-comment-actions">
                             <button class="btn-comment-reply" onclick="event.stopPropagation(); conmutarCascada(${data.comentario.id});">
-                                <i class="far fa-comment"></i>
+                                Responder
                             </button>
                             <button class="btn-comment-like" onclick="event.stopPropagation(); darLikeComentario(${data.comentario.id});" data-id="${data.comentario.id}">
                                 <i class="far fa-heart"></i>
@@ -722,11 +733,9 @@ async function enviarComentario() {
                 </div>
             `;
             
-            // Insertamos arriba del todo e igualamos el scroll al inicio
             modalCommentsList.prepend(item);
             modalCommentsList.scrollTop = 0;
             
-            // Actualizar el contador de comentarios exterior en la tarjeta flotante
             if (botonComentarioActivo) {
                 const spanCounter = botonComentarioActivo.querySelector('.interact-counter');
                 if (spanCounter) {

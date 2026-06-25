@@ -8,13 +8,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-from .models import Serie, Perfil, UserSeriesProgress, HistorialActividad, VotoActividad, ComentarioActividad
+from .models import Serie, Perfil, UserSeriesProgress, HistorialActividad, VotoActividad, ComentarioActividad, ComunidadPost
 from .forms import RegistroForm, LoginForm, ActualizarPerfilForm
 from django.http import JsonResponse, Http404
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.utils.timesince import timesince
 from django.utils import timezone
+from django.db.models import Count  # <-- Asegúrate de que esta línea esté presente
 
 DEFAULT_POSTER = "https://placehold.co/500x750/3D262B/F7F3E3?text=No+Poster"
 API_KEY_TMDB = "ea735303fe1aa8a04e298b1f9c130e6c"
@@ -582,29 +583,58 @@ def crear_serie(request):
             resultado = datos["results"][0]
             id_serie = resultado.get("id")
 
-            url_detalle = f"https://api.themoviedb.org/3/tv/{id_serie}?api_key={API_KEY_TMDB}&language=en-US"
-            try:
-                datos_detalle = requests.get(url_detalle, timeout=3.0).json()
-                if 16 not in [g["id"] for g in datos_detalle.get("genres", [])] or datos_detalle.get("original_language", "") in IDIOMAS_BLOQUEADOS:
+            # Verificar si la serie ya existe localmente para no duplicarla
+            serie_local = Serie.objects.filter(id_tmdb=id_serie).first()
+
+            if not serie_local:
+                url_detalle = f"https://api.themoviedb.org/3/tv/{id_serie}?api_key={API_KEY_TMDB}&language=en-US"
+                try:
+                    datos_detalle = requests.get(url_detalle, timeout=3.0).json()
+                    if 16 not in [g["id"] for g in datos_detalle.get("genres", [])] or datos_detalle.get("original_language", "") in IDIOMAS_BLOQUEADOS:
+                        return redirect("index_invitado")
+
+                    lista_generos = datos_detalle.get("genres", [])
+                    poster_raw = datos_detalle.get("poster_path")
+                    backdrop_raw = datos_detalle.get("backdrop_path")
+
+                    # Creamos la serie de forma limpia
+                    serie_local = Serie.objects.create(
+                        titulo=datos_detalle.get("original_name") or datos_detalle.get("name"),
+                        id_tmdb=id_serie,
+                        sinopsis=datos_detalle.get("overview") or "No se encontró sinopsis.",
+                        calificacion=datos_detalle.get("vote_average", 0.0),
+                        poster_path="https://image.tmdb.org/t/p/w500" + poster_raw if poster_raw else DEFAULT_POSTER,
+                        backdrop_path="https://image.tmdb.org/t/p/original" + backdrop_raw if backdrop_raw else "",
+                        fecha_estreno=datos_detalle.get("first_air_date", "S/D"),
+                        generos=", ".join([g["name"] for g in lista_generos][:3]) if lista_generos else "Animación",
+                        total_capitulos=datos_detalle.get("number_of_episodes", 0),
+                        total_temporadas=datos_detalle.get("number_of_seasons", 1),
+                    )
+                except Exception:
                     return redirect("index_invitado")
 
-                lista_generos = datos_detalle.get("genres", [])
-                poster_raw = datos_detalle.get("poster_path")
-                backdrop_raw = datos_detalle.get("backdrop_path")
-
-                Serie.objects.create(
-                    titulo=datos_detalle.get("original_name") or datos_detalle.get("name"),
-                    id_tmdb=id_serie,
-                    sinopsis=datos_detalle.get("overview") or "No se encontró sinopsis.",
-                    calificacion=datos_detalle.get("vote_average", 0.0),
-                    poster_path="https://image.tmdb.org/t/p/w500" + poster_raw if poster_raw else DEFAULT_POSTER,
-                    backdrop_path="https://image.tmdb.org/t/p/original" + backdrop_raw if backdrop_raw else "",
-                    fecha_estreno=datos_detalle.get("first_air_date", "S/D"),
-                    generos=", ".join([g["name"] for g in lista_generos][:3]) if lista_generos else "Animación",
-                    total_capitulos=datos_detalle.get("number_of_episodes", 0),
-                    total_temporadas=datos_detalle.get("number_of_seasons", 1),
+            # ============================================================
+            # MAGIA: Asociar la serie al usuario actual que la está buscando
+            # ============================================================
+            if request.user.is_authenticated and serie_local:
+                perfil_usuario = request.user.perfil
+                
+                # Buscamos o creamos el progreso en la biblioteca para este usuario
+                progreso, creado = UserSeriesProgress.objects.get_or_create(
+                    perfil=perfil_usuario,
+                    serie=serie_local,
+                    defaults={'estado': 'viendo'} # O el estado por defecto que prefieras
                 )
-            except Exception: pass
+                
+                # Si es un registro nuevo en su biblioteca, generamos explícitamente la tarjeta de actividad
+                if creado:
+                    HistorialActividad.objects.create(
+                        perfil=perfil_usuario,
+                        serie=serie_local,
+                        accion='empezo', # Ajusta este string según las opciones de tu campo 'accion'
+                        comment_momento="¡Añadida a mi biblioteca desde el buscador!"
+                    )
+
         return redirect("index_invitado")
     return render(request, "series/nueva_serie.html")
 
@@ -872,3 +902,37 @@ def agregar_comentario(request, actividad_id):
             })
         except HistorialActividad.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Actividad no encontrada'}, status=404)
+
+@login_required
+def comunidad(request):
+    # 1. Traer toda la actividad automática de series
+    actividades = HistorialActividad.objects.all().select_related('perfil__usuario', 'serie')
+    # Marcamos estas tarjetas como 'actividad'
+    for act in actividades:
+        act.tipo_tarjeta = 'actividad'
+
+    # 2. Traer todos los posts manuales de la comunidad
+    posts_comunidad = ComunidadPost.objects.all().select_related('usuario', 'serie_vinculada', 'capitulo_vinculado').prefetch_related('opciones_encuesta')
+    # Marcamos estas tarjetas según su tipo real en la base de datos ('foro', 'natural', 'encuesta')
+    for post in posts_comunidad:
+        post.tipo_tarjeta = post.tipo  # Copia el valor de tu campo 'tipo' (natural, foro, encuesta)
+
+    # 3. Unificar ambos mundos reales en una sola lista en memoria
+    feed_completo = list(actividades) + list(posts_comunidad)
+
+    # 4. Ordenar cronológicamente: el más reciente primero
+    feed_completo.sort(key=lambda x: x.created_at, reverse=True)
+
+    # 5. Foros más activos para la barra lateral derecha
+    foros_calientes = (
+        ComunidadPost.objects.filter(tipo=ComunidadPost.TipoPost.FORO)
+        .annotate(num_respuestas=Count('respuestas'))
+        .order_by('-num_respuestas')[:4]
+    )
+
+    context = {
+        'feed': feed_completo,
+        'foros_calientes': foros_calientes,
+    }
+
+    return render(request, 'series/comunidad.html', context)

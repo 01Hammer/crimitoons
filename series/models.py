@@ -201,6 +201,8 @@ class HistorialActividad(models.Model):
     def __str__(self):
         return f"{self.perfil.usuario.username} - {self.get_accion_display()} - {self.serie.titulo}"
 
+
+#COMUNIDAD: Tarjetas de actualización de serie, comentarios, foros y encuestas
 class VotoActividad(models.Model):
     class TipoVoto(models.TextChoices):
         LIKE = 'like', 'Me gusta'
@@ -250,3 +252,99 @@ class ComentarioActividad(models.Model):
 
     def __str__(self):
         return f"Comentario de {self.usuario.username} en actividad #{self.actividad.id}"
+
+class ComunidadPost(models.Model):
+    class TipoPost(models.TextChoices):
+        NATURAL = 'natural', 'Publicación Libre'
+        FORO = 'foro', 'Foro de Debate'
+        ENCUESTA = 'encuesta', 'Encuesta'
+
+    class CategoriaForo(models.TextChoices):
+        TEORIAS = 'teorias', 'Teorías'
+        CRITICAS = 'criticas', 'Críticas'
+        DEBATES = 'debates', 'Debates'
+        NOTICIAS = 'noticias', 'Noticias'
+        NINGUNA = 'ninguna', 'Ninguna'
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts_comunidad')
+    tipo = models.CharField(max_length=15, choices=TipoPost.choices, default=TipoPost.NATURAL)
+    
+    titulo = models.CharField(max_length=200, blank=True, null=True)
+    texto = models.TextField()
+    imagen = models.ImageField(upload_to='comunidad/imagenes/', blank=True, null=True)
+    video = models.FileField(upload_to='comunidad/videos/', blank=True, null=True)
+    gif_url = models.URLField(blank=True, null=True)
+
+    # Relaciones opcionales para "llamar" una serie o capítulo
+    serie_vinculada = models.ForeignKey('Serie', on_delete=models.SET_NULL, blank=True, null=True, related_name='posts_mencionados')
+    capitulo_vinculado = models.ForeignKey('Capitulo', on_delete=models.SET_NULL, blank=True, null=True, related_name='posts_mencionados')
+
+    categoria = models.CharField(max_length=20, choices=CategoriaForo.choices, default=CategoriaForo.NINGUNA)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Post de Comunidad'
+        verbose_name_plural = 'Posts de Comunidad'
+
+    def __str__(self):
+        return f"Post {self.tipo} por {self.usuario.username} (#{self.id})"
+
+
+class EncuestaOpcion(models.Model):
+    post = models.ForeignKey(ComunidadPost, on_delete=models.CASCADE, related_name='opciones_encuesta')
+    texto_opcion = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"Opción: {self.texto_opcion} (Post #{self.post.id})"
+
+
+class EncuestaVoto(models.Model):
+    perfil = models.ForeignKey('Perfil', on_delete=models.CASCADE, related_name='votos_encuestas')
+    opcion = models.ForeignKey(EncuestaOpcion, on_delete=models.CASCADE, related_name='votos')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('perfil', 'opcion')
+
+
+class RespuestaComunidad(models.Model):
+    post = models.ForeignKey(ComunidadPost, on_delete=models.CASCADE, related_name='respuestas')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='respuestas_comunidad')
+    texto = models.TextField(max_length=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Respuesta de comunidad'
+        verbose_name_plural = 'Respuestas de comunidad'
+
+    def __str__(self):
+        return f"Respuesta de {self.usuario.username} en post #{self.post.id}"
+
+
+class VotoComunidad(models.Model):
+    class TipoVoto(models.TextChoices):
+        LIKE = 'like', 'Me gusta'
+        DISLIKE = 'dislike', 'Discrepo'
+
+    perfil = models.ForeignKey('Perfil', on_delete=models.CASCADE, related_name='mis_votos_comunidad')
+    post = models.ForeignKey(ComunidadPost, on_delete=models.CASCADE, related_name='votos')
+    tipo = models.CharField(max_length=10, choices=TipoVoto.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('perfil', 'post')
+
+class Capitulo(models.Model):
+    season = models.ForeignKey('Season', on_delete=models.CASCADE, related_name='capitulos')
+    episode_number = models.IntegerField()
+    titulo = models.CharField(max_length=255, blank=True, null=True)
+    sinopsis = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        unique_together = ('season', 'episode_number')
+        ordering = ['episode_number']
+
+    def __str__(self):
+        return f"{self.season.serie.titulo} - T{self.season.season_number}E{self.episode_number}: {self.titulo or 'Sin título'}"
