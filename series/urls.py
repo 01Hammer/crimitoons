@@ -27,4 +27,7 @@ urlpatterns = [
     # comentarios para las series
     path('actividad/<int:actividad_id>/comentarios/', views.obtener_comentarios, name='obtener_comentarios'),
     path('actividad/<int:actividad_id>/comentar/', views.agregar_comentario, name='agregar_comentario'),
+
+    # crear publicación
+    path('comunidad/crear/', views.crear_post_comunidad, name='crear_post_comunidad'),
 ]

@@ -936,3 +936,20 @@ def comunidad(request):
     }
 
     return render(request, 'series/comunidad.html', context)
+
+@login_required
+def crear_post_comunidad(request):
+    if request.method == 'POST':
+        texto = request.POST.get('texto', '').strip()
+        imagen = request.FILES.get('imagen')  # Captura la imagen, gif o video si se seleccionó
+        
+        if texto:
+            # Creamos el registro usando los campos de tu clase ComunidadPost
+            ComunidadPost.objects.create(
+                usuario=request.user,
+                texto=texto,
+                imagen=imagen,
+                tipo='natural'  # Se guarda como un post normal por defecto
+            )
+            
+    return redirect('comunidad')

@@ -37,13 +37,21 @@ body {
 }
 
 .col-filtros  { grid-area: filtros; top: 88px; }
-.col-feed     { grid-area: feed; }
+
+.col-feed {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
 .col-sidebar  { grid-area: sidebar; top: 88px; }
 
-/* ── PRIMER BLOQUE: FILTROS ─────────────────────────────── */
+/* ── Filtros widget ─────────────────────────────── */
 
 .filtros-widget {
-    background: blacks;
+    background: #fff;
     border-radius: 14px;
     border: 1px solid rgba(61, 38, 43, 0.1);
     padding: 20px 12px;
@@ -58,9 +66,10 @@ body {
 
 .publicar-caja {
     padding: 10px;
-    margin-bottom: 16px; /* Aumentado para dar más separación */
-    border-bottom: 2px  rgb(163, 162, 162); /* Crea la línea divisoria horizontal */
+    margin-bottom: 16px;
+    border-bottom: 2px;
 }
+
 .feed-card {
     background: #fff;
     border-radius: 14px;
@@ -120,17 +129,6 @@ body {
     text-overflow: ellipsis;
 }
 
-.filtro-estado {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: transparent;
-    padding: 1px 4px;
-    border-radius: 4px;
-    background: transparent;
-    transition: all 0.15s;
-}
-
 .filtro-btn.activo {
     background: rgba(178, 94, 56, 0.08);
     color: #3D262B;
@@ -139,11 +137,6 @@ body {
 
 .filtro-btn.activo i {
     color: #B25E38;
-}
-
-.filtro-btn.activo .filtro-estado {
-    background: #B25E38;
-    color: #fff;
 }
 
 .filtro-btn:hover:not(.activo) {
@@ -180,14 +173,14 @@ body {
     border-color: #B25E38;
 }
 
-/* ── SEGUNDO BLOQUE: PUBLICAR: caja para publicar y publicaciones ──────────────────────────── */
+/* ── Publicar ──────────────────────────────────── */
 
 .publicar-top {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 12px;
-    background-color:  #fff;
+    background-color: #fff;
     border: 0.1px solid #B25E38;
     border-radius: 30px;
     padding: 4px 18px 4px 6px;
@@ -277,11 +270,62 @@ body {
 
 /* ── Feed ──────────────────────────────────────── */
 
+/*FOTO Y NOMBRE DEL PERFIL (burbuja y nombre de la izquierda) */
+.usuario-flex-info-exterior {
+    display: flex;
+    align-items: center;
+    gap: 7px; /* Mantiene la distancia horizontal exacta de tu diseño anterior */
+}
+
+/* ── DIMENSIONES DE LA CAJA ──────────────────────────────────────── */
+
+/* El contenedor principal de todas las publicaciones del muro */
 .feed-lista {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
+    width: 100%;
 }
+/* Fuerza al contenedor de cada publicación a estirarse al 100% */
+.feed-item-bloque {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.feed-detalles-laterales {
+    flex: 1;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: row; /* Cambiado de column a row para alinear textos e interacciones */
+    justify-content: space-between;
+}
+
+.columna-izquierda-serie {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+}
+
+.estado-puntuacion-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* Control multimedia: fotos, vídeos, gifs, etc */
+.post-multimedia {
+    width: 100%;
+    max-height: 450px;       /* Evita que imágenes demasiado altas traguen infinito scroll */
+    object-fit: cover;       /* Hace que la imagen llene el espacio de forma limpia */
+    border-radius: 8px;      /* Suaviza las esquinas para encajar con el diseño */
+    margin-top: 12px;        /* Separa el texto de la publicación de la multimedia */
+    display: block;
+}
+/* ── por ahora no sé qué hacen estas líneas ──────────────────────────────────────── */
+/* (Nota: Aquí eliminamos la repetición de .feed-lista para evitar conflictos en tu código) */
 
 .feed-card:hover {
     box-shadow: 0 4px 22px rgba(61, 38, 43, 0.09);
@@ -340,32 +384,9 @@ body {
     color: #B25E38;
 }
 
-.feed-cuerpo-serie {
-    display: flex;
-    gap: 18px;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
-
-.poster-mini {
-    width: 60px;
-    height: 88px;
-    object-fit: cover;
-    border-radius: 7px;
-    flex-shrink: 0;
-    border: 1px solid rgba(61, 38, 43, 0.1);
-}
-
-.serie-info {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-top: 2px;
-}
-
 .score-badge {
     display: inline-block;
-    background: #B25E38;
+    background: purple;
     color: #fff;
     font-size: 13px;
     font-weight: 700;
@@ -434,13 +455,14 @@ body {
     background: rgba(178, 94, 56, 0.04);
 }
 
-/* ── BLOQUE MEDIO: TARJETAS ───────────── */
+/* ── Tarjeta horizontal (actividad) ───────────── */
 
 .feed-card.card-horizontal {
     display: flex;
     padding: 0;
     overflow: hidden;
     min-height: 160px;
+    width: 100%; 
 }
 
 .feed-poster-lateral {
@@ -460,14 +482,6 @@ body {
     height: 100%;
     background: #3D262B;
     opacity: 0.1;
-}
-
-.feed-detalles-laterales {
-    flex: 1;
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 }
 
 .feed-card-header-clean {
@@ -529,7 +543,7 @@ body {
     background: rgba(178, 94, 56, 0.04);
 }
 
-/* ── Sidebar de foros ──────────────────────────── */
+/* ── Sidebar foros ─────────────────────────────── */
 
 .foros-lista {
     display: flex;
