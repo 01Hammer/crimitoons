@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Serie, Perfil, ComentarioActividad
+from .models import Serie, Perfil, ComentarioActividad, ComunidadPost
 
 admin.site.register(Serie)
 admin.site.register(ComentarioActividad)
@@ -9,4 +9,10 @@ class PerfilAdmin(admin.ModelAdmin):
     list_display = ('id', 'usuario', 'fecha_creacion', 'fecha_actualizacion')
     list_filter = ('fecha_creacion', 'fecha_actualizacion')
     search_fields = ('usuario__username', 'usuario__email')
-    readonly_fields = ('fecha_creacion', 'fecha_actualizacion')
+    readonly_fields = ('fecha_creacion', 'fecha_actualizacion') # <-- Paréntesis cerrado correctamente
+
+@admin.register(ComunidadPost)                
+class ComunidadPostAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'tipo', 'created_at')
+    list_filter = ('tipo', 'created_at')
+    search_fields = ('texto', 'usuario__username')

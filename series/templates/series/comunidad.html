@@ -60,7 +60,7 @@
                         {% endif %}
                         
                         <div class="publicar-input-wrap">
-                            <input type="text" name="texto" placeholder="En qué serie estás pensando..." class="publicar-input" required />
+                            <input type="text" name="texto" placeholder="En qué serie estás pensando..." class="publicar-input" />
                             
                             <input type="file" name="imagen" id="input-archivo-oculto" accept="image/*" style="display: none;" />
                             
@@ -74,7 +74,8 @@
                         <button type="button" class="accion-btn"><i class="fa-solid fa-fire"></i> Foro</button>
                         <button type="button" class="accion-btn"><i class="fa-solid fa-tv"></i> Serie</button>
                         <button type="button" class="accion-btn" data-tipo="encuesta"><i class="fa-solid fa-square-poll-horizontal"></i> Encuesta</button>
-                        
+                        <button type="button" class="accion-btn" data-tipo="historia"><i class="fa-solid fa-book-open"></i> Historia</button>
+                                                
                         <button type="submit" class="publicar-submit">Publicar</button>
                     </div>
                 </form>
@@ -86,49 +87,54 @@
                     {# ================== TIPO 1: HISTORIAL DE ACTIVIDAD (AUTOMÁTICA) ================== #}
                     {% if card.tipo_tarjeta == 'actividad' %}
                         <div class="feed-item-bloque">
-                            <div class="usuario-flex-info-exterior">
-                                {% if card.perfil.foto_perfil %}
-                                    <img src="{{ card.perfil.foto_perfil.url }}" alt="{{ card.perfil.usuario.username }}" class="avatar-mini" />
-                                {% else %}
-                                    <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
-                                {% endif %}
-                                <span class="feed-usuario">
-                                    <strong>{{ card.perfil.usuario.username }}</strong>
-                                </span>
-                            </div>
-
-                            <article class="feed-card tipo-amigo card-horizontal" data-tipo="actividad">
-                                <div class="feed-poster-lateral">
-                                    {% if card.serie.poster_path %}
-                                        <img src="{{ card.serie.poster_path }}" alt="{{ card.serie.titulo }}" class="poster-comunidad-flex" />
-                                    {% else %}
-                                        <div class="poster-placeholder-flex"></div>
-                                    {% endif %}
+                            <article class="feed-card tipo-amigo" data-tipo="actividad" style="padding: 13px;">
+                                <!-- 1. Fila superior: Avatar, nombre y tiempo alineados -->
+                                <div class="feed-header-interno">
+                                    <div class="usuario-info-grupo">
+                                        {% if card.perfil.foto_perfil %}
+                                            <img src="{{ card.perfil.foto_perfil.url }}" alt="{{ card.perfil.usuario.username }}" class="avatar-mini" />
+                                        {% else %}
+                                            <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
+                                        {% endif %}
+                                        <span class="feed-usuario">
+                                            <strong>{{ card.perfil.usuario.username }}</strong>
+                                        </span>
+                                    </div>
+                                    <span class="feed-tiempo" style="font-size: 0.85rem; color: #666;">Hace {{ card.created_at|timesince }}</span>
                                 </div>
 
-                                <div class="feed-detalles-laterales">
-                                    <div class="columna-izquierda-serie">
-                                        <div class="estado-puntuacion-row">
-                                            <span class="feed-badge amigo">{{ card.get_accion_display }}</span>
-                                            {% if card.score_momento %}
-                                                <span class="score-badge">★ {{ card.score_momento }}</span>
-                                            {% endif %}
-                                        </div>
-                                        <span class="feed-usuario" style="display: block; margin-top: 4px;">
-                                            <strong>{{ card.serie.titulo }}</strong>
-                                        </span>
-                                        <div class="feed-contenido-clean">
-                                            {% if card.comment_momento %}
-                                                <p class="feed-texto">{{ card.comment_momento }}</p>
-                                            {% else %}
-                                                <p class="feed-texto texto-vacio">Sin comentario adicional.</p>
-                                            {% endif %}
-                                        </div>
+                                <!-- 2. Contenido interno de la actividad -->
+                                <div style="display: flex; gap: 16px;">
+                                    <div class="feed-poster-lateral">
+                                        {% if card.serie.poster_path %}
+                                            <img src="{{ card.serie.poster_path }}" alt="{{ card.serie.titulo }}" class="poster-comunidad-flex" />
+                                        {% else %}
+                                            <div class="poster-placeholder-flex"></div>
+                                        {% endif %}
                                     </div>
 
-                                    <div class="columna-derecha-interacciones" style="display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; padding-left: 12px;">
-                                        <span class="feed-tiempo">Hace {{ card.created_at|timesince }}</span>
-                                        <div class="feed-footer-clean" style="display: flex; gap: 8px;">
+                                    <div class="feed-detalles-laterales" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                                        <div class="columna-izquierda-serie">
+                                            <div class="estado-puntuacion-row" style="margin-bottom: 4px;">
+                                                <span class="feed-badge amigo">{{ card.get_accion_display }}</span>
+                                                {% if card.score_momento %}
+                                                    <span class="score-badge">★ {{ card.score_momento }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <span class="feed-usuario" style="display: block; margin-bottom: 6px;">
+                                                <strong>{{ card.serie.titulo }}</strong>
+                                            </span>
+                                            <div class="feed-contenido-clean">
+                                                {% if card.comment_momento %}
+                                                    <p class="feed-texto" style="margin: 0;">{{ card.comment_momento }}</p>
+                                                {% else %}
+                                                    <p class="feed-texto texto-vacio" style="margin: 0;">Sin comentario adicional.</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- Botones de interacción alineados abajo a la derecha de la info -->
+                                        <div class="feed-footer-clean" style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px;">
                                             <button class="interact-btn"><i class="fa-regular fa-heart"></i> {{ card.votos.count|default:0 }}</button>
                                             <button class="interact-btn"><i class="fa-regular fa-thumbs-down"></i></button>
                                             <button class="interact-btn"><i class="fa-regular fa-comment"></i> {{ card.comentarios.count|default:0 }}</button>
@@ -142,36 +148,46 @@
                     {# ================== TIPO 2: PUBLICACIÓN NATURAL O COMPARTIDA ================== #}
                     {% if card.tipo_tarjeta == 'natural' %}
                         <div class="feed-item-bloque">
-                            <div class="usuario-flex-info-exterior">
-                                {% if card.usuario.perfil.foto_perfil %}
-                                    <img src="{{ card.usuario.perfil.foto_perfil.url }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
-                                {% else %}
-                                    <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
-                                {% endif %}
-                                <span class="feed-usuario">
-                                    <strong>{{ card.usuario.username }}</strong> publicó
-                                </span>
-                            </div>
+                            <article class="feed-card tipo-publicacion" data-tipo="publicaciones" style="padding: 13px;">
+                                <!-- 1. Fila superior: Avatar, nombre y tiempo alineados -->
+                                <div class="feed-header-interno">
+                                    <div class="usuario-info-grupo">
+                                        {% if card.usuario.perfil.foto_perfil %}
+                                            <img src="{{ card.usuario.perfil.foto_perfil.url }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
+                                        {% else %}
+                                            <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
+                                        {% endif %}
+                                        <span class="feed-usuario">
+                                            <strong>{{ card.usuario.username }}</strong>
+                                        </span>
+                                    </div>
+                                    <span class="feed-tiempo" style="font-size: 0.85rem; color: #666;">{{ card.created_at|timesince }}</span>
+                                </div>
 
-                            <article class="feed-card tipo-publicacion" data-tipo="publicaciones">
-                                <div class="feed-cuerpo-foro" style="padding: 18px 20px;">
-                                    <div class="feed-card-header-clean" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                <!-- 2. Contenido interno de la publicación -->
+                                <div class="feed-cuerpo-interno">
+                                    <div class="feed-card-header-clean" style="margin-bottom: 8px;">
                                         {% if card.serie_vinculada %}
                                             <span class="cat-tag"><i class="fa-solid fa-tv"></i> {{ card.serie_vinculada.titulo }}</span>
-                                        {% else %}
-                                            <div></div> 
                                         {% endif %}
-                                        <span class="feed-badge publicacion">Post</span>
                                     </div>
 
-                                    <p class="feed-texto">{{ card.texto }}</p>
+                                    <p class="feed-texto" style="margin-bottom: 1px;">{{ card.texto }}</p>
                                     
                                     {% if card.imagen %}
-                                        <img src="{{ card.imagen.url }}" class="post-multimedia" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 12px; display: block;" />
+                                        <div class="multimedia-contenedor-fijo">
+                                            {% if card.imagen.url|lower|slice:"-4:" == ".mp4" or card.imagen.url|lower|slice:"-5:" == ".webm" %}
+                                                <video src="{{ card.imagen.url }}" autoplay loop muted playsinline class="multimedia-blur-bg"></video>
+                                                <video src="{{ card.imagen.url }}" controls class="post-multimedia-elemento"></video>
+                                            {% else %}
+                                                <img src="{{ card.imagen.url }}" class="multimedia-blur-bg" alt="" />
+                                                <img src="{{ card.imagen.url }}" class="post-multimedia-elemento" alt="Contenido multimedia" />
+                                            {% endif %}
+                                        </div>
                                     {% endif %}
                                 </div>
 
-                                <div class="feed-footer" style="margin: 0 20px; padding: 14px 0; border-top: 1px solid rgba(61, 38, 43, 0.1);">
+                                <div class="feed-footer">
                                     <button class="interact-btn"><i class="fa-regular fa-heart"></i> {{ card.votos.count|default:0 }}</button>
                                     <button class="interact-btn"><i class="fa-regular fa-comment"></i> {{ card.respuestas.count|default:0 }}</button>
                                 </div>
@@ -194,8 +210,8 @@
                             </div>
 
                             <article class="feed-card tipo-foro" data-tipo="foros">
-                                <div class="feed-cuerpo-foro" style="padding: 18px 20px;">
-                                    <div class="feed-card-header-clean" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                <div class="feed-cuerpo-foro">
+                                    <div class="feed-card-header-clean">
                                         <span class="cat-tag">{{ card.get_categoria_display }}</span>
                                         <span class="feed-badge foro">Foro</span>
                                     </div>
@@ -226,8 +242,8 @@
                             </div>
 
                             <article class="feed-card tipo-encuesta" data-tipo="publicaciones">
-                                <div class="feed-cuerpo-foro" style="padding: 18px 20px;">
-                                    <div class="feed-card-header-clean" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                <div class="feed-cuerpo-foro">
+                                    <div class="feed-card-header-clean">
                                         <span class="feed-tiempo">Hace {{ card.created_at|timesince }}</span>
                                         <span class="feed-badge encuesta">Encuesta</span>
                                     </div>
