@@ -1,0 +1,43 @@
+{% if card.tipo_tarjeta == 'natural' %}
+                <div class="feed-item-bloque">
+                  <article class="feed-card tipo-publicacion" data-tipo="publicaciones">
+                    <div class="feed-header-interno">
+                      <div class="usuario-info-grupo">
+                        {% if card.usuario.perfil.foto_perfil %}
+                          <img src="{{ card.usuario.perfil.foto_perfil.url }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
+                        {% else %}
+                          <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
+                        {% endif %}
+                        <span class="feed-usuario"><strong>{{ card.usuario.username }}</strong></span>
+                      </div>
+                      <span class="feed-tiempo" style="font-size: 0.85rem; color: #666">{{ card.created_at|timesince }}</span>
+                    </div>
+
+                    <div class="feed-cuerpo-interno">
+                      <div class="feed-card-header-clean" style="margin-bottom: 8px">
+                        {% if card.serie_vinculada %}
+                          <span class="cat-tag"><i class="fa-solid fa-tv"></i> {{ card.serie_vinculada.titulo }}</span>
+                        {% endif %}
+                      </div>
+                      <p class="feed-texto" style="margin-bottom: 1px">{{ card.texto }}</p>
+
+                      {% if card.imagen %}
+                        <div class="multimedia-contenedor-fijo">
+                          {% if card.imagen.url|lower|slice:"-4:" == ".mp4" or card.imagen.url|lower|slice:"-5:" == ".webm" %}
+                            <video src="{{ card.imagen.url }}" autoplay loop muted playsinline class="multimedia-blur-bg"></video>
+                            <video src="{{ card.imagen.url }}" controls class="post-multimedia-elemento"></video>
+                          {% else %}
+                            <img src="{{ card.imagen.url }}" class="multimedia-blur-bg" alt="" />
+                            <img src="{{ card.imagen.url }}" class="post-multimedia-elemento" alt="Contenido" />
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                    </div>
+
+                    <div class="feed-footer">
+                      <button class="interact-btn"><i class="fa-regular fa-heart"></i> {{ card.votos.count|default:0 }}</button>
+                      <button class="interact-btn"><i class="fa-regular fa-comment"></i> {{ card.respuestas.count|default:0 }}</button>
+                    </div>
+                  </article>
+                </div>
+              {% endif %}

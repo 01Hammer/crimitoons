@@ -13,18 +13,17 @@
    7.  Columna Feed: Publicar  (caja, input, acciones, submit)
    8.  Avatar
    9.  Feed: Contenedor  (feed-lista, feed-item-bloque)
-  10.  Feed: Tarjeta base  (feed-card, header, meta, usuario, tiempo)
-  11.  Feed: Badges y etiquetas  (feed-badge, score-badge, cat-tag)
+  10.  Feed: Tarjeta base  (header, meta, usuario, tiempo)
+  11.  Feed: Badges y etiquetas  (feed-badge, cat-tag)
   12.  Feed: Cuerpo textual  (cuerpo-foro, foro-titulo, feed-texto)
   13.  Feed: Pie e interacciones  (feed-footer, interact-btn)
-  14.  Tarjeta Tipo 1 — Actividad  (card-horizontal, poster, detalles)
-  15.  Tarjeta Tipo 2 — Publicación natural
-  16.  Tarjeta Tipo 3 — Foro de debate
-  17.  Tarjeta Tipo 4 — Encuesta
-  18.  Multimedia  (contenedor, imagen/vídeo)
-  19.  Sidebar: Foros calientes
-  20.  Utilidades
-  21.  Responsive
+  14.  Tarjeta Tipo 2 — Publicación natural
+  15.  Tarjeta Tipo 3 — Foro de debate
+  16.  Tarjeta Tipo 4 — Encuesta
+  17.  Multimedia  (contenedor, imagen/vídeo)
+  18.  Sidebar: Foros calientes
+  19.  Utilidades
+  20.  Responsive
    ─────────────────────────────────────────────────  */
 
 
@@ -64,7 +63,6 @@ body {
 
 .comunidad-layout {
     display: grid;
-    /* Aumentamos los filtros de 240px a 290px. El medio (1fr) se encoge notablemente */
     grid-template-columns: 290px 1fr 420px;
     grid-template-areas: "filtros feed sidebar";
     gap: 24px;
@@ -106,7 +104,7 @@ body {
     background: #fff;
     border-radius: 14px;
     border: 1px solid rgba(61, 38, 43, 0.1);
-    padding: 10px 20px;
+    padding: 6px 10px 5px 10px;
     transition: box-shadow 0.2s;
 }
 
@@ -326,7 +324,7 @@ body {
    ══════════════════════════════════════════════════ */
 
 .avatar-mini {
-    width: 48px;  /* Ajustado para que tenga más presencia */
+    width: 48px;
     height: 48px;
     border-radius: 50%;
     object-fit: cover;
@@ -358,15 +356,7 @@ body {
    Estilos comunes a todas las tarjetas
    ══════════════════════════════════════════════════ */
 
-/* Cabecera con avatar + meta */
-.feed-card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-/* Cabecera limpia (variante sin avatar prominente) */
+/* Cabecera limpia (sin avatar prominente) */
 .feed-card-header-clean {
     display: flex;
     align-items: center;
@@ -387,17 +377,15 @@ body {
     gap: 10px;
 }
 
-/* Datos del autor (nombre + tiempo) */
-.feed-meta {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+/* 1. Color por defect o para las tarjetas claras (como la TIPO 2) */
+.feed-usuario strong {
+    font-size: 15px;
+    color: #2b2625;
 }
 
-.feed-usuario strong {
-    font-size: 16px; /* Texto más grande y marcado */
-    color: #3D262B;  /* Manteniendo tu color base oscuro */
+/* 2. Regla exclusiva para la tarjeta TIPO 1 (Historial) */
+.historial-card .feed-usuario strong {
+    color: #ffffff; /* Color blanco impecable */
 }
 
 .feed-tiempo {
@@ -410,13 +398,6 @@ body {
     display: flex;
     align-items: center;
     gap: 7px;
-}
-
-/* Fila interior: foto + nombre dentro de la tarjeta */
-.usuario-flex-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
 }
 
 
@@ -434,23 +415,8 @@ body {
     border-radius: 20px;
 }
 
-.feed-badge.amigo      { background: rgba(122, 175, 192, 0.14); color: #4a7f95; }
 .feed-badge.foro       { background: rgba(178, 94, 56, 0.12);   color: #B25E38; }
-.feed-badge.publicacion{ background: rgba(61, 38, 43, 0.08);    color: #3D262B; }
 .feed-badge.encuesta   { background: rgba(178, 94, 56, 0.08);   color: #B25E38; }
-
-/* Badge de puntuación */
-.score-badge {
-    display: inline-block;
-    background: purple;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 3px 12px;
-    border-radius: 20px;
-    width: fit-content;
-    letter-spacing: 0.02em;
-}
 
 /* Etiqueta de categoría */
 .cat-tag {
@@ -472,9 +438,8 @@ body {
 
 .feed-cuerpo-foro {
     margin-bottom: 16px;
-    /* Creamos una separación sutil con línea debajo de la sección de texto superior */
     padding-bottom: 14px;
-    border-bottom: 1px solid rgba(61, 38, 43, 0.08); 
+    border-bottom: 1px solid rgba(61, 38, 43, 0.08);
 }
 
 .foro-titulo {
@@ -486,23 +451,9 @@ body {
 }
 
 .feed-texto {
-    font-size: 15px; /* Aumentado sutilmente */
-    color: #1a1a1a;  /* Negro limpio y fácilmente legible */
+    font-size: 15px;
+    color: #1a1a1a;
     line-height: 1.6;
-}
-
-/* Contenedor de texto de la actividad */
-.feed-contenido-clean {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 8px;
-}
-
-.feed-contenido-clean .texto-vacio {
-    font-style: italic;
-    opacity: 0.6;
 }
 
 
@@ -515,15 +466,9 @@ body {
     display: flex;
     gap: 8px;
     padding-top: 9px;
-    border-top: none; /* Quitamos la línea artificial generada por HTML/CSS */
+    border-top: none;
 }
 
-.feed-footer-clean {
-    display: flex;
-    gap: 8px;
-    padding-top: 8px;
-    border-top: none; /* Quitamos la línea artificial generada por HTML/CSS */
-}
 /* Botones de interacción: like, comentar, etc. */
 .interact-btn {
     display: flex;
@@ -549,66 +494,7 @@ body {
 
 
 /* ══════════════════════════════════════════════════
-   14. TARJETA TIPO 1 — ACTIVIDAD AUTOMÁTICA
-   card.tipo_tarjeta == 'actividad'
-   ══════════════════════════════════════════════════ */
-
-/* Tarjeta horizontal con póster a la izquierda */
-.feed-card.card-horizontal {
-    display: flex;
-    padding: 0;
-    overflow: hidden;
-    min-height: 160px;
-    width: 100%;
-}
-
-/* Columna del póster (imagen de la serie) */
-.feed-poster-lateral {
-    width: 110px;
-    flex-shrink: 0;
-    position: relative;
-}
-
-.poster-comunidad-flex {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.poster-placeholder-flex {
-    width: 100%;
-    height: 100%;
-    background: #3D262B;
-    opacity: 0.1;
-}
-
-/* Columna derecha con detalles de la actividad */
-.feed-detalles-laterales {
-    flex: 1;
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-/* Sub-columna izquierda: título, estado, puntuación */
-.columna-izquierda-serie {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 6px;
-}
-
-/* Fila: badge de estado + puntuación */
-.estado-puntuacion-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-
-/* ══════════════════════════════════════════════════
-   15. TARJETA TIPO 2 — PUBLICACIÓN NATURAL
+   14. TARJETA TIPO 2 — PUBLICACIÓN NATURAL
    card.tipo_tarjeta == 'natural'
    ══════════════════════════════════════════════════ */
 
@@ -634,14 +520,14 @@ body {
 }
 
 /* ══════════════════════════════════════════════════
-   16. TARJETA TIPO 3 — FORO DE DEBATE
+   15. TARJETA TIPO 3 — FORO DE DEBATE
    card.tipo_tarjeta == 'foro'
    (no requiere reglas extra por ahora)
    ══════════════════════════════════════════════════ */
 
 
 /* ══════════════════════════════════════════════════
-   17. TARJETA TIPO 4 — ENCUESTA
+   16. TARJETA TIPO 4 — ENCUESTA
    card.tipo_tarjeta == 'encuesta'
    ══════════════════════════════════════════════════ */
 
@@ -671,35 +557,35 @@ body {
 
 
 /* ══════════════════════════════════════════════════
-   18. MULTIMEDIA
+   17. MULTIMEDIA
    Fotos, vídeos, gifs dentro de las publicaciones
    ══════════════════════════════════════════════════ */
 
-.multimedia-contenedor-fijo { 
-  position: relative; 
-  width: auto; 
-  margin-top: 3px; 
-  margin-left: -12px; 
-  margin-right: -12px; 
-  border-radius: 0; 
-  overflow: hidden; 
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
-  height: 100%;                 /* OBLIGA al contenedor a usar el alto disponible de la tarjeta */
-  min-height: 400px; 
-  max-height: 400px; 
-  background: transparent; 
+.multimedia-contenedor-fijo {
+    position: relative;
+    width: auto;
+    margin-top: 3px;
+    margin-left: -11px;
+    margin-right: -11px;
+    border-radius: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 400px;
+    max-height: 400px;
+    background: transparent;
 }
 
-/* Nueva sub-clase: Capa trasera que genera el efecto espejo desenfocado */
+/* Capa trasera que genera el efecto espejo desenfocado */
 .multimedia-contenedor-fijo .multimedia-blur-bg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Volvemos a cover para que llene los costados perfectamente */
+    object-fit: cover;
     filter: blur(20px) brightness(0.85);
     transform: scale(1.15);
     z-index: 1;
@@ -707,27 +593,20 @@ body {
 }
 
 /* Elemento multimedia (img o video) que nunca se recorta */
-.post-multimedia-elemento { 
-  position: absolute;           /* CAMBIO CLAVE: Se despega del flujo para alinearse al contenedor */
-  top: 0;                       /* Toca el techo exacto del contenedor blur */
-  bottom: 0;                    /* Toca el suelo exacto del contenedor blur */
-  height: 100%;                 /* Asegura ocupar el 100% del alto disponible */
-  width: auto;                  /* El ancho se adapta proporcionalmente */
-  display: block; 
-  object-fit: contain;          /* Evita recortes y mantiene el aspecto original */
-  z-index: 2; 
-}
-
-/* Versión simplificada (uso directo como <img> sin contenedor) */
-.post-multimedia {
-    max-width: 100%;
-    border-radius: 8px;
-    margin-top: 10px;
+.post-multimedia-elemento {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    z-index: 2;
 }
 
 
 /* ══════════════════════════════════════════════════
-   19. SIDEBAR: FOROS CALIENTES
+   18. SIDEBAR: FOROS CALIENTES
    ══════════════════════════════════════════════════ */
 
 .foros-lista {
@@ -792,7 +671,7 @@ body {
 
 
 /* ══════════════════════════════════════════════════
-   20. UTILIDADES
+   19. UTILIDADES
    ══════════════════════════════════════════════════ */
 
 .feed-vacio {
@@ -803,7 +682,7 @@ body {
 
 
 /* ══════════════════════════════════════════════════
-   21. RESPONSIVE
+   20. RESPONSIVE
    ══════════════════════════════════════════════════ */
 
 @media (max-width: 1200px) {

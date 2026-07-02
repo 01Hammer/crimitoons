@@ -1,298 +1,853 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Comunidad - CRIMITOONS</title>
 
     <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1" />
     <link rel="stylesheet" href="{% static 'series/comunidad.css' %}?v=1015" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{% static 'series/miperfil/menus_perfil.css' %}"
+    />
 
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
     {% include 'series/includes/barra_navegacion.html' %}
 
     <main class="comunidad-wrapper">
-        <div class="comunidad-layout">
+      <div class="comunidad-layout">
+        <aside class="col-filtros">
+          <div class="filtros-widget">
+            <p class="widget-titulo">Mi muro</p>
 
-            <aside class="col-filtros">
-                <div class="filtros-widget">
-                    <p class="widget-titulo">Mi muro</p>
+            <div class="filtros-lista">
+              <button class="filtro-btn activo" data-filtro="amigos">
+                <i class="fa-solid fa-user-group"></i>
+                <span class="filtro-label">Actividad</span>
+              </button>
+              <button class="filtro-btn activo" data-filtro="foros">
+                <i class="fa-solid fa-comments"></i>
+                <span class="filtro-label">Foros</span>
+              </button>
+              <button class="filtro-btn activo" data-filtro="publicaciones">
+                <i class="fa-solid fa-newspaper"></i>
+                <span class="filtro-label">Posts</span>
+              </button>
+            </div>
 
-                    <div class="filtros-lista">
-                        <button class="filtro-btn activo" data-filtro="amigos">
-                            <i class="fa-solid fa-user-group"></i>
-                            <span class="filtro-label">Actividad</span>
-                        </button>
-                        <button class="filtro-btn activo" data-filtro="foros">
-                            <i class="fa-solid fa-comments"></i>
-                            <span class="filtro-label">Foros</span>
-                        </button>
-                        <button class="filtro-btn activo" data-filtro="publicaciones">
-                            <i class="fa-solid fa-newspaper"></i>
-                            <span class="filtro-label">Posts</span>
-                        </button>
+            <div class="filtros-sep"></div>
+
+            <button class="filtro-solo-amigos" data-filtro="solo-amigos">
+              <i class="fa-solid fa-lock"></i>
+              Amigos
+            </button>
+          </div>
+        </aside>
+
+        <section class="col-feed">
+          <form
+            action="{% url 'crear_post_comunidad' %}"
+            method="POST"
+            enctype="multipart/form-data"
+            class="publicar-caja"
+            id="form-publicar-comunidad"
+          >
+            {% csrf_token %}
+
+            <div class="publicar-top">
+              {% if request.user.perfil.foto_perfil %}
+              <img
+                src="{{ request.user.perfil.foto_perfil.url }}"
+                alt="Tu Avatar"
+                class="avatar-mini"
+              />
+              {% else %}
+              <img
+                src="https://via.placeholder.com/42"
+                alt="Tu Avatar"
+                class="avatar-mini"
+              />
+              {% endif %}
+
+              <div class="publicar-input-wrap">
+                <input
+                  type="text"
+                  name="texto"
+                  placeholder="En qué serie estás pensando..."
+                  class="publicar-input"
+                />
+
+                <input
+                  type="file"
+                  name="imagen"
+                  id="input-archivo-oculto"
+                  accept="image/*"
+                  style="display: none"
+                />
+
+                <button
+                  type="button"
+                  class="btn-foto"
+                  title="Subir foto"
+                  onclick="
+                    document.getElementById('input-archivo-oculto').click()
+                  "
+                >
+                  <i class="fa-regular fa-image"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="publicar-acciones">
+              <button type="button" class="accion-btn">
+                <i class="fa-solid fa-fire"></i> Foro
+              </button>
+              <button type="button" class="accion-btn">
+                <i class="fa-solid fa-tv"></i> Serie
+              </button>
+              <button type="button" class="accion-btn" data-tipo="encuesta">
+                <i class="fa-solid fa-square-poll-horizontal"></i> Encuesta
+              </button>
+              <button type="button" class="accion-btn" data-tipo="historia">
+                <i class="fa-solid fa-book-open"></i> Historia
+              </button>
+
+              <button type="submit" class="publicar-submit">Publicar</button>
+            </div>
+          </form>
+
+          <div class="feed-lista">
+            {% for card in feed %}
+              
+              {# TIPO 1: ACTIVIDAD #}
+              {% if card.tipo_tarjeta == 'actividad' %} 
+                {% include 'series/includes/card_actividad.html' with item=card mostrar_usuario=True %}
+              {% endif %}
+
+              {# TIPO 2: NATURAL #}
+              {% include 'series/includes/card_publicacion.html' with item=card %}
+
+              {# TIPO 3: FORO #}
+              {% if card.tipo_tarjeta == 'foro' %}
+                <div class="feed-item-bloque">
+                  <div class="usuario-flex-info-exterior">
+                    {% if card.usuario.perfil.foto_perfil %}
+                      <img src="{{ card.usuario.perfil.foto_perfil.url }}" class="avatar-mini" />
+                    {% else %}
+                      <img src="https://via.placeholder.com/42" class="avatar-mini" />
+                    {% endif %}
+                    <span class="feed-usuario"><strong>{{ card.usuario.username }}</strong> abrió un debate</span>
+                  </div>
+                  <article class="feed-card tipo-foro" data-tipo="foros">
+                    <div class="feed-cuerpo-foro">
+                      <div class="feed-card-header-clean">
+                        <span class="cat-tag">{{ card.get_categoria_display }}</span>
+                        <span class="feed-badge foro">Foro</span>
+                      </div>
+                      <h4 class="foro-titulo">{{ card.titulo }}</h4>
+                      <p class="feed-texto">{{ card.texto }}</p>
                     </div>
+                    <div class="feed-footer">
+                      <button class="interact-btn"><i class="fa-solid fa-fire"></i> {{ card.respuestas.count|default:0 }} respuestas</button>
+                    </div>
+                  </article>
+                </div>
+              {% endif %}
 
-                    <div class="filtros-sep"></div>
+              {# TIPO 4: ENCUESTA #}
+              {% if card.tipo_tarjeta == 'encuesta' %}
+            <div class="feed-item-bloque">
+              <div class="usuario-flex-info-exterior">
+                {% if card.usuario.perfil.foto_perfil %}
+                <img
+                  src="{{ card.usuario.perfil.foto_perfil.url }}"
+                  alt="{{ card.usuario.username }}"
+                  class="avatar-mini"
+                />
+                {% else %}
+                <img
+                  src="https://via.placeholder.com/42"
+                  alt="Avatar"
+                  class="avatar-mini"
+                />
+                {% endif %}
+                <span class="feed-usuario">
+                  <strong>{{ card.usuario.username }}</strong> lanzó una
+                  encuesta
+                </span>
+              </div>
 
-                    <button class="filtro-solo-amigos" data-filtro="solo-amigos">
-                        <i class="fa-solid fa-lock"></i>
-                        Amigos
+              <article
+                class="feed-card tipo-encuesta"
+                data-tipo="publicaciones"
+              >
+                <div class="feed-cuerpo-foro">
+                  <div class="feed-card-header-clean">
+                    <span class="feed-tiempo"
+                      >Hace {{ card.created_at|timesince }}</span
+                    >
+                    <span class="feed-badge encuesta">Encuesta</span>
+                  </div>
+
+                  <h4 class="foro-titulo" style="margin: 8px 0 12px 0">
+                    {{ card.titulo }}
+                  </h4>
+                  <p class="feed-texto" style="margin-bottom: 16px">
+                    {{ card.texto }}
+                  </p>
+
+                  <div
+                    class="encuesta-opciones"
+                    style="display: flex; flex-direction: column; gap: 8px"
+                  >
+                    {% for opcion in card.opciones_encuesta.all %}
+                    <button class="opcion-btn-vote">
+                      {{ opcion.texto_opcion }} ({{ opcion.votos.count|default:0
+                      }} votos)
                     </button>
+                    {% endfor %}
+                  </div>
                 </div>
-            </aside>
 
-            {#ESPACIO PARA ESCRIBIR COMENTARIOS#}
-
-                </aside> <section class="col-feed">
-
-                <form action="{% url 'crear_post_comunidad' %}" method="POST" enctype="multipart/form-data" class="publicar-caja">
-                    {% csrf_token %}
-                    
-                    <div class="publicar-top">
-                        {% if request.user.perfil.foto_perfil %}
-                            <img src="{{ request.user.perfil.foto_perfil.url }}" alt="Tu Avatar" class="avatar-mini" />
-                        {% else %}
-                            <img src="https://via.placeholder.com/42" alt="Tu Avatar" class="avatar-mini" />
-                        {% endif %}
-                        
-                        <div class="publicar-input-wrap">
-                            <input type="text" name="texto" placeholder="En qué serie estás pensando..." class="publicar-input" />
-                            
-                            <input type="file" name="imagen" id="input-archivo-oculto" accept="image/*" style="display: none;" />
-                            
-                            <button type="button" class="btn-foto" title="Subir foto" onclick="document.getElementById('input-archivo-oculto').click();">
-                                <i class="fa-regular fa-image"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="publicar-acciones">
-                        <button type="button" class="accion-btn"><i class="fa-solid fa-fire"></i> Foro</button>
-                        <button type="button" class="accion-btn"><i class="fa-solid fa-tv"></i> Serie</button>
-                        <button type="button" class="accion-btn" data-tipo="encuesta"><i class="fa-solid fa-square-poll-horizontal"></i> Encuesta</button>
-                        <button type="button" class="accion-btn" data-tipo="historia"><i class="fa-solid fa-book-open"></i> Historia</button>
-                                                
-                        <button type="submit" class="publicar-submit">Publicar</button>
-                    </div>
-                </form>
-
-                <div class="feed-lista">
-
-                {% for card in feed %}
-
-                    {# ================== TIPO 1: HISTORIAL DE ACTIVIDAD (AUTOMÁTICA) ================== #}
-                    {% if card.tipo_tarjeta == 'actividad' %}
-                        <div class="feed-item-bloque">
-                            <article class="feed-card tipo-amigo" data-tipo="actividad" style="padding: 13px;">
-                                <!-- 1. Fila superior: Avatar, nombre y tiempo alineados -->
-                                <div class="feed-header-interno">
-                                    <div class="usuario-info-grupo">
-                                        {% if card.perfil.foto_perfil %}
-                                            <img src="{{ card.perfil.foto_perfil.url }}" alt="{{ card.perfil.usuario.username }}" class="avatar-mini" />
-                                        {% else %}
-                                            <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
-                                        {% endif %}
-                                        <span class="feed-usuario">
-                                            <strong>{{ card.perfil.usuario.username }}</strong>
-                                        </span>
-                                    </div>
-                                    <span class="feed-tiempo" style="font-size: 0.85rem; color: #666;">Hace {{ card.created_at|timesince }}</span>
-                                </div>
-
-                                <!-- 2. Contenido interno de la actividad -->
-                                <div style="display: flex; gap: 16px;">
-                                    <div class="feed-poster-lateral">
-                                        {% if card.serie.poster_path %}
-                                            <img src="{{ card.serie.poster_path }}" alt="{{ card.serie.titulo }}" class="poster-comunidad-flex" />
-                                        {% else %}
-                                            <div class="poster-placeholder-flex"></div>
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="feed-detalles-laterales" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-                                        <div class="columna-izquierda-serie">
-                                            <div class="estado-puntuacion-row" style="margin-bottom: 4px;">
-                                                <span class="feed-badge amigo">{{ card.get_accion_display }}</span>
-                                                {% if card.score_momento %}
-                                                    <span class="score-badge">★ {{ card.score_momento }}</span>
-                                                {% endif %}
-                                            </div>
-                                            <span class="feed-usuario" style="display: block; margin-bottom: 6px;">
-                                                <strong>{{ card.serie.titulo }}</strong>
-                                            </span>
-                                            <div class="feed-contenido-clean">
-                                                {% if card.comment_momento %}
-                                                    <p class="feed-texto" style="margin: 0;">{{ card.comment_momento }}</p>
-                                                {% else %}
-                                                    <p class="feed-texto texto-vacio" style="margin: 0;">Sin comentario adicional.</p>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-
-                                        <!-- Botones de interacción alineados abajo a la derecha de la info -->
-                                        <div class="feed-footer-clean" style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px;">
-                                            <button class="interact-btn"><i class="fa-regular fa-heart"></i> {{ card.votos.count|default:0 }}</button>
-                                            <button class="interact-btn"><i class="fa-regular fa-thumbs-down"></i></button>
-                                            <button class="interact-btn"><i class="fa-regular fa-comment"></i> {{ card.comentarios.count|default:0 }}</button>
-                                        </div>
-                                    </div>
-                                </div> 
-                            </article>
-                        </div> 
-                    {% endif %}
-
-                    {# ================== TIPO 2: PUBLICACIÓN NATURAL O COMPARTIDA ================== #}
-                    {% if card.tipo_tarjeta == 'natural' %}
-                        <div class="feed-item-bloque">
-                            <article class="feed-card tipo-publicacion" data-tipo="publicaciones" style="padding: 13px;">
-                                <!-- 1. Fila superior: Avatar, nombre y tiempo alineados -->
-                                <div class="feed-header-interno">
-                                    <div class="usuario-info-grupo">
-                                        {% if card.usuario.perfil.foto_perfil %}
-                                            <img src="{{ card.usuario.perfil.foto_perfil.url }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
-                                        {% else %}
-                                            <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
-                                        {% endif %}
-                                        <span class="feed-usuario">
-                                            <strong>{{ card.usuario.username }}</strong>
-                                        </span>
-                                    </div>
-                                    <span class="feed-tiempo" style="font-size: 0.85rem; color: #666;">{{ card.created_at|timesince }}</span>
-                                </div>
-
-                                <!-- 2. Contenido interno de la publicación -->
-                                <div class="feed-cuerpo-interno">
-                                    <div class="feed-card-header-clean" style="margin-bottom: 8px;">
-                                        {% if card.serie_vinculada %}
-                                            <span class="cat-tag"><i class="fa-solid fa-tv"></i> {{ card.serie_vinculada.titulo }}</span>
-                                        {% endif %}
-                                    </div>
-
-                                    <p class="feed-texto" style="margin-bottom: 1px;">{{ card.texto }}</p>
-                                    
-                                    {% if card.imagen %}
-                                        <div class="multimedia-contenedor-fijo">
-                                            {% if card.imagen.url|lower|slice:"-4:" == ".mp4" or card.imagen.url|lower|slice:"-5:" == ".webm" %}
-                                                <video src="{{ card.imagen.url }}" autoplay loop muted playsinline class="multimedia-blur-bg"></video>
-                                                <video src="{{ card.imagen.url }}" controls class="post-multimedia-elemento"></video>
-                                            {% else %}
-                                                <img src="{{ card.imagen.url }}" class="multimedia-blur-bg" alt="" />
-                                                <img src="{{ card.imagen.url }}" class="post-multimedia-elemento" alt="Contenido multimedia" />
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-
-                                <div class="feed-footer">
-                                    <button class="interact-btn"><i class="fa-regular fa-heart"></i> {{ card.votos.count|default:0 }}</button>
-                                    <button class="interact-btn"><i class="fa-regular fa-comment"></i> {{ card.respuestas.count|default:0 }}</button>
-                                </div>
-                            </article>
-                        </div>
-                    {% endif %}
-
-                    {# ================== TIPO 3: FORO DE DEBATE CLÁSICO ================== #}
-                    {% if card.tipo_tarjeta == 'foro' %}
-                        <div class="feed-item-bloque">
-                            <div class="usuario-flex-info-exterior">
-                                {% if card.usuario.perfil.foto_perfil %}
-                                    <img src="{{ card.usuario.perfil.foto_perfil.url }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
-                                {% else %}
-                                    <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
-                                {% endif %}
-                                <span class="feed-usuario">
-                                    <strong>{{ card.usuario.username }}</strong> abrió un debate
-                                </span>
-                            </div>
-
-                            <article class="feed-card tipo-foro" data-tipo="foros">
-                                <div class="feed-cuerpo-foro">
-                                    <div class="feed-card-header-clean">
-                                        <span class="cat-tag">{{ card.get_categoria_display }}</span>
-                                        <span class="feed-badge foro">Foro</span>
-                                    </div>
-                                    
-                                    <h4 class="foro-titulo" style="margin: 8px 0 12px 0;">{{ card.titulo }}</h4>
-                                    <p class="feed-texto">{{ card.texto }}</p>
-                                </div>
-
-                                <div class="feed-footer" style="margin: 0 20px; padding: 14px 0; border-top: 1px solid rgba(61, 38, 43, 0.1);">
-                                    <button class="interact-btn"><i class="fa-solid fa-fire"></i> {{ card.respuestas.count|default:0 }} respuestas</button>
-                                </div>
-                            </article>
-                        </div>
-                    {% endif %}
-
-                    {# ================== TIPO 4: ENCUESTA ================== #}
-                    {% if card.tipo_tarjeta == 'encuesta' %}
-                        <div class="feed-item-bloque">
-                            <div class="usuario-flex-info-exterior">
-                                {% if card.usuario.perfil.foto_perfil %}
-                                    <img src="{{ card.usuario.perfil.foto_perfil.url }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
-                                {% else %}
-                                    <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
-                                {% endif %}
-                                <span class="feed-usuario">
-                                    <strong>{{ card.usuario.username }}</strong> lanzó una encuesta
-                                </span>
-                            </div>
-
-                            <article class="feed-card tipo-encuesta" data-tipo="publicaciones">
-                                <div class="feed-cuerpo-foro">
-                                    <div class="feed-card-header-clean">
-                                        <span class="feed-tiempo">Hace {{ card.created_at|timesince }}</span>
-                                        <span class="feed-badge encuesta">Encuesta</span>
-                                    </div>
-
-                                    <h4 class="foro-titulo" style="margin: 8px 0 12px 0;">{{ card.titulo }}</h4>
-                                    <p class="feed-texto" style="margin-bottom: 16px;">{{ card.texto }}</p>
-                                    
-                                    <div class="encuesta-opciones" style="display: flex; flex-direction: column; gap: 8px;">
-                                        {% for opcion in card.opciones_encuesta.all %}
-                                            <button class="opcion-btn-vote">
-                                                {{ opcion.texto_opcion }} ({{ opcion.votos.count|default:0 }} votos)
-                                            </button>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-
-                                <div class="feed-footer" style="margin: 0 20px; padding: 14px 0; border-top: 1px solid rgba(61, 38, 43, 0.1);">
-                                    <button class="interact-btn"><i class="fa-regular fa-comment"></i> {{ card.respuestas.count|default:0 }}</button>
-                                </div>
-                            </article>
-                        </div>
-                    {% endif %}
-
-                {% empty %}
-                    <p class="feed-vacio">No hay ninguna publicación en el muro comunitario todavía.</p>
-                {% endfor %}
-
-                </div> </section> <aside class="col-sidebar">
-                <div class="sidebar-widget">
-                    <p class="widget-titulo">Foros calientes</p>
-                    <div class="foros-lista">
-                        {% for foro in foros_calientes %}
-                            <a href="#" class="foro-item">
-                                <span class="foro-rank">{{ forloop.counter }}</span>
-                                <div class="foro-item-info">
-                                    <span class="cat-tag">{{ foro.get_categoria_display }}</span>
-                                    <span class="foro-item-titulo">{{ foro.titulo }}</span>
-                                    <span class="foro-actividad"><i class="fa-regular fa-comment"></i> {{ foro.num_respuestas }} respuestas</span>
-                                </div>
-                            </a>
-                        {% empty %}
-                            <p style="font-size: 13px; color: #888; padding: 10px 0;">No hay debates activos en este momento.</p>
-                        {% endfor %}
-                    </div>
+                <div
+                  class="feed-footer"
+                  style="
+                    margin: 0 20px;
+                    padding: 14px 0;
+                    border-top: 1px solid rgba(61, 38, 43, 0.1);
+                  "
+                >
+                  <button class="interact-btn">
+                    <i class="fa-regular fa-comment"></i> {{
+                    card.respuestas.count|default:0 }}
+                  </button>
                 </div>
-            </aside>
-
-        </div>
+              </article>
+            </div>
+            {% endif %} {% empty %}
+            <p class="feed-vacio">
+              No hay ninguna publicación en el muro comunitario todavía.
+            </p>
+            {% endfor %}
+          </div>
+        </section>
+        <aside class="col-sidebar">
+          <div class="sidebar-widget">
+            <p class="widget-titulo">Foros calientes</p>
+            <div class="foros-lista">
+              {% for foro in foros_calientes %}
+              <a href="#" class="foro-item">
+                <span class="foro-rank">{{ forloop.counter }}</span>
+                <div class="foro-item-info">
+                  <span class="cat-tag">{{ foro.get_categoria_display }}</span>
+                  <span class="foro-item-titulo">{{ foro.titulo }}</span>
+                  <span class="foro-actividad"
+                    ><i class="fa-regular fa-comment"></i> {{
+                    foro.num_respuestas }} respuestas</span
+                  >
+                </div>
+              </a>
+              {% empty %}
+              <p style="font-size: 13px; color: #888; padding: 10px 0">
+                No hay debates activos en este momento.
+              </p>
+              {% endfor %}
+            </div>
+          </div>
+        </aside>
+      </div>
     </main>
+        {% include 'series/includes/modal_comentarios.html' %}
 
-</body>
+  </body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      
+// ==========================================
+        // 1. CONTROL DEL DROPDOWN DE TRES PUNTOS (EDITAR/ELIMINAR) - TIPO 1
+        // Misma lógica que actividad.html, para la tarjeta compartida
+        // ==========================================
+        const dropdownsActividad = document.querySelectorAll('.historial-opciones-dropdown');
+
+        dropdownsActividad.forEach(dropdown => {
+            const button = dropdown.querySelector('.btn-historial-opciones');
+            const menu = dropdown.querySelector('.historial-dropdown-menu');
+
+            if (button && menu) {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+
+                    dropdownsActividad.forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown) {
+                            const otherMenu = otherDropdown.querySelector('.historial-dropdown-menu');
+                            if (otherMenu) otherMenu.classList.remove('show');
+                        }
+                    });
+
+                    menu.classList.toggle('show');
+                });
+
+                menu.addEventListener('mouseleave', () => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+
+        document.querySelectorAll('.historial-card').forEach(card => {
+            card.addEventListener('mouseleave', () => {
+                const openMenu = card.querySelector('.historial-dropdown-menu.show');
+                if (openMenu) openMenu.classList.remove('show');
+            });
+        });
+
+        document.addEventListener("click", function() {
+            document.querySelectorAll('.historial-dropdown-menu.show').forEach(openMenu => {
+                openMenu.classList.remove('show');
+            });
+        });
+
+      // ==========================================
+      // 2. PUBLICACIÓN ASÍNCRONA SIN RECARGA (FORMULARIO)
+      // ==========================================
+      const formPublicar = document.getElementById("form-publicar-comunidad");
+
+      if (formPublicar) {
+        formPublicar.addEventListener("submit", function (event) {
+          event.preventDefault(); // Evita que la página parpadee
+
+          const formData = new FormData(formPublicar);
+          const submitBtn = formPublicar.querySelector(".publicar-submit");
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Publicando...";
+
+          fetch(formPublicar.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+            },
+          })
+            .then((response) => {
+              if (response.ok) {
+                formPublicar.reset();
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Publicar";
+
+                location.reload(); // Recarga silenciosa del feed
+              } else {
+                alert("Hubo un error al procesar la publicación.");
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Publicar";
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              submitBtn.disabled = false;
+              submitBtn.textContent = "Publicar";
+            });
+        });
+      }
+    });
+
+    // ==========================================
+        // 3. LIKES Y DISLIKES PARA ACTIVIDAD (TIPO 1)
+        // Misma lógica que actividad.html, para la tarjeta compartida
+        // ==========================================
+
+        document.querySelectorAll('.historial-acciones-interaccion [data-tipo]').forEach(boton => {
+            boton.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                const actividadId = boton.getAttribute('data-id');
+                const tipoVoto = boton.getAttribute('data-tipo');
+
+                const formData = new FormData();
+                formData.append('tipo', tipoVoto);
+
+                try {
+                    const response = await fetch(`/actividad/${actividadId}/votar/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) throw new Error('Error al procesar la votación');
+
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        const contenedorVotos = boton.closest('.historial-acciones-interaccion');
+                        if (contenedorVotos) {
+                            const btnLike = contenedorVotos.querySelector('[data-tipo="like"]');
+                            const btnDislike = contenedorVotos.querySelector('[data-tipo="dislike"]');
+
+                            if (btnLike && btnDislike) {
+                                btnLike.querySelector('.interact-counter').textContent = data.likes > 0 ? data.likes : "";
+                                btnDislike.querySelector('.interact-counter').textContent = data.dislikes > 0 ? data.dislikes : "";
+
+                                btnLike.classList.remove('activo-like');
+                                btnDislike.classList.remove('activo-dislike');
+
+                                if (data.voto_actual === 'like') {
+                                    btnLike.classList.add('activo-like');
+                                }
+                                if (data.voto_actual === 'dislike') {
+                                    btnDislike.classList.add('activo-dislike');
+                                }
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error en la petición asíncrona:', error);
+                }
+            });
+        });
+
+        // ==========================================
+        // 4. MODAL DE COMENTARIOS PARA ACTIVIDAD (TIPO 1)
+        // ==========================================
+
+    const modalOverlay = document.getElementById('comments-modal');
+
+        let actividadActivaId = null;
+        let botonComentarioActivo = null;
+
+    document.addEventListener("click", async function(event) {
+            // Detectamos el clic en el botón de comentario de la tarjeta TIPO 1
+            const btnComentario = event.target.closest(".btn-interact-comentario");
+            
+            if (btnComentario) {
+                event.preventDefault();
+                if (!modalOverlay) return;
+
+                const tarjetaPadre = btnComentario.closest(".historial-card");
+                if (!tarjetaPadre) return;
+
+                // 1. Extraemos el ID desde los botones de voto de esta misma tarjeta
+                const contenedorAcciones = btnComentario.closest(".historial-acciones-interaccion");
+                const btnVotoAsociado = contenedorAcciones?.querySelector("[data-id]");
+                const actividadId = btnVotoAsociado?.getAttribute("data-id");
+                if (!actividadId) return;
+
+                // Guardamos la referencia de qué tarjeta abrió el modal
+                actividadActivaId = actividadId; 
+                botonComentarioActivo = btnComentario;
+
+                // 2. Extraemos los datos de la tarjeta compartida (historial-card)
+                // 2. Extraemos los datos puros básicos de forma ultra específica
+const posterSrc = tarjetaPadre.querySelector('.historial-poster-img')?.getAttribute('src') || '';
+const tituloSerie = tarjetaPadre.querySelector('.historial-serie-titulo')?.textContent || '';
+const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario')?.textContent || '';
+                
+                const scoreElement = tarjetaPadre.querySelector(".historial-nota-inline");
+                const scoreText = scoreElement ? scoreElement.textContent.trim() : '';
+
+                const estadoElement = tarjetaPadre.querySelector(".status-badge");
+                const estadoText = estadoElement ? estadoElement.textContent.trim() : '';
+                const estadoClase = estadoText.toLowerCase().replace(/\s+/g, '-');
+
+                // Botones originales de fuera para clonar contadores y estados
+                const btnLikeFuera = tarjetaPadre.querySelector('[data-tipo="like"]');
+                const btnDislikeFuera = tarjetaPadre.querySelector('[data-tipo="dislike"]');
+
+                const likesCount = parseInt(btnLikeFuera?.querySelector(".interact-counter")?.textContent) || 0;
+                const dislikesCount = parseInt(btnDislikeFuera?.querySelector(".interact-counter")?.textContent) || 0;
+                
+                const likeActivo = btnLikeFuera?.classList.contains("activo-like") ? "activo-like" : "";
+                const dislikeActivo = btnDislikeFuera?.classList.contains("activo-dislike") ? "activo-dislike" : "";
+
+                // 3. Inyectamos la mini tarjeta dinámica dentro del modal
+                const modalPostPreview = modalOverlay.querySelector(
+                ".debate-modal-post-preview",
+        );
+        if (modalPostPreview) {
+          modalPostPreview.innerHTML = `
+                        <div class="modal-preview-mini-card">
+                            ${posterSrc ? `<div class="mini-card-poster"><img src="${posterSrc}" alt="${tituloSerie}"></div>` : ""}
+                            <div class="mini-card-content">
+                                <div class="mini-card-left-column">
+                                    <h4 class="mini-card-title">${tituloSerie}</h4>
+                                    <p class="mini-card-comment">${comentarioUsuario}</p>
+                                </div>
+                                <div class="mini-card-right-column">
+                                    <div class="mini-card-header-row">
+                                        ${scoreText ? `<span class="modal-mini-score">${scoreText}</span>` : ""}
+                                        ${scoreText ? `<span class="modal-mini-status status-${estadoClase}">${estadoText}</span>` : ""}
+                                    </div>
+                                    <div class="mini-card-actions-row">
+                                        <button class="modal-mini-vote-btn btn-modal-like ${likeActivo}" aria-label="Like">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                                            </svg>
+                                            <span class="like-count">${likesCount > 0 ? likesCount : ""}</span>
+                                        </button>
+                                        
+                                        <button class="modal-mini-vote-btn btn-modal-dislike ${dislikeActivo}" aria-label="Dislike">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H9zM21 2h3v9h-3z"></path></svg>
+                                            <span class="dislike-count">${dislikesCount > 0 ? dislikesCount : ""}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+        }
+
+        // 4. Preparamos la lista de comentarios y el input antes de mostrar
+        const modalCommentsList = modalOverlay.querySelector(
+          ".debate-modal-comments-list",
+        );
+        const modalInput = modalOverlay.querySelector(".modal-comment-input");
+        if (modalCommentsList)
+          modalCommentsList.innerHTML =
+            '<div class="modal-comments-empty">Cargando comentarios...</div>';
+        if (modalInput) modalInput.value = "";
+
+        // 5. Mostramos el modal (misma pareja de clases que actividad.html)
+        modalOverlay.classList.add("show");
+        modalOverlay.classList.add("active");
+
+        // 6. Petición AJAX para traer los comentarios existentes de esta actividad
+        try {
+          const response = await fetch(
+            `/actividad/${actividadId}/comentarios/`,
+          );
+          const data = await response.json();
+          if (data.status === "success") {
+            renderizarComentarios(data.comentarios);
+          } else if (modalCommentsList) {
+            modalCommentsList.innerHTML =
+              '<div class="modal-comments-empty">Error al cargar los comentarios.</div>';
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          if (modalCommentsList)
+            modalCommentsList.innerHTML =
+              '<div class="modal-comments-empty">Error de conexión al servidor.</div>';
+        }
+      }
+    });
+
+    // ==========================================
+    // 5. CIERRE DEL MODAL (seguro ante clics externos)
+    // ==========================================
+    document.addEventListener("click", (e) => {
+      if (!modalOverlay || !modalOverlay.classList.contains("show")) return;
+
+      if (
+        e.target === modalOverlay ||
+        e.target.classList.contains("btn-close-modal") ||
+        e.target.closest(".btn-close-modal")
+      ) {
+        modalOverlay.classList.remove("show");
+        modalOverlay.classList.remove("active");
+        actividadActivaId = null;
+        botonComentarioActivo = null;
+      }
+    });
+
+    // ==========================================
+    // 6. ENVÍO DE COMENTARIOS PRINCIPALES
+    // ==========================================
+    document.addEventListener("click", (e) => {
+      if (
+        e.target &&
+        (e.target.classList.contains("btn-modal-comment-submit") ||
+          e.target.closest(".btn-modal-comment-submit"))
+      ) {
+        enviarComentario();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      // Escucha el Enter global solo si viene de la caja de comentarios principal
+      if (
+        e.key === "Enter" &&
+        e.target &&
+        e.target.classList.contains("modal-comment-input")
+      ) {
+        e.preventDefault();
+        enviarComentario();
+      }
+    });
+
+    // ==========================================
+    // 7. FUNCIONES TEMPORALES PARA EVITAR ERRORES (PASO A PASO)
+    // ==========================================
+    function conmutarCascada(id) {
+      console.log("Click en tarjeta para abrir respuestas:", id);
+    }
+    function mostrarMenuOpciones(id) {
+      console.log("Click en 3 puntos:", id);
+    }
+    function editarComentario(id) {
+      console.log("Editar:", id);
+    }
+    function eliminarComentario(id) {
+      console.log("Eliminar:", id);
+    }
+    function darLikeComentario(id) {
+      console.log("Dar like:", id);
+    }
+    function enviarRespuesta(id) {
+      console.log("Enviar respuesta para:", id);
+    }
+
+    // ==========================================
+    // 8. PINTAR LISTA DE COMENTARIOS (estructura de burbujas)
+    // ==========================================
+    function renderizarComentarios(comentarios) {
+      if (!modalOverlay) return;
+      const modalCommentsList = modalOverlay.querySelector(
+        ".debate-modal-comments-list",
+      );
+      if (!modalCommentsList) return;
+
+      modalCommentsList.innerHTML = "";
+
+      if (comentarios.length === 0) {
+        modalCommentsList.innerHTML =
+          '<div class="modal-comments-empty">No hay comentarios en este debate aún. ¡Sé el primero en opinar!</div>';
+        return;
+      }
+
+      comentarios.forEach((c) => {
+        const item = document.createElement("div");
+        item.classList.add("modal-comment-item");
+
+        const fotoAvatar = c.usuario_foto
+          ? c.usuario_foto
+          : "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+        item.innerHTML = `
+                    <div class="modal-comment-main-row">
+                        <div class="modal-comment-avatar-wrapper">
+                            <img src="${fotoAvatar}" alt="Avatar" class="modal-comment-user-avatar">
+                        </div>
+
+                        <div class="modal-comment-body">
+                            <div class="modal-comment-top-line">
+                                <div class="modal-comment-user-info">
+                                    <span class="modal-comment-username">${c.usuario}</span>
+                                    <span class="modal-comment-divider">•</span>
+                                    <span class="modal-comment-date">${c.fecha}</span>
+                                    <span class="modal-comment-divider"></span>
+
+                                    <div class="modal-comment-options-wrapper">
+                                        <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${c.id});">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="comment-options-menu" id="options-menu-${c.id}">
+                                            <button onclick="event.stopPropagation(); editarComentario(${c.id});">Editar</button>
+                                            <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${c.id});">Eliminar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-comment-text">${c.texto}</div>
+
+                            <div class="modal-comment-actions">
+                                <button class="btn-comment-reply" onclick="event.stopPropagation(); conmutarCascada(${c.id});">
+                                    Responder
+                                </button>
+                                <button class="btn-comment-like" onclick="event.stopPropagation(); darLikeComentario(${c.id});" data-id="${c.id}">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-comment-replies-container" id="replies-${c.id}">
+                        <div class="modal-comment-replies-list" id="replies-list-${c.id}"></div>
+                        <div class="modal-comment-reply-box" onclick="event.stopPropagation();">
+                            <input type="text" placeholder="Escribe una respuesta..." class="modal-comment-reply-input" id="reply-input-${c.id}" />
+                            <button class="btn-modal-reply-submit" onclick="enviarRespuesta(${c.id})">Responder</button>
+                        </div>
+                    </div>
+                `;
+        modalCommentsList.appendChild(item);
+      });
+
+      setTimeout(() => {
+        modalCommentsList.scrollTop = 0;
+      }, 50);
+    }
+
+    // ==========================================
+    // 9. ENVIAR UN COMENTARIO NUEVO
+    // ==========================================
+    async function enviarComentario() {
+      if (!modalOverlay) {
+        console.error("No se encontró el #comments-modal al intentar enviar.");
+        return;
+      }
+
+      const modalInput = modalOverlay.querySelector(".modal-comment-input");
+      const modalCommentsList = modalOverlay.querySelector(
+        ".debate-modal-comments-list",
+      );
+
+      if (!modalInput || !modalCommentsList) {
+        console.error(
+          "No se encontró el input o la lista de comentarios dentro del modal.",
+        );
+        return;
+      }
+
+      const texto = modalInput.value.trim();
+      if (!texto) return;
+
+      if (!actividadActivaId) {
+        console.error(
+          "ERROR: 'actividadActivaId' es null. El script perdió el ID de la tarjeta.",
+        );
+        alert("Error interno: No se pudo identificar la tarjeta de actividad.");
+        return;
+      }
+
+      const csrftoken =
+        document.querySelector("[name=csrfmiddlewaretoken]")?.value ||
+        getCookie("csrftoken");
+
+      const formData = new FormData();
+      formData.append("texto", texto);
+
+      try {
+        const response = await fetch(
+          `/actividad/${actividadActivaId}/comentar/`,
+          {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": csrftoken,
+            },
+            body: formData,
+          },
+        );
+        const data = await response.json();
+
+        if (data.status === "success") {
+          modalInput.value = "";
+
+          const emptyMsg = modalCommentsList.querySelector(
+            ".modal-comments-empty",
+          );
+          if (emptyMsg) emptyMsg.remove();
+
+          const item = document.createElement("div");
+          item.classList.add("modal-comment-item");
+
+          let fotoAvatar = "";
+          if (
+            data.comentario &&
+            data.comentario.usuario_foto &&
+            data.comentario.usuario_foto.trim() !== ""
+          ) {
+            fotoAvatar = data.comentario.usuario_foto.trim();
+            if (!fotoAvatar.startsWith("/") && !fotoAvatar.startsWith("http")) {
+              fotoAvatar = "/" + fotoAvatar;
+            }
+          } else {
+            fotoAvatar =
+              "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+          }
+
+          item.innerHTML = `
+                        <div class="modal-comment-main-row">
+                            <div class="modal-comment-avatar-wrapper">
+                                <img src="${fotoAvatar}" alt="Avatar" class="modal-comment-user-avatar">
+                            </div>
+
+                            <div class="modal-comment-body">
+                                <div class="modal-comment-top-line">
+                                    <div class="modal-comment-user-info">
+                                        <span class="modal-comment-username">${data.comentario.usuario}</span>
+                                        <span class="modal-comment-divider">•</span>
+                                        <span class="modal-comment-date">${data.comentario.fecha}</span>
+                                        <span class="modal-comment-divider"></span>
+
+                                        <div class="modal-comment-options-wrapper">
+                                            <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${data.comentario.id});">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <div class="comment-options-menu" id="options-menu-${data.comentario.id}">
+                                                <button onclick="event.stopPropagation(); editarComentario(${data.comentario.id});">Editar</button>
+                                                <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${data.comentario.id});">Eliminar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-comment-text">${data.comentario.texto}</div>
+
+                                <div class="modal-comment-actions">
+                                    <button class="btn-comment-reply" onclick="event.stopPropagation(); conmutarCascada(${data.comentario.id});">
+                                        Responder
+                                    </button>
+                                    <button class="btn-comment-like" onclick="event.stopPropagation(); darLikeComentario(${data.comentario.id});" data-id="${data.comentario.id}">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-comment-replies-container" id="replies-${data.comentario.id}">
+                            <div class="modal-comment-replies-list" id="replies-list-${data.comentario.id}"></div>
+                            <div class="modal-comment-reply-box" onclick="event.stopPropagation();">
+                                <input type="text" placeholder="Escribe una respuesta..." class="modal-comment-reply-input" id="reply-input-${data.comentario.id}" />
+                                <button class="btn-modal-reply-submit" onclick="enviarRespuesta(${data.comentario.id})">Responder</button>
+                            </div>
+                        </div>
+                    `;
+
+          modalCommentsList.prepend(item);
+          modalCommentsList.scrollTop = 0;
+
+          if (botonComentarioActivo) {
+            const spanCounter =
+              botonComentarioActivo.querySelector(".comment-count");
+            if (spanCounter) {
+              spanCounter.textContent =
+                data.total_comentarios > 0 ? data.total_comentarios : "";
+            }
+          }
+        } else {
+          alert(data.message || "Ocurrió un error al enviar el comentario.");
+        }
+      } catch (error) {
+        console.error(
+          "Error crítico al enviar el comentario vía fetch:",
+          error,
+        );
+      }
+    }
+
+    // Función auxiliar para obtener el token CSRF desde las cookies del navegador
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  </script>
 </html>

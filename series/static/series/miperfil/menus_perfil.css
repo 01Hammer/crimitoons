@@ -1,41 +1,83 @@
-/* ============ CRIMITOONS: MENUS Y PESTAÑA ACTIVIDAD ============ */
+/* =====================================================
+   CRIMITOONS: MENÚ DE PERFIL
+   Paleta: #FFF8EC · #3D262B · #B25E38 · #514745
+   =====================================================
+
+   ÍNDICE DE FAMILIAS
+   ─────────────────────────────────────────────────
+   1.  Caja de publicación rápida
+       1.1  Layout general de la vista
+       1.2  Contenedor de la barra
+       1.3  Campo de texto y placeholder
+       1.4  Botones de acción (media, publicar)
+
+   2.  Actividad
+       2.1  Foto y nombre de usuario  ← flag: mostrar_usuario
+       2.2  Diseño de la caja
+       2.3  Póster
+       2.4  Textos de la izquierda
+            (encabezado, estado, nota, título, comentario, captura)
+       2.5  Botones de la derecha
+            (like, dislike, comentario, contadores, estados activos)
+       2.6  Tres puntos
+            (dropdown, botón, menú, ítems)
+       2.7  Modal de comentarios
+            (overlay, contenedor, cabecera, preview de tarjeta,
+             lista, ítem, respuestas, footer)
+
+   3.  Biblioteca
+
+   4.  Favoritos
+
+   5.  Estadísticas
+
+   6.  Aportes
+   ─────────────────────────────────────────────────  */
+
+
+/* ══════════════════════════════════════════════════
+   1. CAJA DE PUBLICACIÓN RÁPIDA
+   ══════════════════════════════════════════════════ */
+
+/* ── 1.1  Layout general de la vista ── */
 
 .actividad-layout-grid {
     display: grid;
-    /* CAMBIO CLAVE: Subimos la columna principal a 960px para que las tarjetas sean más anchas */
     grid-template-columns: minmax(0, 960px) 348px;
     gap: 32px;
     align-items: start;
-    justify-content: center; 
-    max-width: 1230px;       /* Emparejado con el max-width del padre */
-    margin: 0 auto;          
+    justify-content: center;
+    max-width: 1230px;
+    margin: 0 auto;
     width: 100%;
 }
 
-/* ==========================================================================
-   COLUMNA IZQUIERDA: TARJETAS DEL HISTORIAL
-   ========================================================================== */
+.actividad-col-principal {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+}
 
-   /* ==========================================================================
-   BARRA DE PUBLICACIÓN RÁPIDA
-   ========================================================================== */
+/* ── 1.2  Contenedor de la barra ── */
 
 .quick-publish-bar {
-    background: rgba(255, 255, 255, 0.45); /* Fondo translúcido sutil */
-    backdrop-filter: blur(4px); /* Suaviza el fondo que pasa por detrás */
-    border-radius: 100px; /* 100% de redondeado para extremos completamente ovalados */
-    border: 1.5px dashed rgba(81, 71, 69, 0.25); /* Línea de borde punteada/discontinua sutil */
-    padding: 10px 24px; /* Más espacio a los lados para acompañar la curvatura */
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(4px);
+    border-radius: 100px;
+    border: 1.5px dashed rgba(81, 71, 69, 0.25);
+    padding: 10px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     width: 100%;
     box-sizing: border-box;
-    margin-bottom: 5px; /* Separación limpia con la primera tarjeta */
+    margin-bottom: 5px;
 }
 
-/* Contenedor del campo de texto */
+/* ── 1.3  Campo de texto y placeholder ── */
+
 .publish-input-wrapper {
     flex-grow: 1;
 }
@@ -44,19 +86,19 @@
     width: 100%;
     border: none;
     outline: none;
-    font-size: 16px; /* Texto más grande */
+    font-size: 16px;
     color: rgba(43, 38, 37, 0.9);
     background: transparent;
     font-family: inherit;
 }
 
-/* Estilo para el placeholder: más grande y transparente */
 .publish-input-field::placeholder {
-    font-size: 16px; /* Tamaño del texto aumentado */
-    color: rgba(81, 71, 69, 0.5); /* Tono marrón/oscuro con transparencia */
+    font-size: 16px;
+    color: rgba(81, 71, 69, 0.5);
 }
 
-/* Grupo de botones de acción a la derecha */
+/* ── 1.4  Botones de acción ── */
+
 .publish-actions {
     display: flex;
     align-items: center;
@@ -64,7 +106,6 @@
     flex-shrink: 0;
 }
 
-/* Botón discreto para Multimedia (Icono lineal) */
 .btn-publish-media {
     background: none;
     border: none;
@@ -83,7 +124,6 @@
     background-color: rgba(255, 248, 236, 0.8);
 }
 
-/* Botón Sólido de Publicar (Estilo ovalado a juego) */
 .btn-publish-submit {
     background: #b25e38;
     color: #ffffff;
@@ -91,7 +131,7 @@
     font-size: 12px;
     font-weight: 700;
     padding: 6px 18px;
-    border-radius: 100px; /* Bordes completamente redondeados también en el botón */
+    border-radius: 100px;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
@@ -100,36 +140,71 @@
     background: #964e2e;
 }
 
-/* ACTIVITY LOG*/
-.actividad-col-principal {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+
+/* ══════════════════════════════════════════════════
+   2. ACTIVIDAD
+   ══════════════════════════════════════════════════ */
+
+/* ── 2.1  Foto y nombre de usuario  ·  flag: mostrar_usuario ── */
+
+/*
+   Solo se renderiza cuando el template llama al include con:
+   {% include '...' with item=card mostrar_usuario=True %}
+   En la vista de actividad propia se omite (evita redundancia).
+*/
+
+.historial-usuario-row {
     width: 100%;
+    display: flex;
+    justify-content: space-between; /* Mantiene la fecha a la derecha y el nombre a la izquierda */
+    align-items: center;
+    padding: 6px 10px 5px 10px;
+    background: #3D262B;
 }
 
-/* Tarjeta base del historial unificada - ALTURA REDUCIDA Y SIN LUCES */
+/* Nueva clase limpia para agrupar la foto y el nombre del usuario */
+.historial-usuario-info {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espaciado entre la foto de perfil y el nombre */
+}
+
+
+.avatar-mini {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.feed-usuario {
+    font-size: 0.95em;
+    color: #2b2625;
+}
+
+/* ── 2.2  Diseño de la caja ── */
+
 .historial-card {
     background: #ffffff;
     border-radius: 14px;
     display: flex;
+    flex-direction: column;
     position: relative;
     overflow: hidden;
-    min-height: 110px; /* Reducido drásticamente de 155px a 110px */
     box-shadow: 0 2px 8px rgba(43, 38, 37, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.06); /* Borde plano, limpio y uniforme */
+    border: 1px solid rgba(0, 0, 0, 0.06);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Hover general */
 .historial-card:hover {
     box-shadow: 0 6px 18px rgba(43, 38, 37, 0.12);
 }
 
-/* --- ELIMINADOS LOS BORDES DE COLORES Y EFECTOS LED --- */
+/* Variantes de estado: sin bordes de color ni efectos LED */
 .historial-card.terminada,
-.historial-card.abandonada { 
-    border: 1px solid rgba(0, 0, 0, 0.06); 
+.historial-card.abandonada {
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .historial-card.terminada:hover,
@@ -139,11 +214,28 @@
     border-color: rgba(0, 0, 0, 0.12);
 }
 
-/* ==========================================================================
-   CONTENEDOR DEL PÓSTER (Se escala con la nueva altura)
-   ========================================================================== */
+/* Contenedor inferior: póster a la izquierda, contenido a la derecha */
+.historial-card-body {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-height: 120px;
+}
+
+/* Estado vacío */
+.historial-vacio-box {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #887b78;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px dashed rgba(0, 0, 0, 0.12);
+}
+
+/* ── 2.3  Póster ── */
+
 .historial-poster-wrapper {
-    width: 82px; /* Reducido de 110px a 82px para mantener la proporción vertical */
+    width: 82px;
     position: relative;
     flex-shrink: 0;
     align-self: stretch;
@@ -152,7 +244,7 @@
 .historial-poster-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; 
+    object-fit: cover;
     display: block;
 }
 
@@ -162,111 +254,17 @@
     background: linear-gradient(135deg, #e7d7c4 0%, #f7f3e3 100%);
 }
 
-/* ==========================================================================
-   TRES PUNTOS FLOTANTES (Diseño Ultra Discreto y Compacto)
-   ========================================================================== */
-.historial-opciones-dropdown {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    z-index: 5;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
+/* ── 2.4  Textos de la izquierda ── */
 
-/* El botón flotante se asoma al hacer hover en la tarjeta */
-.historial-card:hover .historial-opciones-dropdown {
-    opacity: 1;
-}
-
-/* Botón estilizado: Se redujo SOLO el width (y el height para mantenerlo circular) */
-.btn-historial-opciones {
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(4px);
-    border: none;
-    color: #ffffff;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px; /* Reducido de 20px a 16px para que sea más estrecho y discreto */
-    height: 16px;
-    border-radius: 50%;
-    transition: background 0.2s ease;
-}
-
-.btn-historial-opciones:hover {
-    background: rgba(178, 94, 56, 0.85);
-    color: #ffffff;
-}
-
-/* Menú flotante: Preparado para transición fluida.
-   Cambiamos display: none por opacity y visibility para que soporte la animación.
-*/
-.historial-dropdown-menu {
-    position: absolute;
-    left: 0;
-    top: 22px;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 6px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-    min-width: 84px; /* Ligero ajuste para acompañar el nuevo tamaño de letra */
-    overflow: hidden;
-    
-    /* Estado inicial oculto y desplazado hacia abajo */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(4px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-}
-
-/* CLASE ACTIVA (Controlada suavemente por JavaScript) */
-.historial-dropdown-menu.show {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-}
-
-/* Mantiene el botón visible si el menú está activo transicionando */
-.historial-opciones-dropdown:has(.historial-dropdown-menu.show) {
-    opacity: 1 !important;
-}
-
-/* Opciones del menú compactas con texto ligeramente mayor */
-.dropdown-item {
-    display: block;
-    padding: 5px 10px;
-    font-size: 12px; /* Incrementado ligeramente de 11px a 12px */
-    color: #514745;
-    text-decoration: none;
-    transition: background 0.15s ease, color 0.15s ease;
-}
-
-.dropdown-item:hover {
-    background: #fff8ec;
-    color: #b25e38;
-}
-
-/* Estilo de alerta sutil para la acción de eliminar */
-.dropdown-item.item-eliminar:hover {
-    background: rgba(198, 40, 40, 0.05);
-    color: #c62828;
-}
-
-/* ==========================================================================
-   BLOQUE DE CONTENIDO TEXTUAL
-   ========================================================================== */
 .historial-contenido {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Fuerza al header arriba y al footer abajo */
-    padding: 12px 18px;             /* Ajustado para el nuevo tamaño compacto */
+    justify-content: space-between;
+    padding: 12px 18px;
 }
 
+/* Encabezado: estado + nota a la izquierda, fecha a la derecha */
 .historial-header-card {
     display: flex;
     justify-content: space-between;
@@ -280,7 +278,7 @@
     gap: 12px;
 }
 
-/* Calificación Inline al lado del badge */
+/* Nota numérica inline */
 .historial-nota-inline {
     font-size: 13.5px;
     font-weight: 700;
@@ -301,44 +299,50 @@
     letter-spacing: 0.4px;
 }
 
-.status-terminada { background: rgba(46, 125, 50, 0.08); color: #2e7d32; }
-.status-pausada { background: rgba(178, 94, 56, 0.08); color: #b25e38; }
-.status-abandonada { background: rgba(198, 40, 40, 0.08); color: #c62828; }
-.status-viendo { background: rgba(0, 0, 0, 0.05); color: #514745; }
+.status-terminada  { background: rgba(46, 125, 50, 0.08);  color: #2e7d32; }
+.status-pausada    { background: rgba(178, 94, 56, 0.08);  color: #b25e38; }
+.status-abandonada { background: rgba(198, 40, 40, 0.08);  color: #c62828; }
+.status-viendo     { background: rgba(0, 0, 0, 0.05);      color: #514745; }
 
+/* FECHA PARA COMUNIDAD, claro para el fondo oscuro */
 .historial-fecha {
-    font-size: 11.5px;
-    color: #887b78;
+    font-size: 11.7px;
+    color: #f7f3e3;
 }
 
-/* Título de la Serie - Reducido levemente */
+/* FECHA PARA ACTIVIDAD, oscuro para el fondo claro */
+.historial-fecha.fecha-clara {
+    color: #3D262B;
+}
+
+
+/* Título de la serie */
 .historial-serie-titulo {
-    font-size: 17.5px; /* Un poco más pequeño pero sigue resaltando */
-    font-weight: 800; 
+    font-size: 17.5px;
+    font-weight: 800;
     margin: 0;
     color: #2B2625;
     line-height: 1.2;
 }
 
-/* 
-   LOGICA DE CENTRADO PARA LOGS RÁPIDOS:
-   Si la tarjeta NO tiene la clase ".tarjeta-detallada", el título se expande
-   con márgenes automáticos verticales, forzándolo a centrarse perfectamente.
+/*
+   Log rápido (sin comentario): el título se centra verticalmente
+   expandiéndose con márgenes automáticos.
 */
 :not(.tarjeta-detallada) .historial-serie-titulo {
     margin-top: auto;
     margin-bottom: auto;
 }
 
-/* Comentario o Crítica */
+/* Comentario o crítica */
 .historial-comentario {
     font-size: 14px;
-    line-height: 1.5; 
+    line-height: 1.5;
     color: #514745;
     margin: 4px 0 6px 0;
 }
 
-/* Estilización de captura opcional */
+/* Captura de pantalla opcional */
 .historial-captura-wrapper {
     margin: 4px 0 6px 0;
     max-width: 100%;
@@ -353,102 +357,95 @@
     object-fit: cover;
 }
 
-/* Footer Elástico Interactivo */
+/* ── 2.5  Botones de la derecha ── */
+
+/* Footer: empuja los botones al extremo derecho */
 .historial-footer-card {
     display: flex;
     justify-content: flex-end;
     padding-top: 2px;
 }
 
-/* 
-    Si la tarjeta cuenta con la clase ".tarjeta-detallada",
-    obligamos al footer a empujarse al fondo de la estructura.
-*/
+/* En tarjeta detallada (con comentario), el footer cae al fondo */
 .tarjeta-detallada .historial-footer-card {
-    margin-top: auto; 
+    margin-top: auto;
 }
 
+/* Fila de botones de interacción */
 .historial-acciones-interaccion {
     display: flex;
     gap: 17px;
     align-items: center;
 }
 
-.btn-interact-comentario,
-.btn-interact-like {
-    background: none;
-    border: none;
-    color: #887b78;
-    cursor: pointer;
-    padding: 2px;
-    transition: color 0.2s ease;
-}
-
-.btn-interact-comentario:hover,
-.btn-interact-like:hover {
-    color: #b25e38;
-}
-
-/* ============================================= */
-/* NUEVAS REGLAS AÑADIDAS */
-/* ============================================= */
-
-.btn-interact-dislike {
-    background: none;
-    border: none;
-    color: #887b78;
-    cursor: pointer;
-    padding: 2px;
-    transition: color 0.2s ease;
-}
-
-.btn-interact-dislike:hover {
-    color: #b25e38;
-}
-
-/* Ajuste de espaciado: like y dislike más cercanos, comentario más separado */
-/* Contenedor general: Mantenemos tu distancia compacta exacta */
+/* Like y dislike más cercanos entre sí */
 .vote-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px; /* Distancia corta original entre botones que se ve genial */
+    gap: 8px;
 }
 
-/* El botón de comentario mantiene su separación original */
-.btn-interact-comentario {
-    margin-left: 16px; 
-    margin-right: 5px;
+/* ── Botón Like ── */
+.btn-interact-like {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: #887b78;
+    cursor: pointer;
+    padding: 2px;
+    position: relative;
+    transition: color 0.2s ease;
 }
 
-/* Aseguramos tamaño, alineación nativa y añadimos posición relativa */
-.btn-interact-like,
-.btn-interact-dislike,
+.btn-interact-like:hover { color: #b25e38; }
+
+/* ── Botón Dislike ── */
+.btn-interact-dislike {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: #887b78;
+    cursor: pointer;
+    padding: 2px;
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.btn-interact-dislike:hover { color: #b25e38; }
+
+/* ── Botón Comentario  (separación extra respecto al grupo de votos) ── */
 .btn-interact-comentario {
     display: flex;
     align-items: center;
     background: none;
     border: none;
+    color: #887b78;
     cursor: pointer;
     padding: 2px;
-    position: relative; /* Necesario para que el contador flote sin empujar */
+    position: relative;
+    margin-left: 16px;
+    margin-right: 5px;
+    transition: color 0.2s ease;
 }
 
-/* --- CONTROL EXCLUSIVO DEL CONTADOR FLOTANTE --- */
-/* El número aparecerá a la derecha del botón de forma absoluta sin empujar a los vecinos */
+.btn-interact-comentario:hover { color: #b25e38; }
+
+/* Contador flotante: se coloca a la derecha del icono sin empujar vecinos */
 .interact-counter {
     position: absolute;
-    left: 100%; /* Se coloca justo donde termina el botón actual */
-    margin-left: 1px; /* Un mini espacio de separación del icono */
+    left: 100%;
+    margin-left: 1px;
     font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
-    pointer-events: none; /* El clic pasa directo al botón */
+    pointer-events: none;
 }
 
-/* --- ESTADOS ACTIVOS (Sin alterar el tamaño ni hacer scale) --- */
+/* Estados activos */
 .btn-interact-like.activo-like {
     color: #B25E38;
-    /* Eliminado el transform: scale para que no se agrande */
 }
 
 .btn-interact-like.activo-like svg {
@@ -460,7 +457,6 @@
 
 .btn-interact-dislike.activo-dislike {
     color: #b25e38;
-    /* Eliminado el transform: scale para que no se agrande */
 }
 
 .btn-interact-dislike.activo-dislike svg {
@@ -470,33 +466,110 @@
     stroke-width: 1px;
 }
 
-/* Transiciones (Corregida la sintaxis añadiendo 'transition:') */
+/* Transición suave del relleno SVG */
 .btn-interact-like svg,
 .btn-interact-dislike svg {
     transition: color 0.2s ease, fill 0.2s ease, stroke 0.2s ease;
 }
 
-/* Contenedor Vacío */
-.historial-vacio-box {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: #887b78;
-    background: #ffffff;
-    border-radius: 14px;
-    border: 1px dashed rgba(0,0,0,0.12);
+/* ── 2.6  Tres puntos ── */
+
+.historial-opciones-dropdown {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
-/* Overlay: Fondo oscuro con un sutil desenfoque glassmorphism */
+/* El botón aparece al hacer hover en la tarjeta */
+.historial-card:hover .historial-opciones-dropdown {
+    opacity: 1;
+}
 
-/*CONFIGURACIÓN DEL MODAL*/
+/* Botón circular discreto */
+.btn-historial-opciones {
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(4px);
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.btn-historial-opciones:hover {
+    background: rgba(178, 94, 56, 0.85);
+    color: #ffffff;
+}
+
+/* Menú flotante: usa opacity/visibility para soportar animación */
+.historial-dropdown-menu {
+    position: absolute;
+    left: 0;
+    top: 22px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    min-width: 84px;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.historial-dropdown-menu.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+}
+
+/* Mantiene el botón visible mientras el menú está abierto */
+.historial-opciones-dropdown:has(.historial-dropdown-menu.show) {
+    opacity: 1 !important;
+}
+
+/* Ítems del menú */
+.dropdown-item {
+    display: block;
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #514745;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background: #fff8ec;
+    color: #b25e38;
+}
+
+.dropdown-item.item-eliminar:hover {
+    background: rgba(198, 40, 40, 0.05);
+    color: #c62828;
+}
+
+/* ── 2.7  Modal de comentarios ── */
+
+/* Overlay oscuro con desenfoque */
 .debate-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Modificado de 0.4 a 0.6 según tu nota */
-    backdrop-filter: blur(1.5px);         /* Añadido el desenfoque de 1.5px que tenías anotado */
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(1.5px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -506,18 +579,16 @@
     transition: opacity 0.25s ease;
 }
 
-
-/* Estado activo del overlay */
 .debate-modal-overlay.show {
     opacity: 1;
     pointer-events: auto;
 }
 
-/* Contenedor del Modal: Cuadrado limpio y perfecto por defecto */
+/* Contenedor principal del modal */
 .debate-modal-container {
     background: #fff8ec;
     width: 760px;
-    height: 690px; /* Forzamos tamaño cuadrado base */
+    height: 690px;
     border-radius: 45px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
     display: flex;
@@ -539,7 +610,7 @@
     border-bottom: 1px solid #fff8ec;
     display: flex;
     align-items: center;
-    justify-content: center; /* Cambiado de space-between a center */
+    justify-content: center;
 }
 
 .debate-modal-header h4 {
@@ -550,24 +621,22 @@
     text-align: center;
 }
 
-/* Ocultamos por completo el botón de cerrar tradicional */
+/* Botón de cierre oculto (se cierra clicando fuera) */
 .btn-close-modal {
     display: none;
 }
 
-/* --- MODIFICADO: Vista previa estructurada para la miniatura con póster --- */
-/* Mantenemos esta clase en el CSS para centrar la tarjeta flotante y limpiar el fondo */
+/* Preview de la tarjeta dentro del modal */
 .debate-modal-post-preview {
     display: flex;
-    justify-content: center; /* Centra la tarjeta horizontalmente a la perfección */
+    justify-content: center;
     align-items: center;
-    padding: 1px 0 11px 0;  /* Espaciado limpio para que respire arriba y abajo */
-    background: transparent;  /* Asegura que no tenga ningún fondo gris u oscuro */
+    padding: 1px 0 11px 0;
+    background: transparent;
     border-bottom: none;
     width: 100%;
 }
 
-/* Tarjeta flotante: Altura incrementada y centrada automáticamente */
 .modal-preview-mini-card {
     display: flex;
     background: #ffffff;
@@ -579,36 +648,26 @@
     margin: 0 auto;
 }
 
-/* Póster: Crece proporcionalmente para cubrir los 118px de altura */
 .mini-card-poster {
-    width: 78px;         /* Ajustado de 85px a 78px para respetar la proporción real del póster */
-    height: 100%;        
+    width: 78px;
+    height: 100%;
     flex-shrink: 0;
 }
 
 .mini-card-poster img {
     width: 100%;
     height: 100%;
-    object-fit: cover;      
+    object-fit: cover;
 }
 
 .mini-card-content {
     flex: 1;
     display: flex;
-    padding: 14px 18px; /* Un pelín más de aire interno para las letras más grandes */
-    justify-content: space-between; 
+    padding: 14px 18px;
+    justify-content: space-between;
 }
 
-.btn-modal-like.activo-like svg,
-.btn-modal-dislike.activo-dislike svg {
-    color: #B25E38;
-    fill: #B25E38;
-    stroke: #B25E38;
-    stroke-width: 1px;
-    padding-right: 2px;
-}
-
-/* Columna Izquierda: Título arriba fijo y comentario abajo */
+/* Columna izquierda de la mini tarjeta */
 .mini-card-left-column {
     display: flex;
     flex-direction: column;
@@ -628,17 +687,17 @@
 
 .mini-card-comment {
     margin: 0;
-    font-size: 15px; /* Aumentado de 13px a 15px para que sea mucho más notorio */
-    color: #4a3e3b;  /* Un tono sutilmente más oscuro para mejorar la legibilidad */
+    font-size: 15px;
+    color: #4a3e3b;
     line-height: 1.4;
-    font-style: normal; /* Quitada la fuente cursiva/italic */
+    font-style: normal;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-/* Columna Derecha: Contendrá las puntuaciones arriba y las interacciones abajo */
+/* Columna derecha de la mini tarjeta */
 .mini-card-right-column {
     display: flex;
     flex-direction: column;
@@ -654,7 +713,7 @@
     flex-wrap: wrap;
 }
 
-/* Estilos limpios para el texto plano de puntuación y estado dentro del modal */
+/* Puntuación en el modal */
 .modal-mini-score {
     font-size: 12px;
     font-weight: 700;
@@ -665,7 +724,7 @@
     border-radius: 6px;
 }
 
-/* Estilo base para el estado (sin colores específicos de fondo) */
+/* Badge de estado en el modal */
 .modal-mini-status {
     font-size: 11px;
     font-weight: 600;
@@ -674,43 +733,23 @@
     text-transform: uppercase;
 }
 
-/* Pendiente / Por ver -> Púrpura */
 .modal-mini-status.status-pendiente,
-.modal-mini-status.status-por-ver {
-    background: #f3e5f5;
-    color: #7b1fa2;
-}
+.modal-mini-status.status-por-ver   { background: #f3e5f5; color: #7b1fa2; }
 
-/* Viendo -> Azul */
-.modal-mini-status.status-viendo {
-    background: #e3f2fd;
-    color: #1565c0;
-}
+.modal-mini-status.status-viendo    { background: #e3f2fd; color: #1565c0; }
 
-/* Completado -> Verde */
 .modal-mini-status.status-completado,
-.modal-mini-status.status-completada {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
+.modal-mini-status.status-completada { background: #e8f5e9; color: #2e7d32; }
 
-/* Pausada -> Amarillo / Naranja */
 .modal-mini-status.status-pausada,
-.modal-mini-status.status-pausado {
-    background: #fff3e0;
-    color: #e65100;
-}
+.modal-mini-status.status-pausado   { background: #fff3e0; color: #e65100; }
 
-/* Abandonada / Dropeada -> Rojo */
 .modal-mini-status.status-abandonada,
 .modal-mini-status.status-abandonado,
 .modal-mini-status.status-dropeada,
-.modal-mini-status.status-dropeado {
-    background: #ffebee;
-    color: #c62828;
-}
+.modal-mini-status.status-dropeado  { background: #ffebee; color: #c62828; }
 
-/* Contenedor inferior de votación */
+/* Botones de voto en la mini tarjeta del modal */
 .mini-card-actions-row {
     display: flex;
     gap: 12px;
@@ -725,26 +764,25 @@
     display: flex;
     align-items: center;
 }
-/* ------------------------------------------------------------------------- */
 
-/* Listado de Comentarios: Activará el slider de forma interna si sobrepasa la altura */
+.btn-modal-like.activo-like svg,
+.btn-modal-dislike.activo-dislike svg {
+    color: #B25E38;
+    fill: #B25E38;
+    stroke: #B25E38;
+    stroke-width: 1px;
+    padding-right: 2px;
+}
 
+/* Lista de comentarios */
 .debate-modal-comments-list {
     flex: 1;
     padding: 20px;
-    overflow-y: auto; 
+    overflow-y: auto;
     background: #fff8ec;
     display: flex;
     flex-direction: column;
     gap: 16px;
-}
-
-.modal-comment-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    position: relative; /* Referencia sutil para el espacio interno */
 }
 
 /* Estado de lista vacía */
@@ -755,94 +793,19 @@
     font-size: 14px;
 }
 
-/* Contenedor del Avatar - ¡AGRANDADO! */
-.modal-comment-avatar-wrapper {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-}
-
-.modal-comment-avatar-wrapper::after {
-    content: '';
-    flex: 1; /* Se estira dinámicamente según la altura que tome el texto del comentario */
-    width: 2px; /* Un trazo fino pero definido */
-    background-color: #ebdcc5; /* El mismo tono beige sutil de tu divisor superior */
-    margin-top: 8px; /* Pequeño respiro debajo del círculo del avatar */
-    border-radius: 1px;
-    opacity: 0.8; /* Le da un acabado más sedoso y menos tosco */
-}
-
-.modal-comment-user-avatar {
-    width: 48px;  /* Cambiado de 36px a 48px para darle importancia */
-    height: 48px; /* Cambiado de 36px a 48px */
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid #eaddd7;
-    background: #ffffff;
-}
-
-/* Nube de diálogo convertida en contenedor plano (SIN NUBE) */
-.modal-comment-bubble {
-    background: transparent !important; /* Eliminamos el fondo blanco */
-    border: none !important;            /* Eliminamos el borde de la nube */
-    border-radius: 0 !important;
-    padding: 0 !important;              /* Eliminamos espaciados internos de la nube */
-    box-shadow: none !important;        /* Eliminamos sombras */
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;                           /* Pegamos el texto más hacia arriba, cerca del nombre */
-}
-
-/* Cabecera interna (Nombre de usuario e información) */
-.modal-comment-user-info {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 6px; /* Espaciado corto y uniforme entre cada elemento */
-    width: 100%;
-}
-
-.modal-comment-username {
-    font-size: 14.5px;         /* Ajustamos sutilmente el tamaño al ser una línea limpia */
-    font-weight: 700;
-    color: black; 
-}
-
-.modal-comment-date {
-    font-size: 12px;
-    color: #a39692;
-}
-
-/* Texto del comentario */
-.modal-comment-text {
-    font-size: 14.5px;
-    color: #3d3330;
-    line-height: 1.4;
-    word-break: break-word;
-    white-space: pre-line;
-    
-    font-weight: 480; /* Le da cuerpo intermedio, ideal para comentarios */
-    -webkit-font-smoothing: antialiased; /* Suaviza los bordes en navegadores basados en WebKit (Chrome, Edge, Safari) */
-    -moz-osx-font-smoothing: grayscale; /* Suaviza los bordes en Firefox para Mac */
-}
-
-/* Línea divisoria superior del modal */
-/* --- DIVISOR SUPERIOR ESTILIZADO CON PUNTO --- */
+/* Divisor decorativo */
 .modal-divider-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;         /* Espacio entre las líneas y el punto central */
-    width: 95%;        /* Mantiene el ancho total que te gustó */
-    margin: 0 auto 0px auto; /* Centrado y con margen abajo para que respiren los comentarios */
+    gap: 12px;
+    width: 95%;
+    margin: 0 auto 0px auto;
     opacity: 0.7;
 }
 
 .divider-line {
-    flex: 1;           /* Hace que ambas líneas se estiren por igual ocupando el espacio */
+    flex: 1;
     height: 1px;
     background-color: #ebdcc5;
 }
@@ -853,7 +816,7 @@
     line-height: 1;
 }
 
-/* --- CONTENEDOR PRINCIPAL DEL COMENTARIO --- */
+/* Ítem de comentario */
 .modal-comment-item {
     display: flex;
     flex-direction: column;
@@ -865,20 +828,76 @@
 
 .modal-comment-main-row {
     display: flex;
-    gap: 14px; 
+    gap: 14px;
     align-items: flex-start;
     width: 100%;
 }
 
-/* --- CABECERA (NOMBRE, FECHA Y 3 PUNTOS) --- */
+/* Avatar con línea vertical de hilo */
+.modal-comment-avatar-wrapper {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.modal-comment-avatar-wrapper::after {
+    content: '';
+    flex: 1;
+    width: 2px;
+    background-color: #ebdcc5;
+    margin-top: 8px;
+    border-radius: 1px;
+    opacity: 0.8;
+}
+
+.modal-comment-user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #eaddd7;
+    background: #ffffff;
+}
+
+/* Cuerpo del comentario */
+.modal-comment-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+}
+
+/* Cabecera: nombre, fecha, tres puntos */
 .modal-comment-top-line {
     display: flex;
-    justify-content: flex-start; /* Forzamos a que todo se agrupe a la izquierda */
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
 }
 
-/* --- BOTÓN DE 3 PUNTOS Y MENÚ FLOTANTE --- */
+.modal-comment-user-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    width: 100%;
+}
+
+.modal-comment-username {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: black;
+}
+
+.modal-comment-date {
+    font-size: 12px;
+    color: #a39692;
+}
+
+/* Tres puntos del comentario */
 .modal-comment-options-wrapper {
     position: relative;
     display: inline-flex;
@@ -890,41 +909,36 @@
     border: none;
     color: #a39692;
     cursor: pointer;
-    padding: 0 2px; /* Espaciado mínimo para que actúe como un separador más */
-    font-size: 11px; /* Lo achicamos un pelo para que nivele con la fecha */
+    padding: 0 2px;
+    font-size: 11px;
     display: flex;
     align-items: center;
-    transition: color 0.2s ease;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, color 0.2s ease;
 }
 
 .btn-comment-options:hover {
     color: #b25e38;
 }
 
-/* 1. Por defecto, ocultamos el botón de opciones de forma suave */
-.modal-comment-options-wrapper .btn-comment-options {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease, color 0.2s ease;
-}
-
-/* 2. Cuando el usuario pasa el mouse por cualquier parte del comentario, se muestran los puntos */
+/* Se muestra al hacer hover sobre el ítem */
 .modal-comment-item:hover .btn-comment-options {
     opacity: 1;
     visibility: visible;
 }
 
-/* 3. Aseguramos que si el menú desplegable está abierto (.show), los puntos no se borren al quitar el mouse */
+/* Permanece visible mientras el menú está abierto */
 .modal-comment-options-wrapper:has(.comment-options-menu.show) .btn-comment-options {
     opacity: 1;
     visibility: visible;
 }
 
 .comment-options-menu {
-    display: none; 
+    display: none;
     position: absolute;
     top: 100%;
-    left: 0; /* Cambiado a left para que se despliegue hacia adelante al estar pegado a la izquierda */
+    left: 0;
     background: #ffffff;
     border: 1px solid #eaddd7;
     border-radius: 8px;
@@ -958,7 +972,19 @@
     color: #e05858;
 }
 
-/* --- TEXTO Y ACCIONES DEBAJO DEL COMENTARIO --- */
+/* Texto del comentario */
+.modal-comment-text {
+    font-size: 14.5px;
+    color: #3d3330;
+    line-height: 1.4;
+    word-break: break-word;
+    white-space: pre-line;
+    font-weight: 480;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Acciones debajo del comentario */
 .modal-comment-actions {
     display: flex;
     align-items: center;
@@ -966,6 +992,13 @@
     margin-top: 7px;
 }
 
+/* Texto y acciones se separan del botón de like flotante */
+.modal-comment-text,
+.modal-comment-actions {
+    margin-right: 32px;
+}
+
+/* Botón "Responder" */
 .btn-comment-reply {
     background: none;
     border: none;
@@ -978,9 +1011,7 @@
     transition: color 0.2s ease;
 }
 
-.btn-comment-reply:hover {
-    color: #b25e38;
-}
+.btn-comment-reply:hover { color: #b25e38; }
 
 .btn-comment-reply::before,
 .btn-comment-reply::after,
@@ -988,21 +1019,18 @@
     display: none !important;
 }
 
-/* Botón de Like: Icono flotando al extremo derecho */
+/* Like del comentario: flota al extremo derecho */
 .btn-comment-like {
     background: none;
     border: none;
     color: #a39692;
-    font-size: 16px; /* Ajustado: un punto intermedio, ni muy grande ni muy invisible */
+    font-size: 16px;
     cursor: pointer;
     padding: 4px;
-    
-    /* Lo sacamos del flujo vertical para centrarlo verticalmente respecto al bloque de texto */
     position: absolute;
     right: 4px;
     top: 50%;
-    transform: translateY(-50%); /* Lo centra matemáticamente en el eje vertical del cuerpo del comentario */
-    
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     transition: transform 0.2s ease, color 0.2s ease;
@@ -1010,15 +1038,10 @@
 
 .btn-comment-like:hover {
     color: #e05858;
-    transform: translateY(-50%) scale(1.1); /* Mantiene el centrado durante el efecto hover */
+    transform: translateY(-50%) scale(1.1);
 }
 
-.modal-comment-text,
-.modal-comment-actions {
-    margin-right: 32px; 
-}
-
-/* --- CASCADA DE RESPUESTAS (CHAT INTERNO) --- */
+/* Cascada de respuestas */
 .modal-comment-replies-container {
     margin-left: 62px; /* 48px avatar + 14px gap */
     margin-top: 6px;
@@ -1067,23 +1090,19 @@
     background-color: #3d3330;
 }
 
-/* ==========================================================================
-   FOOTER: CAJA DE ENTRADA Y BOTÓN ENVIAR
-   ========================================================================== */
-
+/* Footer del modal: input principal + botón enviar */
 .debate-modal-footer {
     padding: 16px 10px;
     border-top: 1px solid #fff8ec;
-    background-color: #fff8ec; 
+    background-color: #fff8ec;
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-/* El input de texto */
 .modal-comment-input {
-    flex: 1; /* Mágico: Absorbe absolutamente todo el espacio restante del contenedor */
-    padding: 11px 20px; 
+    flex: 1;
+    padding: 11px 20px;
     border: 1px solid #dcd5d1;
     border-radius: 45px;
     font-size: 16px;
@@ -1097,10 +1116,9 @@
     background: #ffffff;
 }
 
-/* Botón Responder (Unificado y limpio) */
 .btn-modal-comment-submit {
-    padding: 11px 24px; 
-    min-width: max-content; 
+    padding: 11px 24px;
+    min-width: max-content;
     background: #b25e38;
     color: #ffffff;
     border: none;
@@ -1114,6 +1132,20 @@
 .btn-modal-comment-submit:hover {
     background: #964f2e;
 }
+
+/* Burbuja de comentario (actualmente sin fondo, estilo plano) */
+.modal-comment-bubble {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 /* ==========================================================================
    COLUMNA DERECHA: BARRA LATERAL DE WIDGETS (Ampliada Proporcionalmente)
    ========================================================================== */

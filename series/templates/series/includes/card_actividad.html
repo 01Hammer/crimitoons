@@ -1,0 +1,103 @@
+<div class="historial-card {% if item.accion == 'completed' %}terminada{% elif item.accion == 'paused' %}pausada{% elif item.accion == 'dropped' %}abandonada{% else %}viendo{% endif %} {% if item.comment_momento %}tarjeta-detallada{% else %}tarjeta-rapida{% endif %}">
+
+    {% if mostrar_usuario %}
+        <!-- CASO 1: Con la flag activa, la fecha se posiciona al lado del nombre de usuario -->
+        <div class="historial-usuario-row">
+            <div class="historial-usuario-info">
+                {% if item.perfil.foto_perfil %}
+                    <img src="{{ item.perfil.foto_perfil.url }}" alt="{{ item.perfil.usuario.username }}" class="avatar-mini" />
+                {% else %}
+                    <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
+                {% endif %}
+                <span class="feed-usuario">
+                    <strong>{{ item.perfil.usuario.username }}</strong>
+                </span>
+            </div>
+            <!-- La fecha se renderiza aquí arriba -->
+            <span class="historial-fecha">{{ item.created_at|timesince }}</span>
+        </div>
+    {% endif %}
+
+    <div class="historial-card-body">
+
+        <div class="historial-poster-wrapper">
+            {% if item.serie.poster_path %}
+                <img src="{{ item.serie.poster_path }}" alt="{{ item.serie.titulo }}" class="historial-poster-img" />
+            {% else %}
+                <div class="historial-poster-placeholder"></div>
+            {% endif %} 
+            
+            {% if item.perfil.usuario == request.user %}
+                <div class="historial-opciones-dropdown">
+                    <button class="btn-historial-opciones" aria-label="Opciones de actividad">•••</button>
+                    <div class="historial-dropdown-menu">
+                        <a href="#" class="dropdown-item item-editar" data-actividad-id="{{ item.id }}">Editar</a>
+                        <a href="#" class="dropdown-item item-eliminar" data-actividad-id="{{ item.id }}">Eliminar</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="historial-contenido">
+            <div class="historial-header-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="header-status-meta">
+                    <span class="status-badge {% if item.accion == 'completed' %}status-terminada{% elif item.accion == 'paused' %}status-pausada{% elif item.accion == 'dropped' %}status-abandonada{% else %}status-viendo{% endif %}">
+                        {{ item.get_accion_display }}
+                    </span>
+                    {% if item.score_momento %}
+                        <span class="historial-nota-inline">{{ item.score_momento|floatformat:1 }}</span>
+                    {% endif %}
+                </div>
+                
+                {% if not mostrar_usuario %}
+                    <!-- CASO 2: Sin la flag, la fecha se mantiene abajo en su contenedor original -->
+                    <span class="historial-fecha fecha-clara">{{ item.created_at|timesince }}</span>
+                {% endif %}
+            </div>
+
+            <h3 class="historial-serie-titulo">{{ item.serie.titulo }}</h3>
+
+            {% if item.comment_momento %}
+                <p class="historial-comentario">{{ item.comment_momento }}</p>
+            {% endif %} 
+            
+            {% if item.captura_favorita %}
+                <div class="historial-captura-wrapper">
+                    <img src="{{ item.captura_favorita.url }}" alt="Captura favorita" class="historial-captura-img" />
+                </div>
+            {% endif %}
+
+            <div class="historial-footer-card">
+                <div class="historial-acciones-interaccion">
+                    <button class="btn-interact-like {% if item.voto_usuario == 'like' %}activo-like{% endif %}" data-id="{{ item.id }}" data-tipo="like" title="Like">
+                        <div class="icon-container">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </div>
+                        <span class="interact-counter counter-like">{% if item.total_likes > 0 %}{{ item.total_likes }}{% endif %}</span>
+                    </button>
+
+                    <button class="btn-interact-dislike {% if item.voto_usuario == 'dislike' %}activo-dislike{% endif %}" data-id="{{ item.id }}" data-tipo="dislike" title="Desacuerdo">
+                        <div class="icon-container">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H9zM21 2h3v9h-3z"></path>
+                            </svg>
+                        </div>
+                        <span class="interact-counter counter-dislike">{% if item.total_dislikes > 0 %}{{ item.total_dislikes }}{% endif %}</span>
+                    </button>
+
+                    <button class="btn-interact-comentario" title="comentarios">
+                        <div class="icon-container">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <span class="interact-counter counter-comentario">{% if item.comentarios.count > 0 %}{{ item.comentarios.count }}{% endif %}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

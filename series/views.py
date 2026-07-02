@@ -1020,7 +1020,6 @@ def ver_perfil(request, username):
 def comunidad(request):
     return render(request, "series/comunidad.html", {"notificaciones_count": 0})
 
-
 # ============================================================
 # 5. ACCIONES ASÍNCRONAS (AJAX)
 # ============================================================
@@ -1212,9 +1211,26 @@ def comunidad(request):
     actividades = HistorialActividad.objects.all().select_related(
         "perfil__usuario", "serie"
     )
-    # Marcamos estas tarjetas como 'actividad'
+
+    # Determinamos el perfil del usuario autenticado de forma segura (igual que en ver_perfil)
+    perfil_actual = None
+    if request.user.is_authenticated:
+        try:
+            perfil_actual = request.user.perfil
+        except Perfil.DoesNotExist:
+            perfil_actual = None
+
+    # Marcamos estas tarjetas como 'actividad' y calculamos sus votos
     for act in actividades:
         act.tipo_tarjeta = "actividad"
+        act.total_likes = act.votos.filter(tipo="like").count()
+        act.total_dislikes = act.votos.filter(tipo="dislike").count()
+
+        if perfil_actual:
+            voto = act.votos.filter(perfil=perfil_actual).first()
+            act.voto_usuario = voto.tipo if voto else "ninguno"
+        else:
+            act.voto_usuario = "ninguno"
 
     # 2. Traer todos los posts manuales de la comunidad
     posts_comunidad = (
