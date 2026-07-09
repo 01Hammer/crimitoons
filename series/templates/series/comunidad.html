@@ -22,34 +22,75 @@
     {% include 'series/includes/barra_navegacion.html' %}
 
     <main class="comunidad-wrapper">
-      <div class="comunidad-layout">
-        <aside class="col-filtros">
-          <div class="filtros-widget">
-            <p class="widget-titulo">Mi muro</p>
+  <div class="comunidad-layout">
+    
+    <!-- COLUMNA IZQUIERDA: Filtros, Amigos y Buscador -->
+    <aside class="col-filtros">
+      
+      <!-- Widget 1: Filtros (Tu código base) -->
+      <div class="filtros-widget">
+        <p class="widget-titulo">Mi muro</p>
 
-            <div class="filtros-lista">
-              <button class="filtro-btn activo" data-filtro="amigos">
-                <i class="fa-solid fa-user-group"></i>
-                <span class="filtro-label">Actividad</span>
-              </button>
-              <button class="filtro-btn activo" data-filtro="foros">
-                <i class="fa-solid fa-comments"></i>
-                <span class="filtro-label">Foros</span>
-              </button>
-              <button class="filtro-btn activo" data-filtro="publicaciones">
-                <i class="fa-solid fa-newspaper"></i>
-                <span class="filtro-label">Posts</span>
-              </button>
+        <div class="filtros-lista">
+          <button class="filtro-btn activo" data-filtro="amigos">
+            <i class="fa-solid fa-user-group"></i>
+            <span class="filtro-label">Actividad</span>
+          </button>
+          <button class="filtro-btn activo" data-filtro="foros">
+            <i class="fa-solid fa-comments"></i>
+            <span class="filtro-label">Foros</span>
+          </button>
+          <button class="filtro-btn activo" data-filtro="publicaciones">
+            <i class="fa-solid fa-newspaper"></i>
+            <span class="filtro-label">Posts</span>
+          </button>
+        </div>
+
+        <div class="filtros-sep"></div>
+
+        <button class="filtro-solo-amigos" data-filtro="solo-amigos">
+          <i class="fa-solid fa-lock"></i>
+          Solo Amigos
+        </button>
+      </div>
+
+      <!-- Widget 2: Lista de Amigos (Nuevo para rellenar espacio) -->
+      <div class="amigos-widget">
+        <p class="widget-titulo">Mis Amigos</p>
+        
+        <div class="amigos-lista-previsualizacion">
+          <!-- Ejemplo de amigo conectado -->
+          <div class="amigo-item-mini conectado">
+            <div class="avatar-status-wrapper">
+              <img src="https://via.placeholder.com/32" alt="Avatar amigo" class="avatar-micro" />
+              <span class="status-indicador"></span>
             </div>
-
-            <div class="filtros-sep"></div>
-
-            <button class="filtro-solo-amigos" data-filtro="solo-amigos">
-              <i class="fa-solid fa-lock"></i>
-              Amigos
-            </button>
+            <span class="amigo-nombre">satou</span>
           </div>
-        </aside>
+
+          <!-- Ejemplo de amigo desconectado -->
+          <div class="amigo-item-mini">
+            <div class="avatar-status-wrapper">
+              <img src="https://via.placeholder.com/32" alt="Avatar amigo" class="avatar-micro" />
+              <span class="status-indicador"></span>
+            </div>
+            <span class="amigo-nombre">Nilson</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Widget 3: Descubrir / Buscar Amigos (Nuevo) -->
+      <div class="buscar-amigos-widget">
+        <p class="widget-titulo">Encontrar amigos</p>
+        <form class="buscador-amigos-form" action="#" method="GET">
+          <div class="input-buscar-grupo">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="q_amigos" placeholder="Buscar usuarios..." />
+          </div>
+        </form>
+      </div>
+
+    </aside>
 
         <section class="col-feed">
           <form

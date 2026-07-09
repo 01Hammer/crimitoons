@@ -2,6 +2,7 @@ import datetime
 import requests
 import json
 import random
+import os
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -24,6 +25,8 @@ from django.core.paginator import Paginator
 from django.utils.timesince import timesince
 from django.utils import timezone
 from django.db.models import Count  # <-- Asegúrate de que esta línea esté presente
+from ranged_response import RangedFileResponse
+from django.conf import settings
 
 DEFAULT_POSTER = "https://placehold.co/500x750/3D262B/F7F3E3?text=No+Poster"
 API_KEY_TMDB = "ea735303fe1aa8a04e298b1f9c130e6c"
@@ -1282,3 +1285,15 @@ def crear_post_comunidad(request):
             )
 
     return redirect("comunidad")
+
+def servir_media_con_rango(request, path):
+    """
+    Sirve archivos de MEDIA_ROOT soportando HTTP Range Requests
+    (necesario para que el seek de video funcione correctamente).
+    Solo se usa en desarrollo (DEBUG=True); en producción esto debe
+    ser reemplazado por Nginx sirviendo /media/ directamente.
+    """
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    if not os.path.exists(file_path):
+        raise Http404("Archivo no encontrado")
+    return RangedFileResponse(request, open(file_path, 'rb'))

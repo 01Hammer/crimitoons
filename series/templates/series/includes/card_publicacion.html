@@ -24,14 +24,43 @@
                       {% if card.imagen %}
                         <div class="multimedia-contenedor-fijo">
                           {% if card.imagen.url|lower|slice:"-4:" == ".mp4" or card.imagen.url|lower|slice:"-5:" == ".webm" %}
-                            <video src="{{ card.imagen.url }}" autoplay loop muted playsinline class="multimedia-blur-bg"></video>
-                            <video src="{{ card.imagen.url }}" controls class="post-multimedia-elemento"></video>
+                            
+                            <!-- Toda esta area gigante maneja el clic -->
+                            <div class="zona-click-reproductor" data-video-id="video-{{ card.id }}">
+                                
+                                <!-- Video principal -->
+                                <!-- Prueba esto en tu HTML para descartar bloqueos -->
+<video src="{{ card.imagen.url }}" loop playsinline muted controls class="post-multimedia-elemento" id="video-{{ card.id }}"></video>
+                                
+                                <!-- Boton indicador central (Play/Pausa) -->
+                                <div class="indicador-video-centro" id="indicador-{{ card.id }}">
+                                    <i class="fa-solid fa-play"></i>
+                                </div>
+
+                                <div class="controles-superiores-video">
+                                    <button type="button" class="btn-video-volumen" data-video-id="video-{{ card.id }}" title="Activar sonido">
+                                        <i class="fa-solid fa-volume-xmark"></i>
+                                    </button>
+                                    <a href="{{ card.imagen.url }}" download="crimitoons-video-{{ card.id }}" class="btn-video-descargar" title="Descargar video">
+                                        <i class="fa-solid fa-arrow-down"></i>
+                                        <div class="linea-base-descarga"></div>
+                                    </a>
+                                </div>
+
+                                <!-- Barra inferior silenciosa de progreso -->
+                                <div class="controles-inferiores-video">
+                                    <div class="barra-tiempo-indicador">
+                                        <div class="progreso-tiempo-linea" id="progreso-{{ card.id }}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
                           {% else %}
                             <img src="{{ card.imagen.url }}" class="multimedia-blur-bg" alt="" />
                             <img src="{{ card.imagen.url }}" class="post-multimedia-elemento" alt="Contenido" />
                           {% endif %}
                         </div>
-                      {% endif %}
+                    {% endif %}
                     </div>
 
                     <div class="feed-footer">
@@ -41,3 +70,222 @@
                   </article>
                 </div>
               {% endif %}
+
+<script>
+  if (!window.__reproductorVideoInicializado) {
+    window.__reproductorVideoInicializado = true;
+
+    let videoEnReproduccion = null;
+    let sonidoActivado = false; // preferencia global: se mantiene entre videos
+    let arrastrandoBarra = null; // barra de progreso siendo arrastrada actualmente
+
+    function resetearIndicador(zona) {
+      const indicador = zona.querySelector(".indicador-video-centro i");
+      if (indicador) {
+        indicador.className = "fa-solid fa-play";
+        indicador.parentElement.classList.remove("en-reproduccion");
+      }
+    }
+
+    function actualizarIconoVolumen(video) {
+      const zona = video.closest(".zona-click-reproductor");
+      if (!zona) return;
+      const icono = zona.querySelector(".btn-video-volumen i");
+      if (!icono) return;
+      icono.className = video.muted ? "fa-solid fa-volume-xmark" : "fa-solid fa-volume-high";
+    }
+
+    function pausarVideo(video) {
+      if (!video) return;
+      video.pause();
+      // Ya NO se fuerza muted=true aquí: si el video tenía sonido, lo conserva al reanudar.
+      const zona = video.closest(".zona-click-reproductor");
+      if (zona) resetearIndicador(zona);
+      actualizarIconoVolumen(video);
+    }
+
+    function reproducirVideo(video) {
+      if (!video) return;
+
+      if (videoEnReproduccion && videoEnReproduccion !== video) {
+        pausarVideo(videoEnReproduccion);
+      }
+
+      // Aplica la preferencia global de sonido, no un mute forzado.
+      video.muted = !sonidoActivado;
+
+      video.play()
+        .then(() => {
+          const zona = video.closest(".zona-click-reproductor");
+          if (zona) {
+            const indicador = zona.querySelector(".indicador-video-centro i");
+            if (indicador) {
+              indicador.className = "fa-solid fa-pause";
+              indicador.parentElement.classList.add("en-reproduccion");
+            }
+          }
+          actualizarIconoVolumen(video);
+        })
+        .catch(err => console.error("Error al reproducir:", err));
+
+      videoEnReproduccion = video;
+    }
+
+    function videoDesdeContenedor(contenedor) {
+      const zona = contenedor.closest(".zona-click-reproductor");
+      if (!zona) return null;
+      return document.getElementById(zona.getAttribute("data-video-id"));
+    }
+
+    // Solo mueve la barra VISUALMENTE, sin tocar el video (se usa mientras arrastras)
+    function moverBarraVisual(e, contenedor) {
+      const barra = contenedor.querySelector(".barra-tiempo-indicador");
+      if (!barra) return null;
+      const rect = barra.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      let porcentaje = (clientX - rect.left) / rect.width;
+      porcentaje = Math.min(Math.max(porcentaje, 0), 1);
+
+      const progreso = barra.querySelector(".progreso-tiempo-linea");
+      if (progreso) progreso.style.width = `${porcentaje * 100}%`;
+
+      return porcentaje;
+    }
+
+    // Aplica el salto REAL en el video (se usa solo al soltar el click)
+    function manejarSeek(e, contenedor) {
+      const video = videoDesdeContenedor(contenedor);
+      if (!video || !video.duration) return;
+
+      const porcentaje = moverBarraVisual(e, contenedor);
+      if (porcentaje === null) return;
+
+      const tiempoObjetivo = porcentaje * video.duration;
+      video.currentTime = tiempoObjetivo;
+      video.dataset.seekObjetivo = tiempoObjetivo;
+    }
+
+    // --- Click / arrastre sobre la línea de tiempo ---
+    // Se escucha en todo ".controles-inferiores-video" (área más grande y fácil
+    // de acertar) en vez de solo la barra delgada de 3px.
+    document.addEventListener("mousedown", (e) => {
+      const contenedor = e.target.closest(".controles-inferiores-video");
+      if (!contenedor) return;
+      e.stopPropagation();
+      arrastrandoBarra = contenedor;
+      manejarSeek(e, contenedor);
+    });
+
+    document.addEventListener("touchstart", (e) => {
+      const contenedor = e.target.closest(".controles-inferiores-video");
+      if (!contenedor) return;
+      arrastrandoBarra = contenedor;
+      manejarSeek(e, contenedor);
+    }, { passive: true });
+
+    // Mientras se arrastra: SOLO mueve la barra visualmente (cero peticiones al video)
+    document.addEventListener("mousemove", (e) => {
+      if (arrastrandoBarra) moverBarraVisual(e, arrastrandoBarra);
+    });
+
+    document.addEventListener("touchmove", (e) => {
+      if (arrastrandoBarra) moverBarraVisual(e, arrastrandoBarra);
+    }, { passive: true });
+
+    // Al soltar: AHORA sí se aplica el salto real, una sola vez
+    document.addEventListener("mouseup", (e) => {
+      if (arrastrandoBarra) manejarSeek(e, arrastrandoBarra);
+      arrastrandoBarra = null;
+    });
+
+    document.addEventListener("touchend", (e) => {
+      if (arrastrandoBarra) manejarSeek(e, arrastrandoBarra);
+      arrastrandoBarra = null;
+    });
+
+    // --- Click general (play/pausa, volumen, ignorar descarga y barra) ---
+    document.addEventListener("click", function (e) {
+
+      if (e.target.closest(".controles-inferiores-video")) {
+        return; // ya lo maneja el seek de arriba (evita togglear play/pausa)
+      }
+
+      const botonVolumen = e.target.closest(".btn-video-volumen");
+      if (botonVolumen) {
+        e.stopPropagation();
+        const video = document.getElementById(botonVolumen.getAttribute("data-video-id"));
+        if (video) {
+          video.muted = !video.muted;
+          sonidoActivado = !video.muted; // se vuelve la preferencia para los próximos videos
+          actualizarIconoVolumen(video);
+        }
+        return;
+      }
+
+      if (e.target.closest(".btn-video-descargar")) {
+        return;
+      }
+
+      const zona = e.target.closest(".zona-click-reproductor");
+      if (zona) {
+        e.stopPropagation();
+        const video = document.getElementById(zona.getAttribute("data-video-id"));
+        if (!video) return;
+
+        if (video.paused) {
+          reproducirVideo(video);
+        } else {
+          pausarVideo(video);
+          videoEnReproduccion = null;
+        }
+      }
+    });
+
+    // --- Barra de progreso automática (timeupdate/ended) ---
+    document.addEventListener("timeupdate", function (e) {
+      if (!e.target.matches || !e.target.matches("video.post-multimedia-elemento")) return;
+      if (arrastrandoBarra) return; // no pelear con el usuario mientras arrastra
+      const id = e.target.id.replace("video-", "");
+      const barraProgreso = document.getElementById(`progreso-${id}`);
+      if (barraProgreso && e.target.duration) {
+        barraProgreso.style.width = `${(e.target.currentTime / e.target.duration) * 100}%`;
+      }
+    }, true);
+
+    document.addEventListener("ended", function (e) {
+      if (!e.target.matches || !e.target.matches("video.post-multimedia-elemento")) return;
+      const zona = e.target.closest(".zona-click-reproductor");
+      if (zona) resetearIndicador(zona);
+      const id = e.target.id.replace("video-", "");
+      const barraProgreso = document.getElementById(`progreso-${id}`);
+      if (barraProgreso) barraProgreso.style.width = "0%";
+    }, true);
+
+    // --- Autoplay al hacer scroll ---
+    const observadorVideos = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+          if (videoEnReproduccion !== video) reproducirVideo(video);
+        } else if (videoEnReproduccion === video) {
+          pausarVideo(video);
+          videoEnReproduccion = null;
+        }
+      });
+    }, { threshold: [0, 0.6, 1] });
+
+    function observarVideosNuevos() {
+      document.querySelectorAll("video.post-multimedia-elemento").forEach(video => {
+        if (!video.dataset.observado) {
+          video.dataset.observado = "1";
+          observadorVideos.observe(video);
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", observarVideosNuevos);
+    if (document.readyState === "interactive" || document.readyState === "complete") {
+      observarVideosNuevos();
+    }
+  }
+</script>
