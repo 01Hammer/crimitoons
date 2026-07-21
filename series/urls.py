@@ -30,4 +30,12 @@ urlpatterns = [
 
     # crear publicación
     path('comunidad/crear/', views.crear_post_comunidad, name='crear_post_comunidad'),
+    # busqueda de series para foros
+    path('comunidad/buscar-serie/', views.serie_para_foro, name='buscar_serie_foro'),
+
+    path('encuestas/', views.feed_encuestas, name='feed_encuestas'),
+    
+    # Endpoints interactivos (AJAX / Fetch)
+    path('encuestas/votar/<int:opcion_id>/', views.votar_encuesta, name='votar_encuesta'),
+    path('encuestas/<int:encuesta_id>/anadir-opcion/', views.anadir_opcion_encuesta, name='anadir_opcion_encuesta'),
 ]

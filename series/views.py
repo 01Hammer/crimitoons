@@ -4,10 +4,11 @@ import json
 import random
 import os
 
+from urllib.parse import quote
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth.models import User
 from .models import (
     Serie,
@@ -17,6 +18,8 @@ from .models import (
     VotoActividad,
     ComentarioActividad,
     ComunidadPost,
+    Encuesta,
+    OpcionEncuesta
 )
 from .forms import RegistroForm, LoginForm, ActualizarPerfilForm
 from django.http import JsonResponse, Http404
@@ -1256,6 +1259,7 @@ def comunidad(request):
     # 5. Foros más activos para la barra lateral derecha
     foros_calientes = (
         ComunidadPost.objects.filter(tipo=ComunidadPost.TipoPost.FORO)
+        .select_related("serie_vinculada") # <-- ¡Optimización clave aquí!
         .annotate(num_respuestas=Count("respuestas"))
         .order_by("-num_respuestas")[:4]
     )
@@ -1268,23 +1272,188 @@ def comunidad(request):
     return render(request, "series/comunidad.html", context)
 
 
+def obtener_o_crear_serie_hibrida(serie_id_raw, request_post):
+    """
+    Función auxiliar para resolver si la serie es local o de TMDB,
+    evitando duplicar esta lógica entre foros y encuestas.
+    """
+    if not serie_id_raw:
+        return None
+        
+    if serie_id_raw.startswith("tmdb_"):
+        id_tmdb_externo = int(serie_id_raw.replace("tmdb_", ""))
+        serie_existente = Serie.objects.filter(id_tmdb=id_tmdb_externo).first()
+        if serie_existente:
+            return serie_existente
+        else:
+            titulo_tmdb = request_post.get("serie_titulo_tmdb", "Serie Desconocida")
+            poster_tmdb = request_post.get("serie_poster_tmdb", "")
+            return Serie.objects.create(
+                id_tmdb=id_tmdb_externo,
+                titulo=titulo_tmdb,
+                poster_path=poster_tmdb,
+                generos="Animación"
+            )
+    else:
+        try:
+            return Serie.objects.get(id=int(serie_id_raw))
+        except (ValueError, Serie.DoesNotExist):
+            return None
+
+
 @login_required
 def crear_post_comunidad(request):
     if request.method == "POST":
-        texto = request.POST.get("texto", "").strip()
-        imagen = request.FILES.get("imagen")  # Captura la imagen, gif o video si se seleccionó
+        tipo_tarjeta = request.POST.get("tipo_tarjeta", "publicacion").strip()
+        
+        # ==========================================
+        # NUEVO BLOQUE: PROCESAR ENCUESTA
+        # ==========================================
+        if tipo_tarjeta == "encuesta":
+            titulo = request.POST.get("titulo_encuesta", "").strip()
+            contexto = request.POST.get("contexto_encuesta", "").strip()
 
-        # Mantenemos la validación de que exista al menos uno de los dos
-        if texto or imagen:
-            # Creamos el registro de forma segura para la base de datos
-            ComunidadPost.objects.create(
+            if not titulo:
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({'status': 'error', 'message': 'El título de la encuesta es obligatorio'}, status=400)
+                return redirect("comunidad")
+
+            # 1. Creamos el registro de la Encuesta
+            encuesta = Encuesta.objects.create(
                 usuario=request.user,
-                texto=texto,  # Si está vacío, guardará "" en lugar de None, evitando el IntegrityError
-                imagen=imagen,
-                tipo="natural",  # Se guarda como un post normal por defecto
+                titulo=titulo,
+                contexto=contexto if contexto else None
             )
 
+            # 2. Recorremos las opciones dinámicas del formulario
+            for key in request.POST.keys():
+                if key.startswith('opcion_texto_'):
+                    index = key.split('_')[-1]
+                    texto_opcion = request.POST.get(key, '').strip()
+                    serie_id_raw = request.POST.get(f'opcion_serie_id_{index}', '').strip()
+
+                    if texto_opcion or serie_id_raw:
+                        nueva_opcion = OpcionEncuesta(encuesta=encuesta)
+                        
+                        # Si seleccionó una serie del buscador, la resolvemos
+                        if serie_id_raw:
+                            nueva_opcion.serie_vinculada = obtener_o_crear_serie_hibrida(serie_id_raw, request.POST)
+                        
+                        # Si no es serie o falló la resolución, se guarda como texto plano
+                        if not nueva_opcion.serie_vinculada:
+                            nueva_opcion.texto_personalizado = texto_opcion
+                            
+                        nueva_opcion.save()
+
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'success'})
+            return redirect("comunidad")
+
+        # ==========================================
+        # LOGICA EXISTENTE: FOROS Y POSTS NATURALES
+        # ==========================================
+        if tipo_tarjeta == "foro":
+            titulo = request.POST.get("titulo_foro", "").strip()
+            texto_cuerpo = request.POST.get("contexto_foro", "").strip()
+        else:
+            titulo = None
+            texto_cuerpo = request.POST.get("texto", "").strip()
+
+        imagen = request.FILES.get("imagen")
+        serie_id_raw = request.POST.get("serie_id", "").strip()
+
+        if not texto_cuerpo and not titulo and not imagen:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'error', 'message': 'Publicación vacía'}, status=400)
+            return redirect("comunidad")
+
+        # Reutilizamos la función auxiliar para el foro o post normal
+        serie_vinculada = obtener_o_crear_serie_hibrida(serie_id_raw, request.POST)
+
+        tipo_final = "foro" if tipo_tarjeta == "foro" else "natural"
+
+        ComunidadPost.objects.create(
+            usuario=request.user,
+            tipo=tipo_final,
+            titulo=titulo if tipo_final == "foro" else None,
+            texto=texto_cuerpo,
+            imagen=imagen,
+            serie_vinculada=serie_vinculada
+        )
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success'})
+
     return redirect("comunidad")
+
+@require_GET
+def serie_para_foro(request):
+    q = request.GET.get('q', '').strip()
+    if not q or len(q) < 2:
+        return JsonResponse({'status': 'success', 'data': []})
+
+    resultados = []
+    ids_tmdb_locales = []
+
+    # 1. Buscar primero en tu Base de Datos Local
+    try:
+        series_locales = Serie.objects.filter(titulo__icontains=q).values('id', 'titulo', 'poster_path', 'id_tmdb')[:5]
+        for s in series_locales:
+            resultados.append({
+                'id': s['id'],
+                'titulo': s['titulo'],
+                'poster_path': s['poster_path'] if s['poster_path'] else DEFAULT_POSTER
+            })
+            if s.get('id_tmdb') is not None:
+                ids_tmdb_locales.append(int(s['id_tmdb']))
+    except Exception as e:
+        pass  # Falla silenciosa en producción para no romper la experiencia
+
+    # 2. Consultar TMDB para rellenar (con filtros de descarte aplicados)
+    if len(resultados) < 5:
+        try:
+            query_codificada = quote(q)
+            url = f"https://api.themoviedb.org/3/search/tv?api_key={API_KEY_TMDB}&language=es-MX&query={query_codificada}&page=1&include_adult=true"
+            
+            res = requests.get(url, timeout=3.0)
+            if res.status_code == 200:
+                datos = res.json()
+                for item in datos.get("results", []):
+                    if len(resultados) >= 5:
+                        break
+                    
+                    # FILTRO 1: Solo Animación (Evita Live Action)
+                    if 16 not in item.get("genre_ids", []):
+                        continue
+                    
+                    # FILTRO 2: Excluir Anime / Contenido Asiático (Japón, Corea, China, Taiwán)
+                    if item.get("original_language") in ["ja", "ko", "zh", "cn"]:
+                        continue
+
+                    # FILTRO 3: Validar palabras prohibidas en título o sinopsis
+                    titulo = (item.get("name") or item.get("original_name") or "").lower()
+                    overview = (item.get("overview") or "").lower()
+                    if any(p in titulo or p in overview for p in PALABRAS_PROHIBIDAS):
+                        continue
+
+                    id_tmdb_actual = int(item.get("id"))
+
+                    # FILTRO 4: No duplicar si ya existe en locales
+                    if id_tmdb_actual in ids_tmdb_locales:
+                        continue
+
+                    poster_raw = item.get("poster_path")
+                    poster_url = f"https://image.tmdb.org/t/p/w500{poster_raw}" if poster_raw else DEFAULT_POSTER
+
+                    resultados.append({
+                        'id': f"tmdb_{id_tmdb_actual}",
+                        'titulo': item.get("name") or item.get("original_name"),
+                        'poster_path': poster_url
+                    })
+        except Exception:
+            pass
+
+    return JsonResponse({'status': 'success', 'data': resultados[:5]})
 
 def servir_media_con_rango(request, path):
     """
@@ -1297,3 +1466,95 @@ def servir_media_con_rango(request, path):
     if not os.path.exists(file_path):
         raise Http404("Archivo no encontrado")
     return RangedFileResponse(request, open(file_path, 'rb'))
+
+def feed_encuestas(request):
+    encuestas = Encuesta.objects.all().order_by('-created_at')
+    
+    # En el contexto puedes pasar las encuestas normalmente, 
+    # la propiedad del modelo (@property) se puede invocar directo en el template.
+    return render(request, 'tu_template_feed.html', {'encuestas': encuestas})
+
+
+@login_required
+@require_POST
+def votar_encuesta(request, opcion_id):
+    """
+    Registra o cambia el voto del usuario en una opción.
+    """
+    opcion = get_object_or_404(OpcionEncuesta, id=opcion_id)
+    encuesta = opcion.encuesta
+    usuario = request.user
+
+    # Regla: El usuario solo puede votar por UNA opción por encuesta.
+    # Buscamos si ya votó por alguna otra opción de la misma encuesta
+    voto_anterior = OpcionEncuesta.objects.filter(encuesta=encuesta, votos=usuario).first()
+
+    if voto_anterior:
+        if voto_anterior.id == opcion.id:
+            # Si presiona la misma, le quitamos el voto (opcional, para deshacer)
+            opcion.votos.remove(usuario)
+            voto_activo = False
+        else:
+            # Si cambia de opinión, quitamos el viejo y ponemos el nuevo
+            voto_anterior.votos.remove(usuario)
+            opcion.votos.add(usuario)
+            voto_activo = True
+    else:
+        # Voto limpio por primera vez
+        opcion.votos.add(usuario)
+        voto_activo = True
+
+    return JsonResponse({
+        'status': 'success',
+        'voto_activo': voto_activo,
+        'total_votos_encuesta': encuesta.total_votos,
+        'votos_opcion': opcion.votos.count()
+    })
+
+
+@login_required
+@require_POST
+def anadir_opcion_encuesta(request, encuesta_id):
+    """
+    Permite a los usuarios añadir una nueva opción (Normal o Serie) sobre la marcha.
+    """
+    encuesta = get_object_or_404(Encuesta, id=encuesta_id)
+    
+    try:
+        data = json.loads(request.body)
+        texto = data.get('texto', '').strip()
+        serie_id = data.get('serie_id', None) # Si el frontend manda un ID de serie seleccionado de un buscador
+    except (json.JSONDecodeError, KeyError):
+        return JsonResponse({'status': 'error', 'message': 'Datos inválidos'}, status=400)
+
+    if not texto and not serie_id:
+        return JsonResponse({'status': 'error', 'message': 'La opción no puede estar vacía'}, status=400)
+
+    nueva_opcion = OpcionEncuesta(encuesta=encuesta)
+
+    if serie_id:
+        # Intenta buscar la serie en Crimitoons
+        serie = Serie.objects.filter(id=serie_id).first()
+        if serie:
+            nueva_opcion.serie_vinculada = serie
+        else:
+            # Si el ID no existe por algún motivo, cae en texto normal
+            nueva_opcion.texto_personalizado = texto
+    else:
+        # Es texto puro escrito por el usuario
+        nueva_opcion.texto_personalizado = texto
+
+    nueva_opcion.save()
+
+    # Al guardar la nueva opción, mandamos la respuesta al cliente.
+    # El frontend necesitará saber si tras esta adición los pósters se deben ocultar.
+    return JsonResponse({
+        'status': 'success',
+        'opcion': {
+            'id': nueva_opcion.id,
+            'texto': nueva_opcion.serie_vinculada.titulo if nueva_opcion.serie_vinculada else nueva_opcion.texto_personalizado,
+            'es_serie': nueva_opcion.serie_vinculada is not None,
+            'poster_url': nueva_opcion.serie_vinculada.poster_path if nueva_opcion.serie_vinculada else None
+        },
+        'mostrar_posters_global': encuesta.mostrar_posters # Re-calcula la regla de consistencia instantáneamente
+    })

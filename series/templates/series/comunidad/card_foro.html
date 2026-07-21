@@ -1,0 +1,108 @@
+<div class="feed-item-bloque">
+  <article class="feed-card tipo-foro" data-tipo="foros">
+    
+    <!-- CABECERA INTERNA (Identidad del foro) -->
+    <div class="feed-cuerpo-foro">
+      <div class="feed-card-header-clean">
+        <div class="feed-header-interno" style="width: 100%;">
+          <div class="usuario-info-grupo" style="display: flex; align-items: center; gap: 10px; width: 100%; justify-content: space-between;">
+            
+            <!-- Izquierda: Creador y Serie -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+              {% if card.usuario.perfil.foto_perfil %}
+                <img src="{{ card.usuario.perfil.foto_perfil.url }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
+              {% else %}
+                <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
+              {% endif %}
+              
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span class="feed-usuario"><strong>{{ card.usuario.username }}</strong></span>
+                <span class="feed-tiempo">•</span>
+                
+                {% if card.serie_vinculada %}
+                  <span class="foro-serie-link-container">
+                    <span class="cat-tag tag-serie-vinculo">{{ card.serie_vinculada.titulo }}</span>
+                    {% if card.serie_vinculada.poster_path %}
+                      <span class="tooltip-poster-flotante">
+                        <img src="{{ card.serie_vinculada.poster_path }}" alt="Póster" />
+                      </span>
+                    {% endif %}
+                  </span>
+                {% else %}
+                  <span class="feed-tiempo">DEBATE GENERAL</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Derecha: Tiempo transcurrido -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+              <span class="feed-tiempo">Hace {{ card.created_at|timesince }}</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENIDO: Título formal obligatorio y descripción -->
+      <h4 class="foro-titulo-debate">{{ card.titulo }}</h4>
+      <p class="feed-texto">
+        {{ card.texto|truncatechars:180 }}
+        {% if card.texto|length > 180 %}
+          <a href="#" class="ver-mas-link" style="color: #B25E38; text-decoration: none; font-weight: 500;">ver más</a>
+        {% endif %}
+      </p>
+
+      <!-- MULTIMEDIA ADAPTADA CON BLUR Y CONTENEDOR FIJO -->
+      </div>
+
+    {% if card.imagen %}
+      <div class="multimedia-contenedor-fijo">
+        <!-- Capa trasera: Desenfoque estético -->
+        <img src="{{ card.imagen.url }}" class="multimedia-blur-bg" alt="Fondo desenfocado" />
+        <!-- Capa delantera: Imagen contenida sin recortar -->
+        <img src="{{ card.imagen.url }}" class="post-multimedia-elemento" alt="Contenido del foro" />
+      </div>
+    {% endif %}
+
+    <!-- FOOTER REDISEÑADO: Sistema colectivo -->
+    <div class="feed-footer-foro">
+      
+      <!-- Lado Izquierdo: Votación estilo Reddit (▲ / ▼) -->
+      <div class="foro-votacion-container">
+        <button class="vote-btn vote-up" title="Tema relevante">
+          <i class="fa-solid fa-arrow-up"></i>
+        </button>
+        <span class="vote-contador-num">{{ card.likes.count|default:0 }}</span>
+        <button class="vote-btn vote-down" title="Tema poco interesante">
+          <i class="fa-solid fa-arrow-down"></i>
+        </button>
+      </div>
+
+      <!-- Centro: Rostros de participantes activos (Efecto Comunidad) -->
+      <div class="foro-participantes-grupo">
+        <div class="avatar-stack">
+          <img src="https://via.placeholder.com/24" class="avatar-stack-item" alt="User 1">
+          <img src="https://via.placeholder.com/24" class="avatar-stack-item" alt="User 2">
+          <img src="https://via.placeholder.com/24" class="avatar-stack-item" alt="User 3">
+        </div>
+        <span class="participantes-contador">
+          {% if card.respuestas.count > 0 %}
+            <strong>{{ card.respuestas.count }}</strong> debatiendo
+          {% else %}
+            211 respuestas
+          {% endif %}
+        </span>
+      </div>
+
+      <!-- Lado Derecho: Botón de Llamado a la Acción (CTA Activo) -->
+      <div class="foro-cta-container">
+        <button class="interact-btn-foro-cta boton-comentarios" data-id="{{ card.id }}">
+          <span>Unirse al debate</span>
+          <i class="fa-solid fa-comments"></i>
+        </button>
+      </div>
+
+    </div>
+
+  </article>
+</div>

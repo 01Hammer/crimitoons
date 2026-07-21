@@ -1,0 +1,77 @@
+/* =====================================================
+   ESTILOS BASE Y LAYOUT PRINCIPAL
+   ===================================================== */
+
+/* 1. RESET */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* 2. BASE */
+body {
+    background: #F7F3E3;
+    color: #3D262B;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* 3. LAYOUT PRINCIPAL */
+.comunidad-wrapper {
+    max-width: 1480px; /* Ancho total controlado para evitar desbordes */
+    margin: 0 auto;
+    padding: 10px 24px 80px 0px; 
+}
+
+.comunidad-layout {
+    display: grid;
+    /* Izquierda: Toma un tamaño mínimo de 320px pero crece libremente (1fr) hacia el borde */
+    /* Centro: Se queda clavado en sus 720px */
+    /* Derecha: Se queda clavado en sus 360px */
+    grid-template-columns: minmax(320px, 1fr) 720px 360px;
+    grid-template-areas: "filtros feed sidebar";
+    gap: 40px;
+    align-items: start;
+    justify-content: start; /* Empuja todo el grid hacia el extremo izquierdo */
+}
+
+/* Columnas */
+.col-filtros  { grid-area: filtros; }
+.col-sidebar  { grid-area: sidebar; }
+
+.col-feed {
+    grid-area: feed; /* Mapeado correcto al grid-area */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 19. UTILIDADES */
+.feed-vacio {
+    text-align: center;
+    padding: 20px;
+    color: rgba(61, 38, 43, 0.45);
+}
+
+/* 20. RESPONSIVE GLOBAL */
+@media (max-width: 1200px) {
+    .comunidad-layout {
+        grid-template-columns: 230px 1fr 300px;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 950px) {
+    .comunidad-layout {
+        grid-template-columns: 1fr;
+        grid-template-areas: "filtros" "feed" "sidebar";
+    }
+
+    .col-filtros,
+    .col-sidebar {
+        position: static;
+    }
+}

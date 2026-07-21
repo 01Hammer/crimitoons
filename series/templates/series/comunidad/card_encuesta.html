@@ -1,0 +1,98 @@
+<div class="feed-item-bloque">
+  <article class="feed-card tipo-encuesta" data-tipo="encuestas">
+    
+    <!-- CUERPO DE LA ENCUESTA -->
+    <div class="feed-cuerpo-foro">
+      <div class="feed-card-header-clean">
+        <div class="feed-header-interno" style="width: 100%;">
+          <div class="usuario-info-grupo" style="display: flex; align-items: center; gap: 10px; width: 100%; justify-content: space-between;">
+            
+            <!-- Izquierda: Creador y Badge -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+              {% if card.usuario.perfil.foto_perfil %}
+                <img src="{{ card.usuario.perfil.foto_perfil.url }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
+              {% else %}
+                <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
+              {% endif %}
+              
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span class="feed-usuario"><strong>{{ card.usuario.username }}</strong></span>
+                <span class="feed-tiempo">•</span>
+                <span class="feed-badge encuesta">Encuesta</span>
+              </div>
+            </div>
+
+            <!-- Derecha: Tiempo transcurrido -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+              <span class="feed-tiempo">Hace {{ card.created_at|timesince }}</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Título de la Encuesta -->
+      <h4 class="foro-titulo" style="font-size: 19px; font-weight: 800; margin: 14px 0 6px 0;">{{ card.titulo }}</h4>
+      
+      <!-- Pequeño texto de contexto (Máximo 2 líneas mediante CSS) -->
+      <p class="feed-texto contexto-encuesta-recortado">
+        {{ card.contexto }}
+      </p>
+
+      <!-- CONTENEDOR DE OPCIONES -->
+      <!-- Agregamos la clase 'con-posters' condicionalmente si se cumple tu regla -->
+      <div class="encuesta-opciones {% if mostrar_posters %}con-posters{% endif %}">
+        {% for opcion in card.opciones.all %}
+          <button class="opcion-btn-vote" data-opcion-id="{{ opcion.id }}">
+            
+            <!-- Si se permite mostrar pósters y la opción está vinculada a una serie -->
+            {% if mostrar_posters and opcion.serie_vinculada.poster_path %}
+              <div class="opcion-poster-miniatura">
+                <img src="{{ opcion.serie_vinculada.poster_path }}" alt="{{ opcion.serie_vinculada.titulo }}">
+              </div>
+            {% endif %}
+
+            <div class="opcion-detalles-texto">
+              <span class="opcion-texto-titulo">
+                {% if opcion.serie_vinculada %}
+                  {{ opcion.serie_vinculada.titulo }}
+                {% else %}
+                  {{ opcion.texto_personalizado }}
+                {% endif %}
+              </span>
+            </div>
+
+          </button>
+        {% endfor %}
+
+        <!-- Botón interactivo para añadir opción -->
+        <button class="btn-encuesta-anadir-opcion" data-encuesta-id="{{ card.id }}">
+          <i class="fa-solid fa-plus"></i>
+          <span>Añadir opción</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- FOOTER: Métricas y Comentarios (Sin Likes) -->
+    <div class="feed-footer" style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px 18px 20px; margin-top: -4px;">
+      
+      <!-- Lado Izquierdo: Contador total de votos -->
+      <div class="encuesta-metricas-votos">
+        <i class="fa-solid fa-chart-simple" style="color: rgba(61, 38, 43, 0.4); font-size: 13px;"></i>
+        <span style="font-size: 13px; font-weight: 600; color: rgba(61, 38, 43, 0.6);">
+          {{ card.total_votos|default:0 }} votos
+        </span>
+      </div>
+
+      <!-- Lado Derecho: Botón de comentarios nativo -->
+      <div class="encuesta-cta-comentarios">
+        <button class="interact-btn boton-comentarios" data-id="{{ card.id }}">
+          <span>Comentarios</span>
+          <i class="fa-solid fa-comments"></i>
+        </button>
+      </div>
+
+    </div>
+
+  </article>
+</div>

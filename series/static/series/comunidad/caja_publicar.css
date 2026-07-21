@@ -1,0 +1,281 @@
+/* TARJETA BASE */
+.publicar-caja {
+    position: relative;
+    background-color: #ffffff; 
+    border: 1px solid rgba(61, 38, 43, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    /* Suavizado general del contenedor principal */
+    transition: all 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+    overflow: hidden;
+}
+
+/* El bloque superior controla su altura de forma fluida */
+#bloque-publicar-normal {
+    display: flex;
+    max-height: 80px;
+    opacity: 1;
+    visibility: visible;
+    /* Sincronización y ralentización del colapso */
+    transition: max-height 0.55s cubic-bezier(0.25, 1, 0.5, 1), 
+                opacity 0.4s ease-in-out, 
+                margin 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Estado cuando muta a Foro/Encuesta */
+#bloque-publicar-normal.oculto-modo {
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    margin-bottom: 0;
+    pointer-events: none;
+}
+
+#input-archivo-oculto {
+    display: none;
+}
+
+.publicar-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #f7f3e3; 
+    border: 1px solid #B25E38;
+    border-radius: 30px;
+    padding: 4px 18px 4px 6px;
+    width: 100%;
+    transition: border-color 0.25s ease;
+}
+
+.publicar-top:focus-within {
+    border-color: #B25E38;
+}
+
+.publicar-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    color: #3D262B; 
+    outline: none;
+}
+
+.publicar-input::placeholder {
+    color: rgba(61, 38, 43, 0.45);
+}
+
+.publicar-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.accion-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border: 1px solid rgba(61, 38, 43, 0.2);
+    border-radius: 30px;
+    background: transparent;
+    font-size: 14px;
+    color: #3D262B;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.accion-btn i {
+    font-size: 15px;
+    color: rgba(61, 38, 43, 0.45);
+}
+
+.accion-btn:hover,
+.accion-btn.activo {
+    border-color: #B25E38;
+    color: #B25E38;
+    background: rgba(178, 94, 56, 0.06);
+}
+
+.publicar-submit {
+    margin-left: auto;
+    padding: 9px 24px;
+    background: #B25E38;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    letter-spacing: 0.02em;
+}
+
+.publicar-submit:hover {
+    background: #c97548;
+}
+
+/* REGLAS DE LA TARJETA TRANSFORMADA A FORO */
+.contenedor-animado-modo {
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0 4px;
+    /* Despliegue elástico amortiguado y más pausado */
+    transition: max-height 0.55s cubic-bezier(0.25, 1, 0.5, 1), 
+                opacity 0.45s ease-in-out, 
+                margin 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+    margin: 0;
+}
+
+.contenedor-animado-modo.abierto {
+    max-height: 500px;
+    opacity: 1;
+    visibility: visible;
+    margin-top: 10px;
+    margin-bottom: 16px;
+}
+
+#btn-cerrar-modo {
+    display: none;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #888;
+    cursor: pointer;
+    z-index: 5;
+    transition: color 0.2s ease;
+}
+
+#btn-cerrar-modo:hover {
+    color: #ff4d4d;
+}
+
+/* VARIANTE FORO: título de la sección */
+.foro-titulo-seccion {
+    margin: 0 0 4px 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #3d262b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* VARIANTE FORO: inputs */
+.foro-control {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid rgba(61, 38, 43, 0.15);
+    font-family: inherit;
+    background-color: #f7f3e3; 
+    color: #3D262B;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+.foro-control:focus {
+    border-color: #B25E38;
+}
+
+#input-titulo-foro {
+    padding: 11px;
+}
+
+#textarea-contexto-foro {
+    padding: 10px;
+    resize: vertical;
+}
+
+/* VARIANTE FORO: buscador dinámico de series */
+.campo-buscador-serie {
+    position: relative;
+}
+
+.buscador-serie-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f7f3e3; 
+    border: 1px solid rgba(61, 38, 43, 0.15);
+    border-radius: 8px;
+    padding: 2px 10px;
+    transition: border-color 0.2s ease;
+}
+
+.buscador-serie-wrapper:focus-within {
+    border-color: #B25E38;
+}
+
+.icono-buscador-foro {
+    color: #888;
+    margin-right: 8px;
+}
+
+#buscador-serie-foro {
+    width: 100%;
+    padding: 8px 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #3D262B;
+}
+
+#resultados-series-flotante {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid rgba(61, 38, 43, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    margin-top: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#serie-seleccionada-preview {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 6px;
+}
+
+#preview-serie-poster {
+    width: 35px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+#preview-serie-titulo {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #3D262B;
+}
+
+#btn-remover-serie {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+}

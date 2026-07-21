@@ -1,0 +1,196 @@
+/* =====================================================
+   COMPONENTE MULTIMEDIA (REPRODUCTOR CUSTOM Y IMÁGENES)
+   ===================================================== */
+
+/* 17. MULTIMEDIA */
+.multimedia-contenedor-fijo {
+    position: relative;
+    width: auto;
+    margin-top: 3px;
+    margin-left: -11px;
+    margin-right: -11px;
+    border-radius: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    min-height: 400px;
+    max-height: 400px;
+    background: transparent;
+}
+
+.multimedia-contenedor-fijo .multimedia-blur-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(20px) brightness(0.85);
+    transform: scale(1.15);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.post-multimedia-elemento,
+.post-multimedia-element {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+    display: block;
+    object-fit: contain;
+    z-index: 1;
+}
+
+/* OCULTAR BOTONES NATIVOS */
+.post-multimedia-elemento::-webkit-media-controls,
+.post-multimedia-elemento::-webkit-media-controls-enclosure,
+.post-multimedia-elemento::-webkit-media-controls-panel,
+.post-multimedia-elemento::-webkit-media-controls-start-playback-button,
+.post-multimedia-elemento::-webkit-media-controls-play-button,
+.post-multimedia-elemento::-webkit-media-controls-timeline,
+.post-multimedia-elemento::-webkit-media-controls-volume-slider,
+.post-multimedia-elemento::-webkit-media-controls-fullscreen-button,
+.post-multimedia-elemento::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    -webkit-appearance: none;
+}
+
+/* REGLAS EXCLUSIVAS DE VIDEO */
+.multimedia-contenedor-fijo:has(video) .multimedia-blur-bg {
+    display: none !important;
+}
+
+.multimedia-contenedor-fijo:has(video) {
+    background-color: #060305 !important;
+}
+
+.zona-click-reproductor {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+}
+
+/* HOVER GLOBAL CONTROLES */
+.controles-superiores-video,
+.indicador-video-centro,
+.controles-inferiores-video {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.multimedia-contenedor-fijo:hover .controles-superiores-video,
+.multimedia-contenedor-fijo:hover .indicador-video-centro,
+.multimedia-contenedor-fijo:hover .controles-inferiores-video {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.multimedia-contenedor-fijo:hover .indicador-video-centro.en-reproduccion {
+    opacity: 0.4;
+}
+
+/* BOTON CENTRAL */
+.indicador-video-centro {
+    position: absolute;
+    z-index: 4;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 2.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    transition: transform 0.2s ease, opacity 0.2s ease-in-out;
+}
+
+/* CONTROLES SUPERIORES */
+.controles-superiores-video {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.btn-video-descargar {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    opacity: 0.50;
+}
+
+.btn-video-descargar:hover { opacity: 1; }
+.btn-video-descargar .linea-base-descarga {
+    width: 14px;
+    height: 2px;
+    background-color: #ffffff;
+}
+
+.btn-video-volumen {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #ffffff;
+    opacity: 0.50;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.btn-video-volumen:hover { opacity: 1; }
+
+/* CONTROLES INFERIORES */
+.controles-inferiores-video {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 12px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+}
+
+.barra-tiempo-indicador {
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.25);
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progreso-tiempo-linea {
+    height: 100%;
+    width: 0%;
+    background: #ffffff;
+    position: absolute;
+    left: 0;
+    top: 0;
+}

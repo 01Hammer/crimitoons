@@ -1,0 +1,375 @@
+/* =====================================================
+   ESTILOS DEL FEED Y SUS TARJETAS REUTILIZABLES
+   ===================================================== */
+
+/* 8. AVATAR */
+.avatar-mini {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 9. FEED: CONTENEDOR */
+.feed-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.feed-item-bloque {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* 10. FEED: TARJETA BASE */
+.feed-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid rgba(61, 38, 43, 0.1);
+    padding: 6px 10px 5px 10px;
+    transition: box-shadow 0.2s;
+}
+
+.feed-card:hover {
+    box-shadow: 0 4px 22px rgba(61, 38, 43, 0.09);
+}
+
+.feed-card-header-clean {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.feed-header-interno {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0px;
+}
+
+.feed-header-interno .usuario-info-grupo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feed-usuario strong {
+    font-size: 17x;
+    color: #2b2625;
+}
+
+.historial-card .feed-usuario strong {
+    color: #ffffff;
+}
+
+.feed-tiempo {
+    font-size: 12px;
+    color: rgba(61, 38, 43, 0.45);
+}
+
+.usuario-flex-info-exterior {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+/* 11. FEED: BADGES Y ETIQUETAS */
+.feed-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.feed-badge.encuesta   { background: rgba(178, 94, 56, 0.08);   color: #B25E38; }
+
+.cat-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 5px;
+    background: #3D262B;
+    color: white;
+}
+
+/* 12. FEED: CUERPO TEXTUAL */
+.feed-cuerpo-foro {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(61, 38, 43, 0.08);
+}
+
+.feed-texto {
+    font-size: 16px;
+    color: #1a1a1a;
+    line-height: 1.6;
+}
+
+/* 13. FEED: PIE E INTERACCIONES */
+.feed-footer {
+    display: flex;
+    gap: 8px;
+    padding-top: 9px;
+    border-top: none;
+}
+
+.interact-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: 1px solid rgba(61, 38, 43, 0.1);
+    border-radius: 20px;
+    background: transparent;
+    font-size: 14px;
+    color: rgba(61, 38, 43, 0.45);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.interact-btn i { font-size: 15px; }
+
+.interact-btn:hover {
+    border-color: #B25E38;
+    color: #B25E38;
+    background: rgba(178, 94, 56, 0.04);
+}
+
+/* 14. TARJETA TIPO 2 — PUBLICACIÓN NATURAL */
+.feed-card.tipo-publicacion {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.feed-card.tipo-publicacion .feed-footer,
+.feed-card.tipo-foro        .feed-footer,
+.feed-card.tipo-encuesta    .feed-footer {
+    padding: 14px 20px 18px 20px;
+}
+
+.feed-card.tipo-publicacion .feed-card-header-clean,
+.feed-card.tipo-foro        .feed-card-header-clean,
+.feed-card.tipo-encuesta    .feed-card-header-clean {
+    margin-bottom: 1px;
+    margin-left: -8px;
+    margin-right: -8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* =====================================================
+   TARJETA TIPO 3 — FORO (SÓLO ADICIONES PARTICULARES)
+   ===================================================== */
+
+.feed-card.tipo-foro .feed-cuerpo-foro {
+    border-bottom: none; /* Se quita la línea divisoria para mantener fluidez con el pie */
+}
+
+/* Título imponente para debates */
+.foro-titulo-debate {
+    font-size: 19px;
+    font-weight: 800;
+    color: #3D262B;
+    line-height: 1.3;
+    margin: 14px 0 8px 0;
+    letter-spacing: -0.01em;
+}
+
+/* Estructura específica del pie colectivo (Mantiene alineación con el padding heredado) */
+.feed-footer-foro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px 18px 20px; /* Sincronizado con las bases laterales e inferior */
+    gap: 12px;
+}
+
+/* 1. SISTEMA DE VOTACIÓN (Reddit Style) */
+.foro-votacion-container {
+    display: flex;
+    align-items: center;
+    background: rgba(61, 38, 43, 0.04);
+    border-radius: 20px;
+    padding: 2px 6px;
+    border: 1px solid rgba(61, 38, 43, 0.06);
+}
+
+.vote-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px 8px;
+    color: rgba(61, 38, 43, 0.4);
+    font-size: 14px;
+    transition: color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vote-btn:hover.vote-up { color: #B25E38; }
+.vote-btn:hover.vote-down { color: #5e3a42; }
+
+.vote-contador-num {
+    font-size: 13px;
+    font-weight: 700;
+    color: #3D262B;
+    min-width: 16px;
+    text-align: center;
+    user-select: none;
+}
+
+/* 2. EFECTO COMUNIDAD: AVATARES APILADOS */
+.foro-participantes-grupo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.avatar-stack {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-stack-item {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff;
+    margin-right: -8px;
+    transition: transform 0.15s;
+    background: #eee;
+}
+
+.avatar-stack:hover .avatar-stack-item {
+    transform: translateX(-2px);
+}
+
+.participantes-contador {
+    font-size: 13px;
+    color: rgba(61, 38, 43, 0.6);
+}
+
+/* 3. LLAMADO A LA ACCIÓN (CTA) REFORZADO */
+.interact-btn-foro-cta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #B25E38;
+    border: 1px solid #B25E38;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 6px rgba(178, 94, 56, 0.15);
+}
+
+.interact-btn-foro-cta:hover {
+    background: #964e2d;
+    border-color: #964e2d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(178, 94, 56, 0.25);
+}
+
+.interact-btn-foro-cta i {
+    font-size: 13px;
+}
+
+/* --- TOOLTIP FLOTANTE DEL PÓSTER (HOVER EXCLUSIVO) --- */
+.foro-serie-link-container {
+    position: relative;
+    display: inline-block;
+}
+
+.tag-serie-vinculo {
+    background: rgba(178, 94, 56, 0.1);
+    color: #B25E38;
+    cursor: help;
+    transition: background 0.15s, color 0.15s;
+}
+
+.tag-serie-vinculo:hover {
+    background: #B25E38;
+    color: #ffffff;
+}
+
+.tooltip-poster-flotante {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(61, 38, 43, 0.25);
+    border: 1px solid rgba(61, 38, 43, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 100;
+}
+
+.tooltip-poster-flotante img {
+    width: 110px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 5px;
+    display: block;
+}
+
+.tooltip-poster-flotante::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #ffffff transparent transparent transparent;
+}
+
+.foro-serie-link-container:hover .tooltip-poster-flotante {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* 16. TARJETA TIPO 4 — ENCUESTA */
+.encuesta-opciones {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.opcion-btn-vote {
+    padding: 10px;
+    border: 1px solid rgba(61, 38, 43, 0.1);
+    border-radius: 6px;
+    text-align: left;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    color: #3D262B;
+    transition: all 0.15s;
+}
+
+.opcion-btn-vote:hover {
+    border-color: #B25E38;
+    background: rgba(178, 94, 56, 0.04);
+}

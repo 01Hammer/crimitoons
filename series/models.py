@@ -348,3 +348,37 @@ class Capitulo(models.Model):
 
     def __str__(self):
         return f"{self.season.serie.titulo} - T{self.season.season_number}E{self.episode_number}: {self.titulo or 'Sin título'}"
+
+class Encuesta(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    titulo = models.CharField(db_index=True, max_length=255)
+    contexto = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def mostrar_posters(self):
+        opciones = self.opciones.all()
+        if not opciones.exists():
+            return False
+        # Si al menos una opción NO tiene serie vinculada, devolvemos False
+        return all(opcion.serie_vinculada is not None for opcion in opciones)
+
+    @property
+    def total_votos(self):
+        # Cuenta el total de votos sumando los de cada opción
+        return sum(opcion.votos.count() for opcion in self.opciones.all())
+
+
+class OpcionEncuesta(models.Model):
+    encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE, related_name='opciones')
+    # Si es de tipo serie, guardamos la relación
+    serie_vinculada = models.ForeignKey(Serie, on_delete=models.SET_NULL, blank=True, null=True)
+    # Si es texto personalizado o manual
+    texto_personalizado = models.CharField(max_length=255, blank=True, null=True)
+    # Relación ManyToMany para registrar qué usuarios votaron por esta opción específica
+    votos = models.ManyToManyField(User, blank=True, related_name='opciones_votadas')
+
+    def __str__(self):
+        if self.serie_vinculada:
+            return self.serie_vinculada.titulo
+        return self.texto_personalizado or "Opción vacía"

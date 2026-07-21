@@ -7,7 +7,11 @@
     <title>Comunidad - CRIMITOONS</title>
 
     <link rel="stylesheet" href="{% static 'series/navbar.css' %}?v=1" />
-    <link rel="stylesheet" href="{% static 'series/comunidad.css' %}?v=1015" />
+    <link rel="stylesheet" href="{% static 'series/comunidad/cuerpo_pagina.css' %}">
+    <link rel="stylesheet" href="{% static 'series/comunidad/layout_columnas.css' %}">
+    <link rel="stylesheet" href="{% static 'series/comunidad/tarjetas_feed.css' %}">
+    <link rel="stylesheet" href="{% static 'series/comunidad/reproductor_multimedia.css' %}">
+     <link rel="stylesheet" href="{% static 'series/comunidad/caja_publicar.css' %}">
     <link
       rel="stylesheet"
       href="{% static 'series/miperfil/menus_perfil.css' %}"
@@ -54,32 +58,7 @@
         </button>
       </div>
 
-      <!-- Widget 2: Lista de Amigos (Nuevo para rellenar espacio) -->
-      <div class="amigos-widget">
-        <p class="widget-titulo">Mis Amigos</p>
-        
-        <div class="amigos-lista-previsualizacion">
-          <!-- Ejemplo de amigo conectado -->
-          <div class="amigo-item-mini conectado">
-            <div class="avatar-status-wrapper">
-              <img src="https://via.placeholder.com/32" alt="Avatar amigo" class="avatar-micro" />
-              <span class="status-indicador"></span>
-            </div>
-            <span class="amigo-nombre">satou</span>
-          </div>
-
-          <!-- Ejemplo de amigo desconectado -->
-          <div class="amigo-item-mini">
-            <div class="avatar-status-wrapper">
-              <img src="https://via.placeholder.com/32" alt="Avatar amigo" class="avatar-micro" />
-              <span class="status-indicador"></span>
-            </div>
-            <span class="amigo-nombre">Nilson</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Widget 3: Descubrir / Buscar Amigos (Nuevo) -->
+      <!-- Widget 2: Descubrir / Buscar Amigos -->
       <div class="buscar-amigos-widget">
         <p class="widget-titulo">Encontrar amigos</p>
         <form class="buscador-amigos-form" action="#" method="GET">
@@ -90,219 +69,95 @@
         </form>
       </div>
 
+      <!-- Widget 3: Lista de Amigos -->
+      <div class="amigos-widget">
+        <p class="widget-titulo">Mis Amigos</p>
+        
+        <div class="amigos-lista-previsualizacion">
+          <div class="amigo-item-mini conectado">
+            <div class="avatar-status-wrapper">
+              <img src="https://via.placeholder.com/32" alt="Avatar amigo" class="avatar-micro" />
+              <span class="status-indicador"></span>
+            </div>
+            <span class="amigo-nombre">satou</span>
+          </div>
+
+          <div class="amigo-item-mini">
+            <div class="avatar-status-wrapper">
+              <img src="https://via.placeholder.com/32" alt="Avatar amigo" class="avatar-micro" />
+              <span class="status-indicador"></span>
+            </div>
+            <span class="amigo-nombre">Nilson</span>
+          </div>
+        </div>
+      </div>
+
     </aside>
 
-        <section class="col-feed">
-          <form
-            action="{% url 'crear_post_comunidad' %}"
-            method="POST"
-            enctype="multipart/form-data"
-            class="publicar-caja"
-            id="form-publicar-comunidad"
-          >
-            {% csrf_token %}
+    <!-- COLUMNA CENTRAL: Feed de publicaciones -->
+    <section class="col-feed">
+      
+      <!-- LLAMADA AL COMPONENTE EXTERNO DE LA CAJA -->
+      {% include 'series/comunidad/caja_publicar.html' %}
 
-            <div class="publicar-top">
-              {% if request.user.perfil.foto_perfil %}
-              <img
-                src="{{ request.user.perfil.foto_perfil.url }}"
-                alt="Tu Avatar"
-                class="avatar-mini"
-              />
-              {% else %}
-              <img
-                src="https://via.placeholder.com/42"
-                alt="Tu Avatar"
-                class="avatar-mini"
-              />
-              {% endif %}
+      <div class="feed-lista">
+        {% for card in feed %}
 
-              <div class="publicar-input-wrap">
-                <input
-                  type="text"
-                  name="texto"
-                  placeholder="En qué serie estás pensando..."
-                  class="publicar-input"
-                />
+            {# TIPO 1: ACTIVIDAD AUTOMÁTICA #}
+            {% if card.tipo_tarjeta == 'actividad' %} 
+                {% include 'series/comunidad/card_actividad.html' with item=card mostrar_usuario=True %}
+            {% endif %}
 
-                <input
-                  type="file"
-                  name="imagen"
-                  id="input-archivo-oculto"
-                  accept="image/*"
-                  style="display: none"
-                />
+            {# TIPO 2: NATURAL (Publicación libre - Ahora sí con su condicional) #}
+            {% if card.tipo_tarjeta == 'natural' %}
+                {% include 'series/comunidad/card_publicacion.html' with item=card %}
+            {% endif %}
 
-                <button
-                  type="button"
-                  class="btn-foto"
-                  title="Subir foto"
-                  onclick="
-                    document.getElementById('input-archivo-oculto').click()
-                  "
-                >
-                  <i class="fa-regular fa-image"></i>
-                </button>
-              </div>
-            </div>
+            {# TIPO 3: FORO (Debates con título, póster de serie y contexto) #}
+            {% if card.tipo_tarjeta == 'foro' %}
+                {% include 'series/comunidad/card_foro.html' with card=card %}
+            {% endif %}
 
-            <div class="publicar-acciones">
-              <button type="button" class="accion-btn">
-                <i class="fa-solid fa-fire"></i> Foro
-              </button>
-              <button type="button" class="accion-btn">
-                <i class="fa-solid fa-tv"></i> Serie
-              </button>
-              <button type="button" class="accion-btn" data-tipo="encuesta">
-                <i class="fa-solid fa-square-poll-horizontal"></i> Encuesta
-              </button>
-              <button type="button" class="accion-btn" data-tipo="historia">
-                <i class="fa-solid fa-book-open"></i> Historia
-              </button>
-
-              <button type="submit" class="publicar-submit">Publicar</button>
-            </div>
-          </form>
-
-          <div class="feed-lista">
-            {% for card in feed %}
-              
-              {# TIPO 1: ACTIVIDAD #}
-              {% if card.tipo_tarjeta == 'actividad' %} 
-                {% include 'series/includes/card_actividad.html' with item=card mostrar_usuario=True %}
-              {% endif %}
-
-              {# TIPO 2: NATURAL #}
-              {% include 'series/includes/card_publicacion.html' with item=card %}
-
-              {# TIPO 3: FORO #}
-              {% if card.tipo_tarjeta == 'foro' %}
-                <div class="feed-item-bloque">
-                  <div class="usuario-flex-info-exterior">
-                    {% if card.usuario.perfil.foto_perfil %}
-                      <img src="{{ card.usuario.perfil.foto_perfil.url }}" class="avatar-mini" />
-                    {% else %}
-                      <img src="https://via.placeholder.com/42" class="avatar-mini" />
-                    {% endif %}
-                    <span class="feed-usuario"><strong>{{ card.usuario.username }}</strong> abrió un debate</span>
-                  </div>
-                  <article class="feed-card tipo-foro" data-tipo="foros">
-                    <div class="feed-cuerpo-foro">
-                      <div class="feed-card-header-clean">
-                        <span class="cat-tag">{{ card.get_categoria_display }}</span>
-                        <span class="feed-badge foro">Foro</span>
-                      </div>
-                      <h4 class="foro-titulo">{{ card.titulo }}</h4>
-                      <p class="feed-texto">{{ card.texto }}</p>
-                    </div>
-                    <div class="feed-footer">
-                      <button class="interact-btn"><i class="fa-solid fa-fire"></i> {{ card.respuestas.count|default:0 }} respuestas</button>
-                    </div>
-                  </article>
-                </div>
-              {% endif %}
-
-              {# TIPO 4: ENCUESTA #}
-              {% if card.tipo_tarjeta == 'encuesta' %}
-            <div class="feed-item-bloque">
-              <div class="usuario-flex-info-exterior">
-                {% if card.usuario.perfil.foto_perfil %}
-                <img
-                  src="{{ card.usuario.perfil.foto_perfil.url }}"
-                  alt="{{ card.usuario.username }}"
-                  class="avatar-mini"
-                />
-                {% else %}
-                <img
-                  src="https://via.placeholder.com/42"
-                  alt="Avatar"
-                  class="avatar-mini"
-                />
-                {% endif %}
-                <span class="feed-usuario">
-                  <strong>{{ card.usuario.username }}</strong> lanzó una
-                  encuesta
-                </span>
-              </div>
-
-              <article
-                class="feed-card tipo-encuesta"
-                data-tipo="publicaciones"
-              >
-                <div class="feed-cuerpo-foro">
-                  <div class="feed-card-header-clean">
-                    <span class="feed-tiempo"
-                      >Hace {{ card.created_at|timesince }}</span
-                    >
-                    <span class="feed-badge encuesta">Encuesta</span>
-                  </div>
-
-                  <h4 class="foro-titulo" style="margin: 8px 0 12px 0">
-                    {{ card.titulo }}
-                  </h4>
-                  <p class="feed-texto" style="margin-bottom: 16px">
-                    {{ card.texto }}
-                  </p>
-
-                  <div
-                    class="encuesta-opciones"
-                    style="display: flex; flex-direction: column; gap: 8px"
-                  >
-                    {% for opcion in card.opciones_encuesta.all %}
-                    <button class="opcion-btn-vote">
-                      {{ opcion.texto_opcion }} ({{ opcion.votos.count|default:0
-                      }} votos)
-                    </button>
-                    {% endfor %}
-                  </div>
-                </div>
-
-                <div
-                  class="feed-footer"
-                  style="
-                    margin: 0 20px;
-                    padding: 14px 0;
-                    border-top: 1px solid rgba(61, 38, 43, 0.1);
-                  "
-                >
-                  <button class="interact-btn">
-                    <i class="fa-regular fa-comment"></i> {{
-                    card.respuestas.count|default:0 }}
-                  </button>
-                </div>
-              </article>
-            </div>
-            {% endif %} {% empty %}
-            <p class="feed-vacio">
-              No hay ninguna publicación en el muro comunitario todavía.
-            </p>
+            {# TIPO 4: ENCUESTA (Guardada temporalmente) #}
+            {% if card.tipo_tarjeta == 'foro' %}
+                {% include 'series/comunidad/card_encuesta.html' with card=card %}
+            {% endif %}
+            
+            {% empty %}
+              <p class="feed-vacio">No hay ninguna publicación en el muro comunitario todavía.</p>
             {% endfor %}
           </div>
         </section>
+        
         <aside class="col-sidebar">
-          <div class="sidebar-widget">
-            <p class="widget-titulo">Foros calientes</p>
-            <div class="foros-lista">
-              {% for foro in foros_calientes %}
-              <a href="#" class="foro-item">
-                <span class="foro-rank">{{ forloop.counter }}</span>
-                <div class="foro-item-info">
-                  <span class="cat-tag">{{ foro.get_categoria_display }}</span>
-                  <span class="foro-item-titulo">{{ foro.titulo }}</span>
-                  <span class="foro-actividad"
-                    ><i class="fa-regular fa-comment"></i> {{
-                    foro.num_respuestas }} respuestas</span
-                  >
+            <div class="sidebar-widget">
+                <p class="widget-titulo">Foros calientes</p>
+                <div class="foros-lista">
+                {% for foro in foros_calientes %}
+                <a href="#" class="foro-item">
+                    <span class="foro-rank">{{ forloop.counter }}</span>
+                    <div class="foro-item-info">
+                    <!-- BADGE DINÁMICO: Muestra la serie vinculada si existe; si no, la categoría -->
+                    {% if foro.serie_vinculada %}
+                        <span class="cat-tag">{{ foro.serie_vinculada.titulo|upper }}</span>
+                    {% else %}
+                        <span class="cat-tag">DEBATE GENERAL</span>
+                    {% endif %}
+                    
+                    <span class="foro-item-titulo">{{ foro.titulo }}</span>
+                    <span class="foro-actividad">
+                        <i class="fa-regular fa-comment"></i> {{ foro.num_respuestas }} respuestas
+                    </span>
+                    </div>
+                </a>
+                {% empty %}
+                <p style="font-size: 13px; color: #888; padding: 10px 0">
+                    No hay debates activos en este momento.
+                </p>
+                {% endfor %}
                 </div>
-              </a>
-              {% empty %}
-              <p style="font-size: 13px; color: #888; padding: 10px 0">
-                No hay debates activos en este momento.
-              </p>
-              {% endfor %}
             </div>
-          </div>
-        </aside>
+            </aside>
       </div>
     </main>
         {% include 'series/includes/modal_comentarios.html' %}
@@ -312,9 +167,8 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
       
-// ==========================================
+        // ==========================================
         // 1. CONTROL DEL DROPDOWN DE TRES PUNTOS (EDITAR/ELIMINAR) - TIPO 1
-        // Misma lógica que actividad.html, para la tarjeta compartida
         // ==========================================
         const dropdownsActividad = document.querySelectorAll('.historial-opciones-dropdown');
 
@@ -355,55 +209,9 @@
             });
         });
 
-      // ==========================================
-      // 2. PUBLICACIÓN ASÍNCRONA SIN RECARGA (FORMULARIO)
-      // ==========================================
-      const formPublicar = document.getElementById("form-publicar-comunidad");
-
-      if (formPublicar) {
-        formPublicar.addEventListener("submit", function (event) {
-          event.preventDefault(); // Evita que la página parpadee
-
-          const formData = new FormData(formPublicar);
-          const submitBtn = formPublicar.querySelector(".publicar-submit");
-
-          submitBtn.disabled = true;
-          submitBtn.textContent = "Publicando...";
-
-          fetch(formPublicar.action, {
-            method: "POST",
-            body: formData,
-            headers: {
-              "X-Requested-With": "XMLHttpRequest",
-            },
-          })
-            .then((response) => {
-              if (response.ok) {
-                formPublicar.reset();
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Publicar";
-
-                location.reload(); // Recarga silenciosa del feed
-              } else {
-                alert("Hubo un error al procesar la publicación.");
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Publicar";
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              submitBtn.disabled = false;
-              submitBtn.textContent = "Publicar";
-            });
-        });
-      }
-    });
-
-    // ==========================================
-        // 3. LIKES Y DISLIKES PARA ACTIVIDAD (TIPO 1)
-        // Misma lógica que actividad.html, para la tarjeta compartida
         // ==========================================
-
+        // 2. LIKES Y DISLIKES PARA ACTIVIDAD (TIPO 1)
+        // ==========================================
         document.querySelectorAll('.historial-acciones-interaccion [data-tipo]').forEach(boton => {
             boton.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -457,16 +265,13 @@
         });
 
         // ==========================================
-        // 4. MODAL DE COMENTARIOS PARA ACTIVIDAD (TIPO 1)
+        // 3. MODAL DE COMENTARIOS PARA ACTIVIDAD (TIPO 1)
         // ==========================================
-
-    const modalOverlay = document.getElementById('comments-modal');
-
+        const modalOverlay = document.getElementById('comments-modal');
         let actividadActivaId = null;
         let botonComentarioActivo = null;
 
-    document.addEventListener("click", async function(event) {
-            // Detectamos el clic en el botón de comentario de la tarjeta TIPO 1
+        document.addEventListener("click", async function(event) {
             const btnComentario = event.target.closest(".btn-interact-comentario");
             
             if (btnComentario) {
@@ -476,21 +281,17 @@
                 const tarjetaPadre = btnComentario.closest(".historial-card");
                 if (!tarjetaPadre) return;
 
-                // 1. Extraemos el ID desde los botones de voto de esta misma tarjeta
                 const contenedorAcciones = btnComentario.closest(".historial-acciones-interaccion");
                 const btnVotoAsociado = contenedorAcciones?.querySelector("[data-id]");
                 const actividadId = btnVotoAsociado?.getAttribute("data-id");
                 if (!actividadId) return;
 
-                // Guardamos la referencia de qué tarjeta abrió el modal
                 actividadActivaId = actividadId; 
                 botonComentarioActivo = btnComentario;
 
-                // 2. Extraemos los datos de la tarjeta compartida (historial-card)
-                // 2. Extraemos los datos puros básicos de forma ultra específica
-const posterSrc = tarjetaPadre.querySelector('.historial-poster-img')?.getAttribute('src') || '';
-const tituloSerie = tarjetaPadre.querySelector('.historial-serie-titulo')?.textContent || '';
-const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario')?.textContent || '';
+                const posterSrc = tarjetaPadre.querySelector('.historial-poster-img')?.getAttribute('src') || '';
+                const tituloSerie = tarjetaPadre.querySelector('.historial-serie-titulo')?.textContent || '';
+                const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario')?.textContent || '';
                 
                 const scoreElement = tarjetaPadre.querySelector(".historial-nota-inline");
                 const scoreText = scoreElement ? scoreElement.textContent.trim() : '';
@@ -499,7 +300,6 @@ const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario')?.t
                 const estadoText = estadoElement ? estadoElement.textContent.trim() : '';
                 const estadoClase = estadoText.toLowerCase().replace(/\s+/g, '-');
 
-                // Botones originales de fuera para clonar contadores y estados
                 const btnLikeFuera = tarjetaPadre.querySelector('[data-tipo="like"]');
                 const btnDislikeFuera = tarjetaPadre.querySelector('[data-tipo="dislike"]');
 
@@ -509,12 +309,9 @@ const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario')?.t
                 const likeActivo = btnLikeFuera?.classList.contains("activo-like") ? "activo-like" : "";
                 const dislikeActivo = btnDislikeFuera?.classList.contains("activo-dislike") ? "activo-dislike" : "";
 
-                // 3. Inyectamos la mini tarjeta dinámica dentro del modal
-                const modalPostPreview = modalOverlay.querySelector(
-                ".debate-modal-post-preview",
-        );
-        if (modalPostPreview) {
-          modalPostPreview.innerHTML = `
+                const modalPostPreview = modalOverlay.querySelector(".debate-modal-post-preview");
+                if (modalPostPreview) {
+                    modalPostPreview.innerHTML = `
                         <div class="modal-preview-mini-card">
                             ${posterSrc ? `<div class="mini-card-poster"><img src="${posterSrc}" alt="${tituloSerie}"></div>` : ""}
                             <div class="mini-card-content">
@@ -544,135 +341,109 @@ const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario')?.t
                             </div>
                         </div>
                     `;
-        }
+                }
 
-        // 4. Preparamos la lista de comentarios y el input antes de mostrar
-        const modalCommentsList = modalOverlay.querySelector(
-          ".debate-modal-comments-list",
-        );
-        const modalInput = modalOverlay.querySelector(".modal-comment-input");
-        if (modalCommentsList)
-          modalCommentsList.innerHTML =
-            '<div class="modal-comments-empty">Cargando comentarios...</div>';
-        if (modalInput) modalInput.value = "";
+                const modalCommentsList = modalOverlay.querySelector(".debate-modal-comments-list");
+                const modalInput = modalOverlay.querySelector(".modal-comment-input");
+                if (modalCommentsList) modalCommentsList.innerHTML = '<div class="modal-comments-empty">Cargando comentarios...</div>';
+                if (modalInput) modalInput.value = "";
 
-        // 5. Mostramos el modal (misma pareja de clases que actividad.html)
-        modalOverlay.classList.add("show");
-        modalOverlay.classList.add("active");
+                modalOverlay.classList.add("show");
+                modalOverlay.classList.add("active");
 
-        // 6. Petición AJAX para traer los comentarios existentes de esta actividad
-        try {
-          const response = await fetch(
-            `/actividad/${actividadId}/comentarios/`,
-          );
-          const data = await response.json();
-          if (data.status === "success") {
-            renderizarComentarios(data.comentarios);
-          } else if (modalCommentsList) {
-            modalCommentsList.innerHTML =
-              '<div class="modal-comments-empty">Error al cargar los comentarios.</div>';
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          if (modalCommentsList)
-            modalCommentsList.innerHTML =
-              '<div class="modal-comments-empty">Error de conexión al servidor.</div>';
-        }
-      }
-    });
+                try {
+                    const response = await fetch(`/actividad/${actividadId}/comentarios/`);
+                    const data = await response.json();
+                    if (data.status === "success") {
+                        renderizarComentarios(data.comentarios);
+                    } else if (modalCommentsList) {
+                        modalCommentsList.innerHTML = '<div class="modal-comments-empty">Error al cargar los comentarios.</div>';
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    if (modalCommentsList) modalCommentsList.innerHTML = '<div class="modal-comments-empty">Error de conexión al servidor.</div>';
+                }
+            }
+        });
 
-    // ==========================================
-    // 5. CIERRE DEL MODAL (seguro ante clics externos)
-    // ==========================================
-    document.addEventListener("click", (e) => {
-      if (!modalOverlay || !modalOverlay.classList.contains("show")) return;
+        // ==========================================
+        // 4. CIERRE DEL MODAL
+        // ==========================================
+        document.addEventListener("click", (e) => {
+            if (!modalOverlay || !modalOverlay.classList.contains("show")) return;
 
-      if (
-        e.target === modalOverlay ||
-        e.target.classList.contains("btn-close-modal") ||
-        e.target.closest(".btn-close-modal")
-      ) {
-        modalOverlay.classList.remove("show");
-        modalOverlay.classList.remove("active");
-        actividadActivaId = null;
-        botonComentarioActivo = null;
-      }
-    });
+            if (
+                e.target === modalOverlay ||
+                e.target.classList.contains("btn-close-modal") ||
+                e.target.closest(".btn-close-modal")
+            ) {
+                modalOverlay.classList.remove("show");
+                modalOverlay.classList.remove("active");
+                actividadActivaId = null;
+                botonComentarioActivo = null;
+            }
+        });
 
-    // ==========================================
-    // 6. ENVÍO DE COMENTARIOS PRINCIPALES
-    // ==========================================
-    document.addEventListener("click", (e) => {
-      if (
-        e.target &&
-        (e.target.classList.contains("btn-modal-comment-submit") ||
-          e.target.closest(".btn-modal-comment-submit"))
-      ) {
-        enviarComentario();
-      }
-    });
+        // ==========================================
+        // 5. ENVÍO DE COMENTARIOS PRINCIPALES
+        // ==========================================
+        document.addEventListener("click", (e) => {
+            if (e.target && (e.target.classList.contains("btn-modal-comment-submit") || e.target.closest(".btn-modal-comment-submit"))) {
+                enviarComentario();
+            }
+        });
 
-    document.addEventListener("keydown", (e) => {
-      // Escucha el Enter global solo si viene de la caja de comentarios principal
-      if (
-        e.key === "Enter" &&
-        e.target &&
-        e.target.classList.contains("modal-comment-input")
-      ) {
-        e.preventDefault();
-        enviarComentario();
-      }
-    });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && e.target && e.target.classList.contains("modal-comment-input")) {
+                e.preventDefault();
+                enviarComentario();
+            }
+        });
 
-    // ==========================================
-    // 7. FUNCIONES TEMPORALES PARA EVITAR ERRORES (PASO A PASO)
-    // ==========================================
-    function conmutarCascada(id) {
-      console.log("Click en tarjeta para abrir respuestas:", id);
-    }
-    function mostrarMenuOpciones(id) {
-      console.log("Click en 3 puntos:", id);
-    }
-    function editarComentario(id) {
-      console.log("Editar:", id);
-    }
-    function eliminarComentario(id) {
-      console.log("Eliminar:", id);
-    }
-    function darLikeComentario(id) {
-      console.log("Dar like:", id);
-    }
-    function enviarRespuesta(id) {
-      console.log("Enviar respuesta para:", id);
-    }
+        // ==========================================
+        // 6. FUNCIONES AUXILIARES PARA COMENTARIOS
+        // ==========================================
+        window.conmutarCascada = function(id) {
+            console.log("Click en tarjeta para abrir respuestas:", id);
+        };
+        window.mostrarMenuOpciones = function(id) {
+            console.log("Click en 3 puntos:", id);
+        };
+        window.editarComentario = function(id) {
+            console.log("Editar:", id);
+        };
+        window.eliminarComentario = function(id) {
+            console.log("Eliminar:", id);
+        };
+        window.darLikeComentario = function(id) {
+            console.log("Dar like:", id);
+        };
+        window.enviarRespuesta = function(id) {
+            console.log("Enviar respuesta para:", id);
+        };
 
-    // ==========================================
-    // 8. PINTAR LISTA DE COMENTARIOS (estructura de burbujas)
-    // ==========================================
-    function renderizarComentarios(comentarios) {
-      if (!modalOverlay) return;
-      const modalCommentsList = modalOverlay.querySelector(
-        ".debate-modal-comments-list",
-      );
-      if (!modalCommentsList) return;
+        // ==========================================
+        // 7. PINTAR LISTA DE COMENTARIOS
+        // ==========================================
+        function renderizarComentarios(comentarios) {
+            if (!modalOverlay) return;
+            const modalCommentsList = modalOverlay.querySelector(".debate-modal-comments-list");
+            if (!modalCommentsList) return;
 
-      modalCommentsList.innerHTML = "";
+            modalCommentsList.innerHTML = "";
 
-      if (comentarios.length === 0) {
-        modalCommentsList.innerHTML =
-          '<div class="modal-comments-empty">No hay comentarios en este debate aún. ¡Sé el primero en opinar!</div>';
-        return;
-      }
+            if (comentarios.length === 0) {
+                modalCommentsList.innerHTML = '<div class="modal-comments-empty">No hay comentarios en este debate aún. ¡Sé el primero en opinar!</div>';
+                return;
+            }
 
-      comentarios.forEach((c) => {
-        const item = document.createElement("div");
-        item.classList.add("modal-comment-item");
+            comentarios.forEach((c) => {
+                const item = document.createElement("div");
+                item.classList.add("modal-comment-item");
 
-        const fotoAvatar = c.usuario_foto
-          ? c.usuario_foto
-          : "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+                const fotoAvatar = c.usuario_foto ? c.usuario_foto : "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
-        item.innerHTML = `
+                item.innerHTML = `
                     <div class="modal-comment-main-row">
                         <div class="modal-comment-avatar-wrapper">
                             <img src="${fotoAvatar}" alt="Avatar" class="modal-comment-user-avatar">
@@ -719,93 +490,68 @@ const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario')?.t
                         </div>
                     </div>
                 `;
-        modalCommentsList.appendChild(item);
-      });
+                modalCommentsList.appendChild(item);
+            });
 
-      setTimeout(() => {
-        modalCommentsList.scrollTop = 0;
-      }, 50);
-    }
+            setTimeout(() => {
+                modalCommentsList.scrollTop = 0;
+            }, 50);
+        }
 
-    // ==========================================
-    // 9. ENVIAR UN COMENTARIO NUEVO
-    // ==========================================
-    async function enviarComentario() {
-      if (!modalOverlay) {
-        console.error("No se encontró el #comments-modal al intentar enviar.");
-        return;
-      }
+        // ==========================================
+        // 8. ENVIAR UN COMENTARIO NUEVO
+        // ==========================================
+        async function enviarComentario() {
+            if (!modalOverlay) return;
 
-      const modalInput = modalOverlay.querySelector(".modal-comment-input");
-      const modalCommentsList = modalOverlay.querySelector(
-        ".debate-modal-comments-list",
-      );
+            const modalInput = modalOverlay.querySelector(".modal-comment-input");
+            const modalCommentsList = modalOverlay.querySelector(".debate-modal-comments-list");
 
-      if (!modalInput || !modalCommentsList) {
-        console.error(
-          "No se encontró el input o la lista de comentarios dentro del modal.",
-        );
-        return;
-      }
+            if (!modalInput || !modalCommentsList) return;
 
-      const texto = modalInput.value.trim();
-      if (!texto) return;
+            const texto = modalInput.value.trim();
+            if (!texto) return;
 
-      if (!actividadActivaId) {
-        console.error(
-          "ERROR: 'actividadActivaId' es null. El script perdió el ID de la tarjeta.",
-        );
-        alert("Error interno: No se pudo identificar la tarjeta de actividad.");
-        return;
-      }
-
-      const csrftoken =
-        document.querySelector("[name=csrfmiddlewaretoken]")?.value ||
-        getCookie("csrftoken");
-
-      const formData = new FormData();
-      formData.append("texto", texto);
-
-      try {
-        const response = await fetch(
-          `/actividad/${actividadActivaId}/comentar/`,
-          {
-            method: "POST",
-            headers: {
-              "X-CSRFToken": csrftoken,
-            },
-            body: formData,
-          },
-        );
-        const data = await response.json();
-
-        if (data.status === "success") {
-          modalInput.value = "";
-
-          const emptyMsg = modalCommentsList.querySelector(
-            ".modal-comments-empty",
-          );
-          if (emptyMsg) emptyMsg.remove();
-
-          const item = document.createElement("div");
-          item.classList.add("modal-comment-item");
-
-          let fotoAvatar = "";
-          if (
-            data.comentario &&
-            data.comentario.usuario_foto &&
-            data.comentario.usuario_foto.trim() !== ""
-          ) {
-            fotoAvatar = data.comentario.usuario_foto.trim();
-            if (!fotoAvatar.startsWith("/") && !fotoAvatar.startsWith("http")) {
-              fotoAvatar = "/" + fotoAvatar;
+            if (!actividadActivaId) {
+                alert("Error interno: No se pudo identificar la tarjeta de actividad.");
+                return;
             }
-          } else {
-            fotoAvatar =
-              "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-          }
 
-          item.innerHTML = `
+            const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]")?.value || getCookie("csrftoken");
+
+            const formData = new FormData();
+            formData.append("texto", texto);
+
+            try {
+                const response = await fetch(`/actividad/${actividadActivaId}/comentar/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrftoken,
+                    },
+                    body: formData,
+                });
+                const data = await response.json();
+
+                if (data.status === "success") {
+                    modalInput.value = "";
+
+                    const emptyMsg = modalCommentsList.querySelector(".modal-comments-empty");
+                    if (emptyMsg) emptyMsg.remove();
+
+                    const item = document.createElement("div");
+                    item.classList.add("modal-comment-item");
+
+                    let fotoAvatar = "";
+                    if (data.comentario && data.comentario.usuario_foto && data.comentario.usuario_foto.trim() !== "") {
+                        fotoAvatar = data.comentario.usuario_foto.trim();
+                        if (!fotoAvatar.startsWith("/") && !fotoAvatar.startsWith("http")) {
+                            fotoAvatar = "/" + fotoAvatar;
+                        }
+                    } else {
+                        fotoAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+                    }
+
+                    item.innerHTML = `
                         <div class="modal-comment-main-row">
                             <div class="modal-comment-avatar-wrapper">
                                 <img src="${fotoAvatar}" alt="Avatar" class="modal-comment-user-avatar">
@@ -853,42 +599,36 @@ const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario')?.t
                         </div>
                     `;
 
-          modalCommentsList.prepend(item);
-          modalCommentsList.scrollTop = 0;
+                    modalCommentsList.prepend(item);
+                    modalCommentsList.scrollTop = 0;
 
-          if (botonComentarioActivo) {
-            const spanCounter =
-              botonComentarioActivo.querySelector(".comment-count");
-            if (spanCounter) {
-              spanCounter.textContent =
-                data.total_comentarios > 0 ? data.total_comentarios : "";
+                    if (botonComentarioActivo) {
+                        const spanCounter = botonComentarioActivo.querySelector(".comment-count");
+                        if (spanCounter) {
+                            spanCounter.textContent = data.total_comentarios > 0 ? data.total_comentarios : "";
+                        }
+                    }
+                } else {
+                    alert(data.message || "Ocurrió un error al enviar el comentario.");
+                }
+            } catch (error) {
+                console.error("Error crítico al enviar el comentario:", error);
             }
-          }
-        } else {
-          alert(data.message || "Ocurrió un error al enviar el comentario.");
         }
-      } catch (error) {
-        console.error(
-          "Error crítico al enviar el comentario vía fetch:",
-          error,
-        );
-      }
-    }
 
-    // Función auxiliar para obtener el token CSRF desde las cookies del navegador
-    function getCookie(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== "") {
-        const cookies = document.cookie.split(";");
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          if (cookie.substring(0, name.length + 1) === name + "=") {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            break;
-          }
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + "=") {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
-      }
-      return cookieValue;
-    }
-  </script>
-</html>
+    });
+</script>

@@ -1,0 +1,280 @@
+/* =====================================================
+   WIDGETS, FILTROS, PUBLICAR Y SIDEBAR
+   ===================================================== */
+
+/* 4. WIDGETS COMPARTIDOS */
+.filtros-widget {
+    background: transparent;
+    border-radius: 14px;
+    padding: 0px 12px;
+}
+
+.sidebar-widget {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid rgba(61, 38, 43, 0.1);
+    padding: 24px;
+}
+
+/* 5. WIDGET: TÍTULO DE SECCIÓN */
+.widget-titulo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3D262B;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+    padding-left: 8px;
+}
+
+/* 6. COLUMNA FILTROS (FLOTANTE & LIMPIO) */
+.col-filtros {
+    grid-area: filtros;
+    position: sticky;
+    top: 24px; /* Distancia respecto al borde superior de la ventana al bajar */
+    max-height: calc(100vh - 48px); /* Evita desbordamientos */
+    overflow-y: auto; /* Activa scroll interno si tienes demasiados amigos o filtros */
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    padding: 10px 1px;
+}
+
+.col-filtros::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+.filtros-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; 
+    margin-bottom: 12px;
+}
+
+.filtro-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 12px 8px;
+    border: none;
+    background: transparent;
+    color: rgba(61, 38, 43, 0.55);
+    font-size: 16px; 
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    text-align: left;
+}
+
+.filtro-btn i {
+    font-size: 20px; 
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.filtro-btn.activo {
+    background: transparent;
+    color: #3D262B;
+}
+
+.filtro-btn.activo i {
+    color: #B25E38;
+}
+
+.filtro-btn:hover:not(.activo) {
+    background: transparent;
+    color: #3D262B;
+}
+
+.filtro-solo-amigos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: calc(100% - 16px);
+    margin: 12px auto 0 auto;
+    padding: 14px 12px;
+    border: 1.5px dashed rgba(178, 94, 56, 0.35);
+    border-radius: 12px;
+    background: transparent;
+    color: #B25E38;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filtro-solo-amigos:hover {
+    background: transparent;
+    border-color: #B25E38;
+    color: #3D262B;
+}
+
+/* 7. COLUMNA FEED: PUBLICAR */
+.publicar-caja {
+    padding: 10px;
+    margin-bottom: 16px;
+    border-bottom: 2px;
+}
+
+.publicar-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    background-color: #fff;
+    border: 0.1px solid #B25E38;
+    border-radius: 30px;
+    padding: 4px 18px 4px 6px;
+    width: 100%;
+    transition: border-color 0.18s;
+}
+
+.publicar-top:focus-within {
+    border-color: #B25E38;
+}
+
+.publicar-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    color: #3D262B;
+    outline: none;
+}
+
+.publicar-input::placeholder {
+    color: rgba(61, 38, 43, 0.45);
+}
+
+.publicar-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.accion-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border: 1px solid rgba(61, 38, 43, 0.2);
+    border-radius: 30px;
+    background: transparent;
+    font-size: 14px;
+    color: #3D262B;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.accion-btn i {
+    font-size: 15px;
+    color: rgba(61, 38, 43, 0.45);
+}
+
+.accion-btn:hover {
+    border-color: #B25E38;
+    color: #B25E38;
+    background: rgba(178, 94, 56, 0.06);
+}
+
+.publicar-submit {
+    margin-left: auto;
+    padding: 9px 24px;
+    background: #B25E38;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    letter-spacing: 0.02em;
+}
+
+.publicar-submit:hover {
+    background: #c97548;
+}
+
+/* 18. SIDEBAR: FOROS CALIENTES */
+.col-sidebar {
+    grid-area: sidebar;
+    position: sticky;
+    top: 24px; /* Misma distancia para que bajen en perfecta simetría */
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+}
+
+.foros-lista {
+    display: flex;
+    flex-direction: column;
+}
+
+.foro-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px 4px;
+    border-bottom: 1px solid rgba(61, 38, 43, 0.1);
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.15s;
+}
+
+.foro-item:last-child { border-bottom: none; }
+.foro-item:hover      { opacity: 0.72; }
+
+.foro-rank {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+    padding-top: 1px;
+    min-width: 28px;
+    text-align: center;
+    color: rgba(61, 38, 43, 0.1);
+}
+
+.foro-item:nth-child(1) .foro-rank { color: #B25E38; }
+.foro-item:nth-child(2) .foro-rank { color: #c4936a; }
+.foro-item:nth-child(3) .foro-rank { color: #b0a090; }
+
+.foro-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.foro-item-titulo {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #3D262B;
+    line-height: 1.45;
+}
+
+.foro-actividad {
+    font-size: 12px;
+    color: rgba(61, 38, 43, 0.45);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.foro-actividad i { font-size: 13px; }
+
+/* Responsive adaptado para componentes */
+@media (max-width: 950px) {
+    .filtros-lista {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .filtro-btn         { flex: 1 1 140px; }
+    .filtros-widget     { padding: 20px; }
+    .filtro-solo-amigos { width: 100%; }
+}
