@@ -2,3 +2,4 @@ Django
 gunicorn
 requests
 django-ranged-response
+Pillow
