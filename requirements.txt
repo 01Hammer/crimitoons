@@ -3,3 +3,4 @@ gunicorn
 requests
 django-ranged-response
 Pillow
+whitenoise
