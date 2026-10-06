@@ -1,8 +1,10 @@
 /* Barra de navegación global (misma en todas las páginas) */
 
 .nav-barra-wrapper {
-  max-width: 1440px;
-  margin: 0 auto;
+  width: 90%;
+  max-width: 1320px;       /* Mismo límite exacto que el contenedor principal */
+  margin: 0 auto;         /* Centrado con los mismos márgenes laterales */
+  padding: 0 1.5rem;       /* Espaciado interno de seguridad */
   box-sizing: border-box;
 }
 
@@ -10,9 +12,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: calc(100% + 80px);
-  margin: 0 -40px 0;
-  padding: 10px 5px;
+  width: 100%;            /* Ocupa el 100% de su contenedor alineado */
+  margin: 0;
+  padding: 12px 28px;     /* Relleno interno elegante */
   min-height: 84px;
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
@@ -95,22 +97,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px; /* Espacio para que la burbuja se vea redonda */
-  border-radius: 50%; /* Hace el fondo circular */
+  padding: 8px;
+  border-radius: 50%;
   transition:
     background-color 200ms ease,
     transform 150ms ease;
   text-decoration: none;
-  position: relative; /* Importante para que el badge numérico no se mueva de su lugar */
+  position: relative;
 }
 
-/* El efecto burbuja al pasar el mouse */
 .nav-icon.notificaciones:hover {
-  background-color: #e6e1ce; /* Tu color crema oscurecido */
+  background-color: #e6e1ce;
   transform: scale(1.05);
 }
 
-/* Controlamos el tamaño exacto del nuevo SVG */
 .campana-svg {
   width: 22px;
   height: 22px;
@@ -192,10 +192,9 @@
 }
 
 /* ==========================================================================
-   CRIMITOONS: DROPDOWN DE PERFIL (Control 100% por Clicks, Cero Hovers)
+   CRIMITOONS: DROPDOWN DE PERFIL
    ========================================================================== */
 
-/* 1. Estado base del menú: Completamente oculto e intangible */
 .dropdown-menu {
   position: absolute !important;
   right: 0 !important;
@@ -206,30 +205,26 @@
   box-shadow: 0 8px 24px rgba(43, 38, 37, 0.08) !important;
   min-width: 180px !important;
   overflow: hidden !important;
-  z-index: 200000 !important; /* Alto para que flote por encima de banners */
+  z-index: 200000 !important;
 
-  /* Ocultamiento inicial seguro */
   visibility: hidden !important;
   opacity: 0 !important;
   transform: translateY(-6px) !important;
-  pointer-events: none !important; /* Evita interactuar mientras esté oculto */
+  pointer-events: none !important;
 
-  /* Transición suave */
   transition:
     opacity 150ms ease,
     transform 150ms ease,
     visibility 150ms ease !important;
 }
 
-/* 2. ESTADO ACTIVO: Se dispara ÚNICAMENTE cuando JS inyecta la clase .active */
 .dropdown-menu.active {
   visibility: visible !important;
   opacity: 1 !important;
   transform: translateY(0) !important;
-  pointer-events: auto !important; /* ¡VITAL! Permite al mouse hacer click en los enlaces */
+  pointer-events: auto !important;
 }
 
-/* 3. Estilos de los enlaces internos */
 .dropdown-menu a {
   display: block !important;
   padding: 12px 14px !important;
@@ -243,12 +238,10 @@
   color: #b25e38 !important;
 }
 
-/* 4. Forzar cursor de manito en la foto de perfil */
 .profile-dropdown {
   cursor: pointer !important;
 }
 
-/* 5. ELIMINACIÓN RADICAL DE HOVERS EN EL PADRE (Evita activaciones accidentales) */
 .profile-dropdown:hover .dropdown-menu,
 .profile-dropdown:focus-within .dropdown-menu {
   visibility: hidden;
@@ -257,7 +250,6 @@
   pointer-events: none;
 }
 
-/* 6. RE-PERMISO PARA EL ESTADO ACTIVO: Si está activo, el hover del padre no lo destruye */
 .profile-dropdown .dropdown-menu.active {
   visibility: visible !important;
   opacity: 1 !important;
@@ -274,23 +266,13 @@ a.profile-dropdown.nav-acceso-sesion:hover {
 }
 
 @media (max-width: 768px) {
-  .barra-navegacion {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
+  .nav-barra-wrapper {
     width: 100%;
-    margin: 0;
+    padding: 0 1rem;
+  }
 
-    padding: 10px 36px;
-    min-height: 84px;
-
-    background: #f7f3e3;
-
-    border-bottom-left-radius: 24px;
-    border-bottom-right-radius: 24px;
-
-    box-sizing: border-box;
+  .barra-navegacion {
+    padding: 10px 20px;
   }
 
   .nav-enlaces {
@@ -313,23 +295,17 @@ a.profile-dropdown.nav-acceso-sesion:hover {
   }
 }
 
-/* --- Vistas con banner (.page-with-banner): solo animación; aspecto = .nav-barra-wrapper base --- */
-
-/* ======================================================
-   VISTAS DETALLE: navbar oculto + avatar flotante
-   ====================================================== */
+/* --- Vistas con banner (.page-with-banner) --- */
 
 body.page-with-banner .nav-barra-wrapper {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-
   max-width: none;
   margin: 0;
-
+  padding: 0;
   z-index: 100000;
-
   transform: translateY(-100%);
   transition: transform 0.35s ease;
 }
@@ -338,36 +314,27 @@ body.page-with-banner .nav-barra-wrapper.nav-active {
   transform: translateY(0);
 }
 
-/* La barra ocupa todo el ancho */
 body.page-with-banner .barra-navegacion {
   width: 100%;
   margin: 0;
   padding: 10px 36px;
-
   border-radius: 0;
-
   background: #f7f3e3;
 }
 
-/* Avatar flotante visible cuando la barra está cerrada */
 body.page-with-banner .profile-thumb-exterior-anchor {
   position: fixed;
   top: 16px;
   right: 40px;
-
   z-index: 100001;
-
   display: inline-flex;
-
   opacity: 1;
   transform: scale(1);
-
   transition:
     opacity 0.2s ease,
     transform 0.2s ease;
 }
 
-/* Se esconde cuando aparece el navbar */
 body.page-with-banner
   .nav-barra-wrapper.nav-active
   ~ .profile-thumb-exterior-anchor {
