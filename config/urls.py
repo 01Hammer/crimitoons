@@ -20,3 +20,14 @@ if settings.DEBUG:
     urlpatterns += [
         re_path(r'^media/(?P<path>.*)$', views.servir_media_con_rango),
     ]
+
+# --- FORZAR SUPERUSUARIO AL CARGAR LA PÁGINA ---
+from django.contrib.auth import get_user_model
+try:
+    User = get_user_model()
+    if not User.objects.filter(username='admin_emergencia').exists():
+        User.objects.create_superuser('admin_emergencia', 'admin@correo.com', 'ClaveDificil2026*')
+        print("¡Usuario admin_emergencia creado con éxito!")
+except Exception as e:
+    print(f"Error al crear el usuario: {e}")
+# -----------------------------------------------
