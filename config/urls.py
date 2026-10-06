@@ -32,7 +32,7 @@ try:
     # Solo se ejecuta si configuraste las variables en Render
     if admin_user and admin_pass:
         if not User.objects.filter(username=admin_user).exists():
-            User.objects.create_superuser(admin_user, 'hammer@correo.com', admin_pass)
+            User.objects.create_superuser('hammer', 'hammer@correo.com', 'hammer123')
             print(f"¡Usuario {admin_user} asegurado correctamente!")
 except Exception as e:
     print(f"Error en script de superusuario: {e}")
