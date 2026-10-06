@@ -88,10 +88,9 @@ a:hover { color: #E6A15C; }
     transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* TARJETA */
+/* TARJETA (Exactamente 4 por fila teniendo en cuenta un gap de 20px) */
 .mini-tarjeta-compacta {
-    width: 100%;
-    flex: 0 0 calc(25% - 15px); 
+    flex: 0 0 calc((100% - 60px) / 4); 
     box-sizing: border-box;
     background-color: #FFFFFF; 
     border: 1px solid #E6E1CE;
@@ -100,7 +99,6 @@ a:hover { color: #E6A15C; }
     box-shadow: 0 4px 12px rgba(61, 38, 43, 0.05);
     transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
-
 /* Efecto Zoom */
 .mini-tarjeta-compacta:hover {
     transform: translateY(-6px);
