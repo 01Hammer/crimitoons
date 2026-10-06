@@ -268,6 +268,8 @@ class ComunidadPost(models.Model):
 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts_comunidad')
     tipo = models.CharField(max_length=15, choices=TipoPost.choices, default=TipoPost.NATURAL)
+
+    imagen = models.ImageField(upload_to='comunidad/', null=True, blank=True)
     
     titulo = models.CharField(max_length=200, blank=True, null=True)
     texto = models.TextField()
