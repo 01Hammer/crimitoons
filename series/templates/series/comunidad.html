@@ -632,3 +632,51 @@
         }
     });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Buscamos el formulario de la caja de publicación (usualmente es el primero o único con método POST)
+    const formPublicar = document.querySelector('form[action*="comunidad/crear"]');
+    
+    if (formPublicar) {
+        // 1. Aseguramos el atributo multimedia directamente en el HTML mediante JS
+        formPublicar.setAttribute('enctype', 'multipart/form-data');
+
+        // 2. Interceptamos el evento de envío antes de que lo procese cualquier otro script viejo
+        formPublicar.addEventListener('submit', async function (e) {
+            // Si el envío ya fue manejado por FormData, no hacemos nada extra
+            if (formPublicar.dataset.interceptado === 'true') return;
+            
+            e.preventDefault();
+            e.stopImmediatePropagation(); // Detiene cualquier otra función JS vieja que intente romper el envío de la foto
+
+            const datosMultimedia = new FormData(formPublicar);
+
+            try {
+                const response = await fetch(formPublicar.action || "/comunidad/crear/", {
+                    method: "POST",
+                    body: datosMultimedia, // Enviamos textos + archivos adjuntos
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error en el servidor');
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Marcamos como interceptado con éxito y recargamos
+                    formPublicar.dataset.interceptado = 'true';
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Hubo un error al publicar');
+                }
+            } catch (error) {
+                console.error('Error al enviar la imagen a Cloudinary:', error);
+            }
+        });
+    }
+});
+</script>
