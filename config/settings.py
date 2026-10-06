@@ -33,6 +33,9 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'cloudinary_storage',
+    'cloudinary',
+    'django.contrib.staticfiles',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
