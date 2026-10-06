@@ -36,3 +36,31 @@ try:
 except Exception as e:
     print(f"Error forzando el superusuario: {e}")
 # --------------------------------------
+
+# --- SCRIPT AUTOMÁTICO DE MIGRACIONES COMPLETO ---
+from django.core.management import call_command
+from django.contrib.auth import get_user_model
+
+try:
+    # 1. Detectar cambios en los modelos (como el ImageField) y crear los archivos de migración
+    print("--- GENERANDO ARCHIVOS DE MIGRACIÓN PARA POSTGRESQL ---")
+    call_command('makemigrations', 'series', interactive=False)
+    
+    # 2. Aplicar los cambios directamente en la base de datos de Render
+    print("--- EJECUTANDO MIGRACIONES EN LA BASE DE DATOS ---")
+    call_command('migrate', interactive=False)
+    print("--- BASE DE DATOS ACTUALIZADA CON ÉXITO ---")
+
+    # 3. Asegurar tu cuenta de administrador
+    User = get_user_model()
+    usuario, creado = User.objects.get_or_create(
+        username='hammer',
+        defaults={'email': 'hammer@correo.com', 'is_staff': True, 'is_superuser': True}
+    )
+    usuario.set_password('hammer123')
+    usuario.save()
+    print("--- USUARIO 'hammer' VERIFICADO Y OPERATIVO ---")
+
+except Exception as e:
+    print(f"--- ERROR EN EL ARRANQUE DEL SCRIPT AUTOMÁTICO: {e} ---")
+# --------------------------------------------------
