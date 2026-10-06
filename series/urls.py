@@ -34,21 +34,3 @@ urlpatterns = [
     path('comunidad/buscar-serie/', views.serie_para_foro, name='buscar_serie_foro'),
 
     path('encuestas/', views.feed_encuestas, name='feed_encuestas'),
-
-    # --- SCRIPT TEMPORAL PARA CREAR SUPERUSUARIO ---
-from django.contrib.auth import get_user_model
-from django.db.models.signals import post_migrate
-from django.dispatch import receiver
-
-@receiver(post_migrate)
-def crear_super_usuario_temporal(sender, **kwargs):
-    User = get_user_model()
-    if not User.objects.filter(username='temporal_admin').exists():
-        User.objects.create_superuser('temporal_admin', 'temporal@correo.com', 'Temporal123*')
-        print("--- SUPERUSUARIO TEMPORAL CREADO CON ÉXITO ---")
-# -----------------------------------------------
-
-    # Endpoints interactivos (AJAX / Fetch)
-    path('encuestas/votar/<int:opcion_id>/', views.votar_encuesta, name='votar_encuesta'),
-    path('encuestas/<int:encuesta_id>/anadir-opcion/', views.anadir_opcion_encuesta, name='anadir_opcion_encuesta'),
-]
