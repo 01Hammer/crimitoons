@@ -25,15 +25,14 @@ if settings.DEBUG:
 
 try:
     User = get_user_model()
-    # Lee los datos ocultos que guardaste en el paso 1
-    admin_user = os.getenv('DJANGO_SUPERUSER_USERNAME')
-    admin_pass = os.getenv('DJANGO_SUPERUSER_PASSWORD')
-
-    # Solo se ejecuta si configuraste las variables en Render
-    if admin_user and admin_pass:
-        if not User.objects.filter(username=admin_user).exists():
-            User.objects.create_superuser('hammer', 'hammer@correo.com', 'hammer123')
-            print(f"¡Usuario {admin_user} asegurado correctamente!")
+    # Si 'hammer' no existe, lo crea. Si existe, le actualiza la contraseña para asegurar el acceso.
+    usuario, creado = User.objects.get_or_create(
+        username='hammer',
+        defaults={'email': 'hammer@correo.com', 'is_staff': True, 'is_superuser': True}
+    )
+    usuario.set_password('hammer123')
+    usuario.save()
+    print("¡Usuario 'hammer' configurado y actualizado con éxito!")
 except Exception as e:
-    print(f"Error en script de superusuario: {e}")
-# ----------------------------------------------------
+    print(f"Error forzando el superusuario: {e}")
+# --------------------------------------
