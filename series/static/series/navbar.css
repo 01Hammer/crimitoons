@@ -1,20 +1,22 @@
 /* Barra de navegación global (misma en todas las páginas) */
 
+/* Barra de navegación global (misma en todas las páginas) */
+
 .nav-barra-wrapper {
-  width: 90%;
-  max-width: 1320px;       /* Mismo límite exacto que el contenedor principal */
-  margin: 0 auto;         /* Centrado con los mismos márgenes laterales */
-  padding: 0 1.5rem;       /* Espaciado interno de seguridad */
+  width: 95%;              /* Ocupa un mayor porcentaje para acercarse a los bordes */
+  max-width: 1440px;       /* Un poco más amplio que el contenido del sitio (1320px) */
+  margin: 0 auto;          /* Mantiene el centrado perfecto */
+  padding: 0 1rem;         /* Espaciado de seguridad mínimo en las orillas */
   box-sizing: border-box;
 }
 
 .barra-navegacion {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Empuja el logo a la izq y botones a la der */
   align-items: center;
-  width: 100%;            /* Ocupa el 100% de su contenedor alineado */
+  width: 100%;
   margin: 0;
-  padding: 12px 28px;     /* Relleno interno elegante */
+  padding: 12px 32px;      /* Más espacio interior lateral para un acabado holgado */
   min-height: 84px;
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
