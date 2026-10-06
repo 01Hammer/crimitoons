@@ -19,8 +19,10 @@ a {
 a:hover { color: #E6A15C; }
 
 .contenedor-landing-ancho {
-    max-width: 1440px;
-    margin: 0 auto;;
+    width: 90%;             /* Ocupa el 90% de la pantalla para dejar 5% a cada lado */
+    max-width: 1320px;       /* Límite máximo para que en pantallas ultra grandes no se desparrame */
+    margin: 0 auto;         /* Centra todo el bloque en la pantalla */
+    padding: 0 1.5rem;       /* Espaciado interno de seguridad */
     box-sizing: border-box;
 }
 
@@ -49,9 +51,24 @@ a:hover { color: #E6A15C; }
 /* ==========================================================================
    3. ARQUITECTURA ASIMÉTRICA
    ========================================================================== */
+.panel-dos-columnas-asimetrico { 
+    display: flex; 
+    justify-content: space-between; 
+    gap: 32px;              /* Espacio cómodo entre la columna principal y la barra social */
+    width: 100%; 
+}
 .panel-dos-columnas-asimetrico { display: flex; justify-content: space-between; gap: 40px; width: 100%; }
-.columna-izquierda-visual { flex: 62; max-width: 62%; }
-.columna-derecha-social { flex: 38; max-width: 38%; display: flex; flex-direction: column; gap: 30px; }
+.columna-izquierda-visual { 
+    flex: 1; 
+    min-width: 0;           /* Obligatorio: evita que el carrusel desborde el ancho permitido */
+}
+.columna-derecha-social { 
+    width: 340px;           /* Le damos un ancho fijo y elegante a la barra social */
+    flex-shrink: 0; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 30px; 
+}
 
 /* ==========================================================================
    4. VITRINAS Y PANEL DE DETALLES LATERAL (DERECHO)
