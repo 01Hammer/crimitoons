@@ -373,109 +373,96 @@
       </div>
     </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // --- Popover de tarjetas ---
-        const popover = document.getElementById("popover-global-detalle");
-        const pTitulo = document.getElementById("popover-titulo");
-        const pNota = document.getElementById("popover-nota");
-        const pFecha = document.getElementById("popover-fecha");
-        const pGeneros = document.getElementById("popover-generos");
-
-        document
-          .querySelectorAll(".enlace-serie-tarjeta")
-          .forEach(function (tarjeta) {
-            tarjeta.addEventListener("mouseenter", function () {
-              pTitulo.textContent = this.dataset.titulo;
-              pNota.textContent = `★ ${this.dataset.nota}`;
-              pFecha.textContent =
-                (this.dataset.fecha || "").substring(0, 4) || "----";
-              pGeneros.textContent = this.dataset.generos;
-
-              const rect = this.getBoundingClientRect();
-              popover.style.top = `${rect.top + window.scrollY}px`;
-              popover.style.left = `${rect.right + window.scrollX + 12}px`;
-              popover.classList.remove("oculto-total");
-            });
-            tarjeta.addEventListener("mouseleave", function () {
-              popover.classList.add("oculto-total");
-            });
-          });
-
-        // --- Visibilidad inicial de botones de carrusel ---
-        document
-          .querySelectorAll(".grid-cuatro-series")
-          .forEach(function (grid) {
-            const maxDesplazamiento = -(
-              grid.scrollWidth -
-              grid.parentElement.getBoundingClientRect().width
-            );
-            actualizarVisibilidadBotones(grid, 0, maxDesplazamiento);
-          });
-
-        // --- Menú desplegable de perfil ---
-        const contenedorPerfil = document.querySelector(".profile-dropdown");
-        const menuDesplegable = document.querySelector(".dropdown-menu");
-        let temporizadorCierre;
-
-        if (contenedorPerfil && menuDesplegable) {
-          contenedorPerfil.addEventListener("click", function (e) {
-            e.stopPropagation();
-            menuDesplegable.classList.toggle("active");
-          });
-          document.addEventListener("click", function (e) {
-            if (!contenedorPerfil.contains(e.target)) {
-              menuDesplegable.classList.remove("active");
-            }
-          });
-          contenedorPerfil.addEventListener("mouseleave", function () {
-            if (menuDesplegable.classList.contains("active")) {
-              temporizadorCierre = setTimeout(function () {
-                menuDesplegable.classList.remove("active");
-              }, 750);
-            }
-          });
-          contenedorPerfil.addEventListener("mouseenter", function () {
-            clearTimeout(temporizadorCierre);
-          });
-        }
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // --- Popover de tarjetas ---
+      const popover = document.getElementById("popover-global-detalle");
+      const pTitulo = document.getElementById("popover-titulo");
+      const pNota = document.getElementById("popover-nota");
+      const pFecha = document.getElementById("popover-fecha");
+      const pGeneros = document.getElementById("popover-generos");
+  
+      document.querySelectorAll(".enlace-serie-tarjeta").forEach(function (tarjeta) {
+        tarjeta.addEventListener("mouseenter", function () {
+          pTitulo.textContent = this.dataset.titulo;
+          pNota.textContent = `★ ${this.dataset.nota}`;
+          pFecha.textContent = (this.dataset.fecha || "").substring(0, 4) || "----";
+          pGeneros.textContent = this.dataset.generos;
+  
+          const rect = this.getBoundingClientRect();
+          popover.style.top = `${rect.top + window.scrollY}px`;
+          popover.style.left = `${rect.right + window.scrollX + 12}px`;
+          popover.classList.remove("oculto-total");
+        });
+        tarjeta.addEventListener("mouseleave", function () {
+          popover.classList.add("oculto-total");
+        });
       });
-
-      function scrollCarousel(gridId, direccion) {
-        const grid = document.getElementById(gridId);
-        if (!grid) return;
-        const tarjeta = grid.querySelector(".mini-tarjeta-compacta");
-        if (!tarjeta) return;
-
-        const desplazamiento = (tarjeta.getBoundingClientRect().width + 20) * 4;
-        const maxDesplazamiento = -(
-          grid.scrollWidth - grid.parentElement.getBoundingClientRect().width
-        );
-        let posicion = Math.min(
-          0,
-          Math.max(
-            parseFloat(grid.dataset.posicion || 0) - direccion * desplazamiento,
-            maxDesplazamiento,
-          ),
-        );
-
-        grid.dataset.posicion = posicion;
-        grid.style.transform = `translateX(${posicion}px)`;
-        actualizarVisibilidadBotones(grid, posicion, maxDesplazamiento);
+  
+      // --- Visibilidad inicial de botones de carrusel ---
+      document.querySelectorAll(".grid-cuatro-series").forEach(function (grid) {
+        const maxDesplazamiento = -(grid.scrollWidth - grid.parentElement.clientWidth);
+        actualizarVisibilidadBotones(grid, 0, maxDesplazamiento);
+      });
+  
+      // --- Menú desplegable de perfil ---
+      const contenedorPerfil = document.querySelector(".profile-dropdown");
+      const menuDesplegable = document.querySelector(".dropdown-menu");
+      let temporizadorCierre;
+  
+      if (contenedorPerfil && menuDesplegable) {
+        contenedorPerfil.addEventListener("click", function (e) {
+          e.stopPropagation();
+          menuDesplegable.classList.toggle("active");
+        });
+        document.addEventListener("click", function (e) {
+          if (!contenedorPerfil.contains(e.target)) {
+            menuDesplegable.classList.remove("active");
+          }
+        });
+        contenedorPerfil.addEventListener("mouseleave", function () {
+          if (menuDesplegable.classList.contains("active")) {
+            temporizadorCierre = setTimeout(function () {
+              menuDesplegable.classList.remove("active");
+            }, 750);
+          }
+        });
+        contenedorPerfil.addEventListener("mouseenter", function () {
+          clearTimeout(temporizadorCierre);
+        });
       }
-
-      function actualizarVisibilidadBotones(grid, posicion, maxDesplazamiento) {
-        const wrapper = grid.parentElement;
-        const btnIzq = wrapper.querySelector(".btn-izq");
-        const btnDer = wrapper.querySelector(".btn-der");
-        if (!btnIzq || !btnDer) return;
-
-        btnIzq.classList.toggle("oculto-total", posicion >= -5);
-        btnDer.classList.toggle(
-          "oculto-total",
-          posicion <= maxDesplazamiento + 5,
-        );
-      }
-    </script>
-  </body>
+    });
+  
+    function scrollCarousel(gridId, direccion) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+  
+      const wrapper = grid.parentElement;
+      // Ancho total exacto que ocupa el carrusel visible (4 tarjetas + sus espacios)
+      const desplazamiento = wrapper.clientWidth;
+      const maxDesplazamiento = -(grid.scrollWidth - wrapper.clientWidth);
+  
+      let posicionActual = parseFloat(grid.dataset.posicion || 0);
+      let nuevaPosicion = posicionActual - (direccion * desplazamiento);
+  
+      // Limitar posición dentro de los bordes exactos
+      if (nuevaPosicion > 0) nuevaPosicion = 0;
+      if (nuevaPosicion < maxDesplazamiento) nuevaPosicion = maxDesplazamiento;
+  
+      grid.dataset.posicion = nuevaPosicion;
+      grid.style.transform = `translateX(${nuevaPosicion}px)`;
+      actualizarVisibilidadBotones(grid, nuevaPosicion, maxDesplazamiento);
+    }
+  
+    function actualizarVisibilidadBotones(grid, posicion, maxDesplazamiento) {
+      const wrapper = grid.parentElement;
+      const btnIzq = wrapper.querySelector(".btn-izq");
+      const btnDer = wrapper.querySelector(".btn-der");
+      if (!btnIzq || !btnDer) return;
+  
+      btnIzq.classList.toggle("oculto-total", posicion >= -5);
+      btnDer.classList.toggle("oculto-total", posicion <= maxDesplazamiento + 5);
+    }
+  </script>
+</body>
 </html>
