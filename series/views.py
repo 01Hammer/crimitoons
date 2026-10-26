@@ -934,24 +934,29 @@ def cerrar_sesion(request):
 def editar_perfil(request):
     perfil = request.user.perfil
     if request.method == "POST":
+        print("--- 1. ENTRÓ AL POST DE EDITAR PERFIL ---")
+        print("FILES recibidos:", request.FILES)
+        
         form = ActualizarPerfilForm(request.POST, instance=perfil)
         if form.is_valid():
-            form.save()  # Guarda la biografía limpia
+            print("--- 2. EL FORMULARIO DE BIO ES VÁLIDO ---")
+            perfil_obj = form.save(commit=False)
             
-            # Subimos y asignamos la foto de perfil directamente al objeto perfil
             if 'foto_perfil' in request.FILES:
+                print("--- 3. HAY FOTO DE PERFIL EN FILES, SUBIENDO A SUPABASE... ---")
                 url_foto = subir_a_supabase(request.FILES['foto_perfil'], folder="perfiles")
+                print("--- 4. URL DEVUELTA POR SUPABASE ---", url_foto)
                 if url_foto:
-                    perfil.foto_perfil = url_foto
+                    perfil_obj.foto_perfil = url_foto
+                    print("--- 5. URL ASIGNADA A PERFIL_OBJ.FOTO_PERFIL ---")
+            else:
+                print("--- 3B. NO HAY FOTO DE PERFIL EN FILES ---")
                     
-            # Subimos y asignamos el banner directamente al objeto perfil
-            if 'banner' in request.FILES:
-                url_banner = subir_a_supabase(request.FILES['banner'], folder="banners")
-                if url_banner:
-                    perfil.banner = url_banner
-                    
-            perfil.save()  # Guardado final con las URLs de Supabase intactas
+            perfil_obj.save()
+            print("--- 6. PERFIL GUARDADO EN DB EXITOSAMENTE ---", perfil_obj.foto_perfil)
             return redirect("ver_perfil", username=request.user.username)
+        else:
+            print("--- ERROR: EL FORMULARIO NO ES VÁLIDO ---", form.errors)
     else:
         form = ActualizarPerfilForm(instance=perfil)
         
