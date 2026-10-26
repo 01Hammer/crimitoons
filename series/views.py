@@ -22,12 +22,13 @@ from .models import (
     OpcionEncuesta
 )
 from .forms import RegistroForm, LoginForm, ActualizarPerfilForm
+from .supabase_helper import subir_a_supabase
 from django.http import JsonResponse, Http404
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.utils.timesince import timesince
 from django.utils import timezone
-from django.db.models import Count  # <-- Asegúrate de que esta línea esté presente
+from django.db.models import Count
 from ranged_response import RangedFileResponse
 from django.conf import settings
 
@@ -377,7 +378,6 @@ def detalle_serie(request, serie_id):
         serie.poster_path = DEFAULT_POSTER
     serie.total_temporadas = total_temporadas
 
-    # Se limita estrictamente a los 3 primeros generos para mantener la consistencia
     if generos_principales:
         serie.generos = ", ".join(generos_principales[:3])
 
@@ -473,7 +473,6 @@ def guardar_progreso(request, serie_id):
     if status not in {choice[0] for choice in UserSeriesProgress.Status.choices}:
         status = UserSeriesProgress.Status.WATCHING
 
-    # 1. Guardamos o actualizamos en la biblioteca del usuario
     progreso, creado = UserSeriesProgress.objects.update_or_create(
         perfil=request.user.perfil,
         serie=serie,
@@ -486,13 +485,12 @@ def guardar_progreso(request, serie_id):
         },
     )
 
-    # 2. Sincronizamos y guardamos los datos exactos en la tarjeta de actividad
     HistorialActividad.objects.create(
         perfil=request.user.perfil,
         serie=serie,
-        accion=status,  # Pasa el estado (watching, completed, etc.)
-        score_momento=score,  # Pasa la puntuación decimal o None
-        comment_momento=progreso.comment,  # Pasa el comentario limpio
+        accion=status,
+        score_momento=score,
+        comment_momento=progreso.comment,
     )
 
     return JsonResponse(
@@ -547,7 +545,6 @@ def index_invitado(request):
                 ]
                 sid = item.get("id")
 
-                # Cambiado 'calificacion' por 'nota' para solucionar el problema del popover y el badge
                 lista_limpia.append(
                     {
                         "id": sid,
@@ -728,7 +725,6 @@ def buscar_series(request):
         titulo = (item.get("name") or item.get("original_name") or "").lower()
         overview = (item.get("overview") or "").lower()
 
-        # Corregido: cambiada a PALABRAS_PROHIBIDAS en mayúsculas para usar la constante global
         if any(p in titulo or p in overview for p in PALABRAS_PROHIBIDAS):
             continue
         if item.get("original_language") in ["ja", "ko", "zh", "cn"]:
@@ -810,7 +806,6 @@ def crear_serie(request):
             resultado = datos["results"][0]
             id_serie = resultado.get("id")
 
-            # Verificar si la serie ya existe localmente para no duplicarla
             serie_local = Serie.objects.filter(id_tmdb=id_serie).first()
 
             if not serie_local:
@@ -828,7 +823,6 @@ def crear_serie(request):
                     poster_raw = datos_detalle.get("poster_path")
                     backdrop_raw = datos_detalle.get("backdrop_path")
 
-                    # Creamos la serie de forma limpia
                     serie_local = Serie.objects.create(
                         titulo=datos_detalle.get("original_name")
                         or datos_detalle.get("name"),
@@ -858,27 +852,22 @@ def crear_serie(request):
                 except Exception:
                     return redirect("index_invitado")
 
-            # ============================================================
-            # MAGIA: Asociar la serie al usuario actual que la está buscando
-            # ============================================================
             if request.user.is_authenticated and serie_local:
                 perfil_usuario = request.user.perfil
 
-                # Buscamos o creamos el progreso en la biblioteca para este usuario
                 progreso, creado = UserSeriesProgress.objects.get_or_create(
                     perfil=perfil_usuario,
                     serie=serie_local,
                     defaults={
                         "estado": "viendo"
-                    },  # O el estado por defecto que prefieras
+                    },
                 )
 
-                # Si es un registro nuevo en su biblioteca, generamos explícitamente la tarjeta de actividad
                 if creado:
                     HistorialActividad.objects.create(
                         perfil=perfil_usuario,
                         serie=serie_local,
-                        accion="empezo",  # Ajusta este string según las opciones de tu campo 'accion'
+                        accion="empezo",
                         comment_momento="¡Añadida a mi biblioteca desde el buscador!",
                     )
 
@@ -947,7 +936,21 @@ def editar_perfil(request):
     if request.method == "POST":
         form = ActualizarPerfilForm(request.POST, request.FILES, instance=perfil)
         if form.is_valid():
-            form.save()
+            perfil_obj = form.save(commit=False)
+            
+            # --- INTEGRACIÓN SUPABASE: Subida de foto de perfil ---
+            if 'foto_perfil' in request.FILES:
+                url_foto = subir_a_supabase(request.FILES['foto_perfil'], folder="perfiles")
+                if url_foto:
+                    perfil_obj.foto_perfil = url_foto
+                    
+            # --- INTEGRACIÓN SUPABASE: Subida de banner ---
+            if 'banner' in request.FILES:
+                url_banner = subir_a_supabase(request.FILES['banner'], folder="banners")
+                if url_banner:
+                    perfil_obj.banner = url_banner
+                    
+            perfil_obj.save()
             return redirect("ver_perfil", username=request.user.username)
     else:
         form = ActualizarPerfilForm(instance=perfil)
@@ -960,14 +963,12 @@ def ver_perfil(request, username):
     usuario = get_object_or_404(User, username=username)
     perfil_usuario = usuario.perfil
 
-    # Consulta limpia para la pestaña Actividad (sin el filtro incompleto de es_silencioso)
     actividades_reales = (
         HistorialActividad.objects.filter(perfil=perfil_usuario)
         .select_related("serie")
         .order_by("-id")
-    )  # Añadido un ordenamiento por si acaso para mantener las recientes arriba
+    )
 
-    # Determinamos el perfil del usuario autenticado de forma segura
     perfil_actual = None
     if request.user.is_authenticated:
         try:
@@ -975,20 +976,16 @@ def ver_perfil(request, username):
         except Perfil.DoesNotExist:
             perfil_actual = None
 
-    # Procesamos todas las tarjetas en un único bucle limpio
     for act in actividades_reales:
-        # 1. Guardamos los contadores en atributos limpios
         act.total_likes = act.votos.filter(tipo="like").count()
         act.total_dislikes = act.votos.filter(tipo="dislike").count()
 
-        # 2. Averiguamos si el usuario actual ya votó esta tarjeta
         if perfil_actual:
             voto = act.votos.filter(perfil=perfil_actual).first()
             act.voto_usuario = voto.tipo if voto else "ninguno"
         else:
             act.voto_usuario = "ninguno"
 
-    # Consulta base de seguimiento de series para las pestañas Biblioteca, Favoritos y Aportes
     progresos_usuario = UserSeriesProgress.objects.filter(
         perfil=perfil_usuario
     ).select_related("serie")
@@ -1002,15 +999,12 @@ def ver_perfil(request, username):
             "es_propietario": (
                 request.user == usuario if request.user.is_authenticated else False
             ),
-            # Actividad
             "actividades": actividades_reales,
-            # Biblioteca, favoritos y aportes
             "progresos": progresos_usuario,
             "progresos_usuario": progresos_usuario,
             "biblioteca": progresos_usuario,
             "favoritos": progresos_usuario,
             "aportes": progresos_usuario,
-            # Estadísticas
             "stats": {
                 "total_vistas": 24,
                 "genero_top": "Aventura / Ciencia Ficción",
@@ -1025,6 +1019,7 @@ def ver_perfil(request, username):
 
 def comunidad(request):
     return render(request, "series/comunidad.html", {"notificaciones_count": 0})
+
 
 # ============================================================
 # 5. ACCIONES ASÍNCRONAS (AJAX)
@@ -1070,44 +1065,36 @@ def guardar_serie_rapido(request):
 @require_POST
 def votar_actividad(request, actividad_id):
     try:
-        # Obtenemos el perfil del usuario autenticado
         perfil_usuario = request.user.perfil
         actividad = HistorialActividad.objects.get(id=actividad_id)
     except (Perfil.DoesNotExist, HistorialActividad.DoesNotExist):
         return JsonResponse({"error": "Recurso no encontrado"}, status=404)
 
-    # Obtenemos el tipo de voto enviado desde el frontend ('like' o 'dislike')
     tipo_voto = request.POST.get("tipo")
     if tipo_voto not in [VotoActividad.TipoVoto.LIKE, VotoActividad.TipoVoto.DISLIKE]:
         return JsonResponse({"error": "Tipo de voto inválido"}, status=400)
 
-    # Buscamos si ya existe un voto previo de este usuario en esta actividad
     voto_existente = VotoActividad.objects.filter(
         perfil=perfil_usuario, actividad=actividad
     ).first()
 
     if voto_existente:
         if voto_existente.tipo == tipo_voto:
-            # Regla: Si presiona el mismo botón que ya tenía activo, el voto se cancela (quita el voto)
             voto_existente.delete()
             estado_voto = "removido"
         else:
-            # Regla: Si cambia de opinión (de like a dislike o viceversa), se actualiza el tipo
             voto_existente.tipo = tipo_voto
             voto_existente.save()
             estado_voto = "cambiado"
     else:
-        # Regla: Si no había votado antes, se crea el nuevo registro
         VotoActividad.objects.create(
             perfil=perfil_usuario, actividad=actividad, tipo=tipo_voto
         )
         estado_voto = "creado"
 
-    # Calculamos los totales actualizados de la actividad para mandarlos de vuelta
     total_likes = actividad.votos.filter(tipo=VotoActividad.TipoVoto.LIKE).count()
     total_dislikes = actividad.votos.filter(tipo=VotoActividad.TipoVoto.DISLIKE).count()
 
-    # Averiguamos qué voto tiene activo el usuario justo ahora para mandarlo al front-end
     voto_final = VotoActividad.objects.filter(
         perfil=perfil_usuario, actividad=actividad
     ).first()
@@ -1119,7 +1106,7 @@ def votar_actividad(request, actividad_id):
             "estado_voto": estado_voto,
             "likes": total_likes,
             "dislikes": total_dislikes,
-            "voto_actual": voto_actual,  # Devuelve: 'like', 'dislike' o 'ninguno'
+            "voto_actual": voto_actual,
         }
     )
 
@@ -1144,9 +1131,7 @@ def obtener_comentarios(request, actividad_id):
                 ):
                     usuario_foto = c.usuario.perfil.foto_perfil.url
 
-                # Calculamos el tiempo transcurrido (ej: "5 minutes" o "1 day")
                 tiempo_transcurrido = timesince(c.created_at, timezone.now())
-                # Tomamos solo el primer componente para evitar cosas como "1 semana, 2 días"
                 tiempo_limpio = tiempo_transcurrido.split(",")[0]
                 fecha_relativa = f"hace {tiempo_limpio}"
 
@@ -1156,7 +1141,7 @@ def obtener_comentarios(request, actividad_id):
                         "usuario": c.usuario.username,
                         "usuario_foto": usuario_foto,
                         "texto": c.texto,
-                        "fecha": fecha_relativa,  # Pasamos el formato corto y limpio
+                        "fecha": fecha_relativa,
                     }
                 )
 
@@ -1183,7 +1168,6 @@ def agregar_comentario(request, actividad_id):
                 actividad=actividad, usuario=request.user, texto=texto
             )
 
-            # Buscamos la foto directamente usando la relación del comentario recién guardado
             usuario_foto = None
             if (
                 hasattr(nuevo_comentario.usuario, "perfil")
@@ -1198,7 +1182,7 @@ def agregar_comentario(request, actividad_id):
                     "comentario": {
                         "id": nuevo_comentario.id,
                         "usuario": nuevo_comentario.usuario.username,
-                        "usuario_foto": usuario_foto,  # Enviamos la URL comprobada
+                        "usuario_foto": usuario_foto,
                         "texto": nuevo_comentario.texto,
                         "fecha": f"hace {timesince(nuevo_comentario.created_at, timezone.now()).split(',')[0]}",
                     },
@@ -1213,12 +1197,10 @@ def agregar_comentario(request, actividad_id):
 
 @login_required
 def comunidad(request):
-    # 1. Traer toda la actividad automática de series
     actividades = HistorialActividad.objects.all().select_related(
         "perfil__usuario", "serie"
     )
 
-    # Determinamos el perfil del usuario autenticado de forma segura (igual que en ver_perfil)
     perfil_actual = None
     if request.user.is_authenticated:
         try:
@@ -1226,7 +1208,6 @@ def comunidad(request):
         except Perfil.DoesNotExist:
             perfil_actual = None
 
-    # Marcamos estas tarjetas como 'actividad' y calculamos sus votos
     for act in actividades:
         act.tipo_tarjeta = "actividad"
         act.total_likes = act.votos.filter(tipo="like").count()
@@ -1238,28 +1219,20 @@ def comunidad(request):
         else:
             act.voto_usuario = "ninguno"
 
-    # 2. Traer todos los posts manuales de la comunidad
     posts_comunidad = (
         ComunidadPost.objects.all()
         .select_related("usuario", "serie_vinculada", "capitulo_vinculado")
         .prefetch_related("opciones_encuesta")
     )
-    # Marcamos estas tarjetas según su tipo real en la base de datos ('foro', 'natural', 'encuesta')
     for post in posts_comunidad:
-        post.tipo_tarjeta = (
-            post.tipo
-        )  # Copia el valor de tu campo 'tipo' (natural, foro, encuesta)
+        post.tipo_tarjeta = post.tipo
 
-    # 3. Unificar ambos mundos reales en una sola lista en memoria
     feed_completo = list(actividades) + list(posts_comunidad)
-
-    # 4. Ordenar cronológicamente: el más reciente primero
     feed_completo.sort(key=lambda x: x.created_at, reverse=True)
 
-    # 5. Foros más activos para la barra lateral derecha
     foros_calientes = (
         ComunidadPost.objects.filter(tipo=ComunidadPost.TipoPost.FORO)
-        .select_related("serie_vinculada") # <-- ¡Optimización clave aquí!
+        .select_related("serie_vinculada")
         .annotate(num_respuestas=Count("respuestas"))
         .order_by("-num_respuestas")[:4]
     )
@@ -1273,10 +1246,6 @@ def comunidad(request):
 
 
 def obtener_o_crear_serie_hibrida(serie_id_raw, request_post):
-    """
-    Función auxiliar para resolver si la serie es local o de TMDB,
-    evitando duplicar esta lógica entre foros y encuestas.
-    """
     if not serie_id_raw:
         return None
         
@@ -1306,9 +1275,6 @@ def crear_post_comunidad(request):
     if request.method == "POST":
         tipo_tarjeta = request.POST.get("tipo_tarjeta", "publicacion").strip()
         
-        # ==========================================
-        # NUEVO BLOQUE: PROCESAR ENCUESTA
-        # ==========================================
         if tipo_tarjeta == "encuesta":
             titulo = request.POST.get("titulo_encuesta", "").strip()
             contexto = request.POST.get("contexto_encuesta", "").strip()
@@ -1318,14 +1284,12 @@ def crear_post_comunidad(request):
                     return JsonResponse({'status': 'error', 'message': 'El título de la encuesta es obligatorio'}, status=400)
                 return redirect("comunidad")
 
-            # 1. Creamos el registro de la Encuesta
             encuesta = Encuesta.objects.create(
                 usuario=request.user,
                 titulo=titulo,
                 contexto=contexto if contexto else None
             )
 
-            # 2. Recorremos las opciones dinámicas del formulario
             for key in request.POST.keys():
                 if key.startswith('opcion_texto_'):
                     index = key.split('_')[-1]
@@ -1335,11 +1299,9 @@ def crear_post_comunidad(request):
                     if texto_opcion or serie_id_raw:
                         nueva_opcion = OpcionEncuesta(encuesta=encuesta)
                         
-                        # Si seleccionó una serie del buscador, la resolvemos
                         if serie_id_raw:
                             nueva_opcion.serie_vinculada = obtener_o_crear_serie_hibrida(serie_id_raw, request.POST)
                         
-                        # Si no es serie o falló la resolución, se guarda como texto plano
                         if not nueva_opcion.serie_vinculada:
                             nueva_opcion.texto_personalizado = texto_opcion
                             
@@ -1349,9 +1311,6 @@ def crear_post_comunidad(request):
                 return JsonResponse({'status': 'success'})
             return redirect("comunidad")
 
-        # ==========================================
-        # LOGICA EXISTENTE: FOROS Y POSTS NATURALES
-        # ==========================================
         if tipo_tarjeta == "foro":
             titulo = request.POST.get("titulo_foro", "").strip()
             texto_cuerpo = request.POST.get("contexto_foro", "").strip()
@@ -1359,32 +1318,48 @@ def crear_post_comunidad(request):
             titulo = None
             texto_cuerpo = request.POST.get("texto", "").strip()
 
+        # --- INTEGRACIÓN SUPABASE: Subida de imágenes/videos de comunidad ---
         imagen = request.FILES.get("imagen")
+        video = request.FILES.get("video")
+        
+        imagen_url = None
+        video_url = None
+        
+        if imagen:
+            imagen_url = subir_a_supabase(imagen, folder="comunidad/imagenes")
+        if video:
+            video_url = subir_a_supabase(video, folder="comunidad/videos")
+
         serie_id_raw = request.POST.get("serie_id", "").strip()
 
-        if not texto_cuerpo and not titulo and not imagen:
+        if not texto_cuerpo and not titulo and not imagen and not video:
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({'status': 'error', 'message': 'Publicación vacía'}, status=400)
             return redirect("comunidad")
 
-        # Reutilizamos la función auxiliar para el foro o post normal
         serie_vinculada = obtener_o_crear_serie_hibrida(serie_id_raw, request.POST)
-
         tipo_final = "foro" if tipo_tarjeta == "foro" else "natural"
 
-        ComunidadPost.objects.create(
+        post = ComunidadPost(
             usuario=request.user,
             tipo=tipo_final,
             titulo=titulo if tipo_final == "foro" else None,
             texto=texto_cuerpo,
-            imagen=imagen,
             serie_vinculada=serie_vinculada
         )
+        
+        if imagen_url:
+            post.imagen = imagen_url
+        if video_url:
+            post.video = video_url
+            
+        post.save()
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'status': 'success'})
 
     return redirect("comunidad")
+
 
 @require_GET
 def serie_para_foro(request):
@@ -1395,7 +1370,6 @@ def serie_para_foro(request):
     resultados = []
     ids_tmdb_locales = []
 
-    # 1. Buscar primero en tu Base de Datos Local
     try:
         series_locales = Serie.objects.filter(titulo__icontains=q).values('id', 'titulo', 'poster_path', 'id_tmdb')[:5]
         for s in series_locales:
@@ -1406,10 +1380,9 @@ def serie_para_foro(request):
             })
             if s.get('id_tmdb') is not None:
                 ids_tmdb_locales.append(int(s['id_tmdb']))
-    except Exception as e:
-        pass  # Falla silenciosa en producción para no romper la experiencia
+    except Exception:
+        pass
 
-    # 2. Consultar TMDB para rellenar (con filtros de descarte aplicados)
     if len(resultados) < 5:
         try:
             query_codificada = quote(q)
@@ -1422,15 +1395,12 @@ def serie_para_foro(request):
                     if len(resultados) >= 5:
                         break
                     
-                    # FILTRO 1: Solo Animación (Evita Live Action)
                     if 16 not in item.get("genre_ids", []):
                         continue
                     
-                    # FILTRO 2: Excluir Anime / Contenido Asiático (Japón, Corea, China, Taiwán)
                     if item.get("original_language") in ["ja", "ko", "zh", "cn"]:
                         continue
 
-                    # FILTRO 3: Validar palabras prohibidas en título o sinopsis
                     titulo = (item.get("name") or item.get("original_name") or "").lower()
                     overview = (item.get("overview") or "").lower()
                     if any(p in titulo or p in overview for p in PALABRAS_PROHIBIDAS):
@@ -1438,7 +1408,6 @@ def serie_para_foro(request):
 
                     id_tmdb_actual = int(item.get("id"))
 
-                    # FILTRO 4: No duplicar si ya existe en locales
                     if id_tmdb_actual in ids_tmdb_locales:
                         continue
 
@@ -1455,52 +1424,37 @@ def serie_para_foro(request):
 
     return JsonResponse({'status': 'success', 'data': resultados[:5]})
 
+
 def servir_media_con_rango(request, path):
-    """
-    Sirve archivos de MEDIA_ROOT soportando HTTP Range Requests
-    (necesario para que el seek de video funcione correctamente).
-    Solo se usa en desarrollo (DEBUG=True); en producción esto debe
-    ser reemplazado por Nginx sirviendo /media/ directamente.
-    """
     file_path = os.path.join(settings.MEDIA_ROOT, path)
     if not os.path.exists(file_path):
         raise Http404("Archivo no encontrado")
     return RangedFileResponse(request, open(file_path, 'rb'))
 
+
 def feed_encuestas(request):
     encuestas = Encuesta.objects.all().order_by('-created_at')
-    
-    # En el contexto puedes pasar las encuestas normalmente, 
-    # la propiedad del modelo (@property) se puede invocar directo en el template.
     return render(request, 'tu_template_feed.html', {'encuestas': encuestas})
 
 
 @login_required
 @require_POST
 def votar_encuesta(request, opcion_id):
-    """
-    Registra o cambia el voto del usuario en una opción.
-    """
     opcion = get_object_or_404(OpcionEncuesta, id=opcion_id)
     encuesta = opcion.encuesta
     usuario = request.user
 
-    # Regla: El usuario solo puede votar por UNA opción por encuesta.
-    # Buscamos si ya votó por alguna otra opción de la misma encuesta
     voto_anterior = OpcionEncuesta.objects.filter(encuesta=encuesta, votos=usuario).first()
 
     if voto_anterior:
         if voto_anterior.id == opcion.id:
-            # Si presiona la misma, le quitamos el voto (opcional, para deshacer)
             opcion.votos.remove(usuario)
             voto_activo = False
         else:
-            # Si cambia de opinión, quitamos el viejo y ponemos el nuevo
             voto_anterior.votos.remove(usuario)
             opcion.votos.add(usuario)
             voto_activo = True
     else:
-        # Voto limpio por primera vez
         opcion.votos.add(usuario)
         voto_activo = True
 
@@ -1515,15 +1469,12 @@ def votar_encuesta(request, opcion_id):
 @login_required
 @require_POST
 def anadir_opcion_encuesta(request, encuesta_id):
-    """
-    Permite a los usuarios añadir una nueva opción (Normal o Serie) sobre la marcha.
-    """
     encuesta = get_object_or_404(Encuesta, id=encuesta_id)
     
     try:
         data = json.loads(request.body)
         texto = data.get('texto', '').strip()
-        serie_id = data.get('serie_id', None) # Si el frontend manda un ID de serie seleccionado de un buscador
+        serie_id = data.get('serie_id', None)
     except (json.JSONDecodeError, KeyError):
         return JsonResponse({'status': 'error', 'message': 'Datos inválidos'}, status=400)
 
@@ -1533,21 +1484,16 @@ def anadir_opcion_encuesta(request, encuesta_id):
     nueva_opcion = OpcionEncuesta(encuesta=encuesta)
 
     if serie_id:
-        # Intenta buscar la serie en Crimitoons
         serie = Serie.objects.filter(id=serie_id).first()
         if serie:
             nueva_opcion.serie_vinculada = serie
         else:
-            # Si el ID no existe por algún motivo, cae en texto normal
             nueva_opcion.texto_personalizado = texto
     else:
-        # Es texto puro escrito por el usuario
         nueva_opcion.texto_personalizado = texto
 
     nueva_opcion.save()
 
-    # Al guardar la nueva opción, mandamos la respuesta al cliente.
-    # El frontend necesitará saber si tras esta adición los pósters se deben ocultar.
     return JsonResponse({
         'status': 'success',
         'opcion': {
@@ -1556,5 +1502,5 @@ def anadir_opcion_encuesta(request, encuesta_id):
             'es_serie': nueva_opcion.serie_vinculada is not None,
             'poster_url': nueva_opcion.serie_vinculada.poster_path if nueva_opcion.serie_vinculada else None
         },
-        'mostrar_posters_global': encuesta.mostrar_posters # Re-calcula la regla de consistencia instantáneamente
+        'mostrar_posters_global': encuesta.mostrar_posters
     })
