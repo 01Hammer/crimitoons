@@ -22,11 +22,7 @@
   <!-- BLOQUE SUPERIOR (Publicación Normal) -->
   <div class="publicar-top" id="bloque-publicar-normal">
     {% if request.user.perfil.foto_perfil %}
-    <img
-      src="{{ request.user.perfil.foto_perfil.url }}"
-      alt="Tu Avatar"
-      class="avatar-mini"
-    />
+    <img src="{{ request.user.perfil.foto_perfil }}" alt="Tu Avatar" class="avatar-mini" />
     {% else %}
     <img
       src="https://via.placeholder.com/42"
