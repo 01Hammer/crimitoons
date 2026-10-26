@@ -65,21 +65,10 @@ class LoginForm(forms.Form):
     )
 
 
+from django import forms
+from .models import Perfil
+
 class ActualizarPerfilForm(forms.ModelForm):
-    foto_perfil = forms.ImageField(
-        required=False,
-        widget=forms.FileInput(attrs={
-            'class': 'form-control',
-            'accept': 'image/*',
-        })
-    )
-    banner = forms.ImageField(
-        required=False,
-        widget=forms.FileInput(attrs={
-            'class': 'form-control',
-            'accept': 'image/*',
-        })
-    )
     bio = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={
@@ -91,4 +80,4 @@ class ActualizarPerfilForm(forms.ModelForm):
 
     class Meta:
         model = Perfil
-        fields = ('foto_perfil', 'banner', 'bio')
+        fields = ['bio']
