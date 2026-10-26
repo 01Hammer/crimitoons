@@ -963,6 +963,9 @@ def ver_perfil(request, username):
     usuario = get_object_or_404(User, username=username)
     perfil_usuario = usuario.perfil
 
+    # 🔍 REVISIÓN AQUÍ: Imprime esto en los logs de Render
+    print("VALOR ACTUAL DE FOTO_PERFIL EN DB:", perfil_usuario.foto_perfil)
+
     actividades_reales = (
         HistorialActividad.objects.filter(perfil=perfil_usuario)
         .select_related("serie")
