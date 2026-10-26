@@ -37,11 +37,11 @@
                     <button type="button" class="btn-video-volumen" data-video-id="video-{{ card.id }}" title="Activar sonido">
                         <i class="fa-solid fa-volume-xmark"></i>
                     </button>
-                    <!-- Cambiamos el link normal por un botón con atributo de descarga -->
-                    <button type="button" class="btn-video-descargar btn-descargar-directo" data-url="{{ card.imagen }}" title="Descargar video">
+                    <!-- Mantenemos la etiqueta <a> para conservar los estilos CSS intactos -->
+                    <a href="{{ card.imagen }}" download="crimitoons-video-{{ card.id }}.mp4" class="btn-video-descargar btn-descargar-directo" title="Descargar video" target="_blank">
                         <i class="fa-solid fa-arrow-down"></i>
                         <div class="linea-base-descarga"></div>
-                    </button>
+                    </a>
                 </div>
 
                 <div class="controles-inferiores-video">
@@ -125,32 +125,41 @@ document.addEventListener("DOMContentLoaded", function () {
             if (contenedorIndicador) contenedorIndicador.classList.remove("en-reproduccion");
             if (lineaProgreso) lineaProgreso.style.width = "0%";
         });
-    });
-});
 
-  // 5. Descarga directa del video
+        // 5. Descarga directa del video mediante Blob (bien ubicada dentro del bucle)
         const btnDescargar = zona.querySelector(".btn-descargar-directo");
         if (btnDescargar) {
             btnDescargar.addEventListener("click", async function (e) {
-                e.stopPropagation(); // Evita pausar el video
-                const urlVideo = this.getAttribute("data-url");
+                e.preventDefault(); 
+                e.stopPropagation(); 
+                
+                const urlVideo = this.href;
                 try {
-                    const response = await fetch(urlVideo);
+                    const response = await fetch(urlVideo, { mode: 'cors' });
                     const blob = await response.blob();
                     const blobUrl = window.URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.style.display = "none";
-                    a.href = blobUrl;
-                    a.download = `crimitoons-video-{{ card.id }}.mp4`;
-                    document.body.appendChild(a);
-                    a.click();
+                    
+                    const tempLink = document.createElement("a");
+                    tempLink.style.display = "none";
+                    tempLink.href = blobUrl;
+                    tempLink.download = `crimitoons-video-{{ card.id }}.mp4`;
+                    document.body.appendChild(tempLink);
+                    tempLink.click();
+                    
                     window.URL.revokeObjectURL(blobUrl);
-                    a.remove();
+                    tempLink.remove();
                 } catch (err) {
-                    console.error("Error al descargar el video:", err);
-                    // Fallback por si falla el fetch: abre la URL directamente
-                    window.open(urlVideo, '_blank');
+                    console.error("Error en descarga directa por CORS, usando enlace directo:", err);
+                    const fallbackLink = document.createElement("a");
+                    fallbackLink.href = urlVideo;
+                    fallbackLink.download = `crimitoons-video-{{ card.id }}.mp4`;
+                    fallbackLink.target = "_blank";
+                    document.body.appendChild(fallbackLink);
+                    fallbackLink.click();
+                    fallbackLink.remove();
                 }
             });
         }
+    });
+});
 </script>
