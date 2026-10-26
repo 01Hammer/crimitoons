@@ -240,12 +240,12 @@
                 <h2>Aspecto Visual Superior</h2>
                 
                 <div class="config-identidad-row">
-                    <!-- Foto de Perfil (Compacta a la izquierda) -->
+                    <!-- Foto de Perfil -->
                     <div class="form-group avatar-box">
                         <label>Foto de Perfil</label>
                         <div class="preview-wrapper">
                             {% if perfil.foto_perfil %}
-                                <img src="{{ perfil.foto_perfil.url }}" alt="Avatar" class="preview-image" id="avatar-preview">
+                                <img src="{{ perfil.foto_perfil }}" alt="Avatar" class="preview-image" id="avatar-preview">
                             {% else %}
                                 <div class="preview-image" style="background:#e7d7c4; display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto;">👤</div>
                             {% endif %}
@@ -253,13 +253,13 @@
                         <label for="id_foto_perfil" class="file-label-custom">✨ Cambiar Avatar</label>
                         <input type="file" name="foto_perfil" id="id_foto_perfil" class="file-input-custom" onchange="previewFile('id_foto_perfil', 'avatar-preview')">
                     </div>
-
-                    <!-- Banner (Largo a la derecha) -->
+            
+                    <!-- Banner -->
                     <div class="form-group">
                         <label>Ilustración de Banner</label>
                         <div class="preview-wrapper">
                             {% if perfil.banner %}
-                                <img src="{{ perfil.banner.url }}" alt="Banner" class="preview-banner" id="banner-preview">
+                                <img src="{{ perfil.banner }}" alt="Banner" class="preview-banner" id="banner-preview">
                             {% else %}
                                 <div class="preview-banner" style="background:linear-gradient(135deg, #e7d7c4 0%, #b25e38 100%);"></div>
                             {% endif %}
