@@ -934,29 +934,29 @@ def cerrar_sesion(request):
 def editar_perfil(request):
     perfil = request.user.perfil
     if request.method == "POST":
-        # 1. Capturamos la biografía directamente del POST
-        bio_nueva = request.POST.get("bio", "")
-        if bio_nueva is not None:
-            perfil.bio = bio_nueva
-
-        # 2. Subimos la foto de perfil directamente a Supabase si el usuario eligió una
-        if 'foto_perfil' in request.FILES:
-            url_foto = subir_a_supabase(request.FILES['foto_perfil'], folder="perfiles")
-            if url_foto:
-                perfil.foto_perfil = url_foto
-
-        # 3. Subimos el banner directamente a Supabase si el usuario eligió uno
-        if 'banner' in request.FILES:
-            url_banner = subir_a_supabase(request.FILES['banner'], folder="banners")
-            if url_banner:
-                perfil.banner = url_banner
-
-        # 4. Guardamos el perfil de forma definitiva con las URLs ya listas
-        perfil.save()
-        return redirect("ver_perfil", username=request.user.username)
-    
+        form = ActualizarPerfilForm(request.POST, request.FILES, instance=perfil)
+        if form.is_valid():
+            # Guardamos primero los campos de texto del formulario (como la bio)
+            perfil_obj = form.save(commit=False)
+            
+            # --- MANEJADOR MANUAL DE SUPABASE (Le ganamos al formulario) ---
+            if 'foto_perfil' in request.FILES:
+                url_foto = subir_a_supabase(request.FILES['foto_perfil'], folder="perfiles")
+                if url_foto:
+                    perfil_obj.foto_perfil = url_foto  # Asignamos la URL en texto plano
+                    
+            if 'banner' in request.FILES:
+                url_banner = subir_a_supabase(request.FILES['banner'], folder="banners")
+                if url_banner:
+                    perfil_obj.banner = url_banner  # Asignamos la URL en texto plano
+                    
+            perfil_obj.save()
+            return redirect("ver_perfil", username=request.user.username)
+    else:
+        form = ActualizarPerfilForm(instance=perfil)
+        
     return render(
-        request, "series/editar_perfil.html", {"perfil": perfil}
+        request, "series/editar_perfil.html", {"form": form, "perfil": perfil}
     )
 
 def ver_perfil(request, username):
