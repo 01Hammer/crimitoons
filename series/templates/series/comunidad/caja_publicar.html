@@ -5,6 +5,8 @@
   class="publicar-caja"
   id="form-publicar-comunidad">
   
+  {% csrf_token %}
+  
   <input type="hidden" name="tipo_tarjeta" id="input-tipo-tarjeta" value="publicacion">
 
   <button type="button" id="btn-cerrar-modo" title="Volver a publicación normal" style="display: none;">
@@ -190,7 +192,7 @@
               }
           });
 
-          // Envío protegido y blindado
+          // Envío protegido y blindado con CSRF Token incluido
           if (formCaja) {
               let estaEnviando = false;
 
@@ -210,13 +212,12 @@
                   const csrfInput = formCaja.querySelector('[name=csrfmiddlewaretoken]');
                   const csrfToken = csrfInput ? csrfInput.value : '';
 
-                  // Ya no necesitamos buscar el token manualmente para los headers, FormData lo lleva solo
                   fetch(formCaja.action, {
                       method: "POST",
                       body: formData,
                       headers: { 
-                          "X-Requested-With": "XMLHttpRequest"
-                          // Quitamos X-CSRFToken de aquí porque FormData ya lo envía en el body
+                          "X-Requested-With": "XMLHttpRequest",
+                          "X-CSRFToken": csrfToken
                       },
                   })
                   .then(async (response) => {
@@ -227,7 +228,7 @@
                       } else {
                           const errorData = await response.text();
                           console.error("Error del servidor:", errorData);
-                          alert("Hubo un error al procesar la publicación. Revisa la consola.");
+                          alert("Hubo un error al procesar la publicación.");
                           estaEnviando = false;
                           if (submitBtn) {
                               submitBtn.disabled = false;
