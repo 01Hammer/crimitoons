@@ -5,7 +5,7 @@ from django.dispatch import receiver
 
 class Perfil(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
-    foto_perfil = models.TextField(null=True, blank=True) # O CharField con max_length grande
+    foto_perfil = models.TextField(null=True, blank=True)
     banner = models.TextField(null=True, blank=True)
     bio = models.TextField(blank=True, null=True, max_length=500)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -13,35 +13,6 @@ class Perfil(models.Model):
 
     def __str__(self):
         return f"Perfil de {self.usuario.username}"
-
-    @property
-    def avatar_url(self):
-        """
-        Retorna la URL de la foto de perfil sin importar si es un enlace completo de Supabase 
-        o un archivo tradicional, evitando que falle en las plantillas.
-        """
-        if self.foto_perfil:
-            # Si ya es una URL completa (como la de Supabase), la devolvemos tal cual
-            if str(self.foto_perfil).startswith("http"):
-                return self.foto_perfil
-            # Por si quedó algún archivo viejo almacenado de forma local
-            try:
-                return self.foto_perfil.url
-            except Exception:
-                return str(self.foto_perfil)
-        return None  # O puedes poner aquí el enlace de una imagen por defecto genérica
-
-    @property
-    def banner_url(self):
-        """Retorna la URL del banner de forma segura."""
-        if self.banner:
-            if str(self.banner).startswith("http"):
-                return self.banner
-            try:
-                return self.banner.url
-            except Exception:
-                return str(self.banner)
-        return None
 
 # Señal para crear automáticamente un Perfil cuando se crea un Usuario
 @receiver(post_save, sender=User)
@@ -60,7 +31,7 @@ class Serie(models.Model):
     poster_path = models.CharField(max_length=255, blank=True, null=True)
     backdrop_path = models.CharField(max_length=255, blank=True, null=True)
     fecha_estreno = models.CharField(max_length=20, blank=True, null=True)
-    generos = models.CharField(max_length=255, blank=True, null=True)  # Para guardar "Animación, Acción"
+    generos = models.CharField(max_length=255, blank=True, null=True)
     total_capitulos = models.IntegerField(blank=True, null=True)
     total_temporadas = models.IntegerField(blank=True, null=True)
     id_tmdb = models.IntegerField(unique=True, null=True, blank=True)
@@ -84,6 +55,7 @@ class Season(models.Model):
 
 class UserSeriesProgress(models.Model):
     class Status(models.TextChoices):
+        PLAN_TO_WATCH = 'plan_to_watch', 'Por Ver'
         WATCHING = 'watching', 'Viendo'
         COMPLETED = 'completed', 'Completada'
         PAUSED = 'paused', 'Pausada'
@@ -91,36 +63,7 @@ class UserSeriesProgress(models.Model):
 
     perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name='series_progress')
     serie = models.ForeignKey(Serie, on_delete=models.CASCADE, related_name='user_progress')
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.WATCHING)
-    score = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
-    comment = models.TextField(blank=True, null=True, max_length=1000)
-    current_season = models.IntegerField(default=1)
-    current_episode = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('perfil', 'serie')
-        verbose_name_plural = 'User series progress'
-
-    def __str__(self):
-        return f"{self.perfil.usuario.username} - {self.serie.titulo} ({self.status})"
-
-
-class UserSeriesProgress(models.Model):
-    class Status(models.TextChoices):
-        PLAN_TO_WATCH = 'plan_to_watch', 'Por Ver'  # <-- Agregamos tu guardado rápido
-        WATCHING = 'watching', 'Viendo'
-        COMPLETED = 'completed', 'Completada'
-        PAUSED = 'paused', 'Pausada'
-        DROPPED = 'dropped', 'Abandonada'
-
-    perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name='series_progress')
-    serie = models.ForeignKey(Serie, on_delete=models.CASCADE, related_name='user_progress')
-    
-    # <-- Cambiamos el default a Status.PLAN_TO_WATCH
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PLAN_TO_WATCH)
-    
     score = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
     comment = models.TextField(blank=True, null=True, max_length=1000)
     current_season = models.IntegerField(default=1)
@@ -134,6 +77,7 @@ class UserSeriesProgress(models.Model):
 
     def __str__(self):
         return f"{self.perfil.usuario.username} - {self.serie.titulo} ({self.get_status_display()})"
+
 
 class CustomList(models.Model):
     perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name='custom_lists')
@@ -197,6 +141,7 @@ class CustomEpisodeListEntry(models.Model):
     def __str__(self):
         return f"{self.custom_episode_list.name} - {self.serie.titulo} S{self.season_number}E{self.episode_number}"
 
+
 class HistorialActividad(models.Model):
     class TipoAccion(models.TextChoices):
         PLAN_TO_WATCH = 'plan_to_watch', 'Por Ver'
@@ -207,20 +152,11 @@ class HistorialActividad(models.Model):
 
     perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name='historial_actividades')
     serie = models.ForeignKey(Serie, on_delete=models.CASCADE, related_name='historial_eventos')
-    
-    # Guarda qué hizo el usuario
     accion = models.CharField(max_length=20, choices=TipoAccion.choices)
-    
-    # Capturas del momento exacto en que se creó la tarjeta
     score_momento = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
     comment_momento = models.TextField(blank=True, null=True, max_length=1000)
-    
-    # Tu decisión final: 1 Imagen opcional para la captura favorita
-    captura_favorita = models.ImageField(upload_to='capturas_actividad/', null=True, blank=True)
-    
-    # REGLA 1: Guardado silencioso (para ocultarlo del muro si da vergüenza)
+    captura_favorita = models.TextField(null=True, blank=True)
     es_silencioso = models.BooleanField(default=False)
-    
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -231,7 +167,6 @@ class HistorialActividad(models.Model):
         return f"{self.perfil.usuario.username} - {self.get_accion_display()} - {self.serie.titulo}"
 
 
-#COMUNIDAD: Tarjetas de actualización de serie, comentarios, foros y encuestas
 class VotoActividad(models.Model):
     class TipoVoto(models.TextChoices):
         LIKE = 'like', 'Me gusta'
@@ -243,34 +178,15 @@ class VotoActividad(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        # Esto impide estrictamente que un perfil vote más de una vez la misma actividad
         unique_together = ('perfil', 'actividad')
 
     def __str__(self):
         return f"{self.perfil.usuario.username} - {self.tipo} -> {self.actividad.id}"
-    
-    @property
-    def total_likes(self):
-        return self.votos.filter(tipo='like').count()
 
-    @property
-    def total_dislikes(self):
-        return self.votos.filter(tipo='dislike').count()
-
-from django.db import models
-from django.contrib.auth.models import User
 
 class ComentarioActividad(models.Model):
-    actividad = models.ForeignKey(
-        'HistorialActividad', 
-        on_delete=models.CASCADE, 
-        related_name='comentarios'
-    )
-    usuario = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='comentarios_actividad'
-    )
+    actividad = models.ForeignKey('HistorialActividad', on_delete=models.CASCADE, related_name='comentarios')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comentarios_actividad')
     texto = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -281,6 +197,7 @@ class ComentarioActividad(models.Model):
 
     def __str__(self):
         return f"Comentario de {self.usuario.username} en actividad #{self.actividad.id}"
+
 
 class ComunidadPost(models.Model):
     class TipoPost(models.TextChoices):
@@ -297,19 +214,13 @@ class ComunidadPost(models.Model):
 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts_comunidad')
     tipo = models.CharField(max_length=15, choices=TipoPost.choices, default=TipoPost.NATURAL)
-
-    imagen = models.ImageField(upload_to='comunidad/', null=True, blank=True)
-    
     titulo = models.CharField(max_length=200, blank=True, null=True)
     texto = models.TextField()
-    imagen = models.ImageField(upload_to='comunidad/imagenes/', blank=True, null=True)
-    video = models.FileField(upload_to='comunidad/videos/', blank=True, null=True)
+    imagen = models.TextField(null=True, blank=True)
+    video = models.TextField(null=True, blank=True)
     gif_url = models.URLField(blank=True, null=True)
-
-    # Relaciones opcionales para "llamar" una serie o capítulo
     serie_vinculada = models.ForeignKey('Serie', on_delete=models.SET_NULL, blank=True, null=True, related_name='posts_mencionados')
     capitulo_vinculado = models.ForeignKey('Capitulo', on_delete=models.SET_NULL, blank=True, null=True, related_name='posts_mencionados')
-
     categoria = models.CharField(max_length=20, choices=CategoriaForo.choices, default=CategoriaForo.NINGUNA)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -367,18 +278,20 @@ class VotoComunidad(models.Model):
     class Meta:
         unique_together = ('perfil', 'post')
 
+
 class Capitulo(models.Model):
     season = models.ForeignKey('Season', on_delete=models.CASCADE, related_name='capitulos')
     episode_number = models.IntegerField()
     titulo = models.CharField(max_length=255, blank=True, null=True)
     sinopsis = models.TextField(blank=True, null=True)
-    
+
     class Meta:
         unique_together = ('season', 'episode_number')
         ordering = ['episode_number']
 
     def __str__(self):
         return f"{self.season.serie.titulo} - T{self.season.season_number}E{self.episode_number}: {self.titulo or 'Sin título'}"
+
 
 class Encuesta(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -391,22 +304,17 @@ class Encuesta(models.Model):
         opciones = self.opciones.all()
         if not opciones.exists():
             return False
-        # Si al menos una opción NO tiene serie vinculada, devolvemos False
         return all(opcion.serie_vinculada is not None for opcion in opciones)
 
     @property
     def total_votos(self):
-        # Cuenta el total de votos sumando los de cada opción
         return sum(opcion.votos.count() for opcion in self.opciones.all())
 
 
 class OpcionEncuesta(models.Model):
     encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE, related_name='opciones')
-    # Si es de tipo serie, guardamos la relación
     serie_vinculada = models.ForeignKey(Serie, on_delete=models.SET_NULL, blank=True, null=True)
-    # Si es texto personalizado o manual
     texto_personalizado = models.CharField(max_length=255, blank=True, null=True)
-    # Relación ManyToMany para registrar qué usuarios votaron por esta opción específica
     votos = models.ManyToManyField(User, blank=True, related_name='opciones_votadas')
 
     def __str__(self):
