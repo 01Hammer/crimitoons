@@ -5,8 +5,9 @@ from django.dispatch import receiver
 
 class Perfil(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
-    foto_perfil = models.ImageField(upload_to='fotos_perfil/', null=True, blank=True)
-    banner = models.ImageField(upload_to='banners/', null=True, blank=True)
+    # Cambiamos ImageField por CharField o URLField con espacio de sobra para la URL de Supabase
+    foto_perfil = models.CharField(max_length=500, null=True, blank=True)
+    banner = models.CharField(max_length=500, null=True, blank=True)
     bio = models.TextField(blank=True, null=True, max_length=500)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
