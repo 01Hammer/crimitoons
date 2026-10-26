@@ -1,16 +1,16 @@
 <div class="feed-item-bloque">
-  <article class="feed-card tipo-foro" data-tipo="foros">
+  <article class="feed-card tipo-encuesta" data-tipo="encuestas">
     
-    <!-- CABECERA INTERNA (Identidad del foro) -->
+    <!-- CUERPO DE LA ENCUESTA -->
     <div class="feed-cuerpo-foro">
       <div class="feed-card-header-clean">
         <div class="feed-header-interno" style="width: 100%;">
           <div class="usuario-info-grupo" style="display: flex; align-items: center; gap: 10px; width: 100%; justify-content: space-between;">
             
-            <!-- Izquierda: Creador y Serie -->
+            <!-- Izquierda: Creador y Badge -->
             <div style="display: flex; align-items: center; gap: 10px;">
               {% if card.usuario.perfil.foto_perfil %}
-                <img src="{{ card.usuario.perfil.foto_perfil.url }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
+                <img src="{{ card.usuario.perfil.foto_perfil }}" alt="{{ card.usuario.username }}" class="avatar-mini" />
               {% else %}
                 <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
               {% endif %}
@@ -18,19 +18,7 @@
               <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                 <span class="feed-usuario"><strong>{{ card.usuario.username }}</strong></span>
                 <span class="feed-tiempo">•</span>
-                
-                {% if card.serie_vinculada %}
-                  <span class="foro-serie-link-container">
-                    <span class="cat-tag tag-serie-vinculo">{{ card.serie_vinculada.titulo }}</span>
-                    {% if card.serie_vinculada.poster_path %}
-                      <span class="tooltip-poster-flotante">
-                        <img src="{{ card.serie_vinculada.poster_path }}" alt="Póster" />
-                      </span>
-                    {% endif %}
-                  </span>
-                {% else %}
-                  <span class="feed-tiempo">DEBATE GENERAL</span>
-                {% endif %}
+                <span class="feed-badge encuesta">Encuesta</span>
               </div>
             </div>
 
@@ -43,61 +31,63 @@
         </div>
       </div>
 
-      <!-- CONTENIDO: Título formal obligatorio y descripción -->
-      <h4 class="foro-titulo-debate">{{ card.titulo }}</h4>
-      <p class="feed-texto">
-        {{ card.texto|truncatechars:180 }}
-        {% if card.texto|length > 180 %}
-          <a href="#" class="ver-mas-link" style="color: #B25E38; text-decoration: none; font-weight: 500;">ver más</a>
-        {% endif %}
+      <!-- Título de la Encuesta -->
+      <h4 class="foro-titulo" style="font-size: 19px; font-weight: 800; margin: 14px 0 6px 0;">{{ card.titulo }}</h4>
+      
+      <!-- Pequeño texto de contexto (Máximo 2 líneas mediante CSS) -->
+      <p class="feed-texto contexto-encuesta-recortado">
+        {{ card.contexto }}
       </p>
 
-      <!-- MULTIMEDIA ADAPTADA CON BLUR Y CONTENEDOR FIJO -->
-      </div>
+      <!-- CONTENEDOR DE OPCIONES -->
+      <!-- Agregamos la clase 'con-posters' condicionalmente si se cumple tu regla -->
+      <div class="encuesta-opciones {% if mostrar_posters %}con-posters{% endif %}">
+        {% for opcion in card.opciones.all %}
+          <button class="opcion-btn-vote" data-opcion-id="{{ opcion.id }}">
+            
+            <!-- Si se permite mostrar pósters y la opción está vinculada a una serie -->
+            {% if mostrar_posters and opcion.serie_vinculada.poster_path %}
+              <div class="opcion-poster-miniatura">
+                <img src="{{ opcion.serie_vinculada.poster_path }}" alt="{{ opcion.serie_vinculada.titulo }}">
+              </div>
+            {% endif %}
 
-    {% if card.imagen %}
-      <div class="multimedia-contenedor-fijo">
-        <!-- Capa trasera: Desenfoque estético -->
-        <img src="{{ card.imagen.url }}" class="multimedia-blur-bg" alt="Fondo desenfocado" />
-        <!-- Capa delantera: Imagen contenida sin recortar -->
-        <img src="{{ card.imagen.url }}" class="post-multimedia-elemento" alt="Contenido del foro" />
-      </div>
-    {% endif %}
+            <div class="opcion-detalles-texto">
+              <span class="opcion-texto-titulo">
+                {% if opcion.serie_vinculada %}
+                  {{ opcion.serie_vinculada.titulo }}
+                {% else %}
+                  {{ opcion.texto_personalizado }}
+                {% endif %}
+              </span>
+            </div>
 
-    <!-- FOOTER REDISEÑADO: Sistema colectivo -->
-    <div class="feed-footer-foro">
+          </button>
+        {% endfor %}
+
+        <!-- Botón interactivo para añadir opción -->
+        <button class="btn-encuesta-anadir-opcion" data-encuesta-id="{{ card.id }}">
+          <i class="fa-solid fa-plus"></i>
+          <span>Añadir opción</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- FOOTER: Métricas y Comentarios (Sin Likes) -->
+    <div class="feed-footer" style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px 18px 20px; margin-top: -4px;">
       
-      <!-- Lado Izquierdo: Votación estilo Reddit (▲ / ▼) -->
-      <div class="foro-votacion-container">
-        <button class="vote-btn vote-up" title="Tema relevante">
-          <i class="fa-solid fa-arrow-up"></i>
-        </button>
-        <span class="vote-contador-num">{{ card.likes.count|default:0 }}</span>
-        <button class="vote-btn vote-down" title="Tema poco interesante">
-          <i class="fa-solid fa-arrow-down"></i>
-        </button>
-      </div>
-
-      <!-- Centro: Rostros de participantes activos (Efecto Comunidad) -->
-      <div class="foro-participantes-grupo">
-        <div class="avatar-stack">
-          <img src="https://via.placeholder.com/24" class="avatar-stack-item" alt="User 1">
-          <img src="https://via.placeholder.com/24" class="avatar-stack-item" alt="User 2">
-          <img src="https://via.placeholder.com/24" class="avatar-stack-item" alt="User 3">
-        </div>
-        <span class="participantes-contador">
-          {% if card.respuestas.count > 0 %}
-            <strong>{{ card.respuestas.count }}</strong> debatiendo
-          {% else %}
-            211 respuestas
-          {% endif %}
+      <!-- Lado Izquierdo: Contador total de votos -->
+      <div class="encuesta-metricas-votos">
+        <i class="fa-solid fa-chart-simple" style="color: rgba(61, 38, 43, 0.4); font-size: 13px;"></i>
+        <span style="font-size: 13px; font-weight: 600; color: rgba(61, 38, 43, 0.6);">
+          {{ card.total_votos|default:0 }} votos
         </span>
       </div>
 
-      <!-- Lado Derecho: Botón de Llamado a la Acción (CTA Activo) -->
-      <div class="foro-cta-container">
-        <button class="interact-btn-foro-cta boton-comentarios" data-id="{{ card.id }}">
-          <span>Unirse al debate</span>
+      <!-- Lado Derecho: Botón de comentarios nativo -->
+      <div class="encuesta-cta-comentarios">
+        <button class="interact-btn boton-comentarios" data-id="{{ card.id }}">
+          <span>Comentarios</span>
           <i class="fa-solid fa-comments"></i>
         </button>
       </div>

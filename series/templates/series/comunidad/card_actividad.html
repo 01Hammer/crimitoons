@@ -1,103 +1,537 @@
-<div class="historial-card {% if item.accion == 'completed' %}terminada{% elif item.accion == 'paused' %}pausada{% elif item.accion == 'dropped' %}abandonada{% else %}viendo{% endif %} {% if item.comment_momento %}tarjeta-detallada{% else %}tarjeta-rapida{% endif %}">
+<form
+  action="{% url 'crear_post_comunidad' %}"
+  method="POST"
+  enctype="multipart/form-data"
+  class="publicar-caja"
+  id="form-publicar-comunidad"
+>
+  {% csrf_token %}
+  
+  <!-- Control interno del tipo de publicacion para Django -->
+  <input type="hidden" name="tipo_tarjeta" id="input-tipo-tarjeta" value="publicacion">
 
-    {% if mostrar_usuario %}
-        <!-- CASO 1: Con la flag activa, la fecha se posiciona al lado del nombre de usuario -->
-        <div class="historial-usuario-row">
-            <div class="historial-usuario-info">
-                {% if item.perfil.foto_perfil %}
-                    <img src="{{ item.perfil.foto_perfil.url }}" alt="{{ item.perfil.usuario.username }}" class="avatar-mini" />
-                {% else %}
-                    <img src="https://via.placeholder.com/42" alt="Avatar" class="avatar-mini" />
-                {% endif %}
-                <span class="feed-usuario">
-                    <strong>{{ item.perfil.usuario.username }}</strong>
-                </span>
-            </div>
-            <!-- La fecha se renderiza aquí arriba -->
-            <span class="historial-fecha">{{ item.created_at|timesince }}</span>
-        </div>
+  <!-- Botón X para cerrar modos especiales (Foro / Encuesta) -->
+  <button 
+      type="button" 
+      id="btn-cerrar-modo" 
+      title="Volver a publicación normal"
+  >
+      <i class="fa-solid fa-xmark"></i>
+  </button>
+
+  <!-- BLOQUE SUPERIOR (Publicación Normal) -->
+  <div class="publicar-top" id="bloque-publicar-normal">
+    {% if request.user.perfil.foto_perfil %}
+    <img src="{{ request.user.perfil.foto_perfil }}" alt="Tu Avatar" class="avatar-mini" />
+    {% else %}
+    <img
+      src="https://via.placeholder.com/42"
+      alt="Tu Avatar"
+      class="avatar-mini"
+    />
     {% endif %}
 
-    <div class="historial-card-body">
+    <div class="publicar-input-wrap">
+      <input
+        type="text"
+        name="texto"
+        id="publicar-input-principal"
+        placeholder="En qué serie estás pensando..."
+        class="publicar-input"
+      />
 
-        <div class="historial-poster-wrapper">
-            {% if item.serie.poster_path %}
-                <img src="{{ item.serie.poster_path }}" alt="{{ item.serie.titulo }}" class="historial-poster-img" />
-            {% else %}
-                <div class="historial-poster-placeholder"></div>
-            {% endif %} 
-            
-            {% if item.perfil.usuario == request.user %}
-                <div class="historial-opciones-dropdown">
-                    <button class="btn-historial-opciones" aria-label="Opciones de actividad">•••</button>
-                    <div class="historial-dropdown-menu">
-                        <a href="#" class="dropdown-item item-editar" data-actividad-id="{{ item.id }}">Editar</a>
-                        <a href="#" class="dropdown-item item-eliminar" data-actividad-id="{{ item.id }}">Eliminar</a>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
+      <input
+        type="file"
+        name="imagen"
+        id="input-archivo-oculto"
+        accept="image/*"
+      />
 
-        <div class="historial-contenido">
-            <div class="historial-header-card" style="display: flex; justify-content: space-between; align-items: center;">
-                <div class="header-status-meta">
-                    <span class="status-badge {% if item.accion == 'completed' %}status-terminada{% elif item.accion == 'paused' %}status-pausada{% elif item.accion == 'dropped' %}status-abandonada{% else %}status-viendo{% endif %}">
-                        {{ item.get_accion_display }}
-                    </span>
-                    {% if item.score_momento %}
-                        <span class="historial-nota-inline">{{ item.score_momento|floatformat:1 }}</span>
-                    {% endif %}
-                </div>
-                
-                {% if not mostrar_usuario %}
-                    <!-- CASO 2: Sin la flag, la fecha se mantiene abajo en su contenedor original -->
-                    <span class="historial-fecha fecha-clara">{{ item.created_at|timesince }}</span>
-                {% endif %}
-            </div>
-
-            <h3 class="historial-serie-titulo">{{ item.serie.titulo }}</h3>
-
-            {% if item.comment_momento %}
-                <p class="historial-comentario">{{ item.comment_momento }}</p>
-            {% endif %} 
-            
-            {% if item.captura_favorita %}
-                <div class="historial-captura-wrapper">
-                    <img src="{{ item.captura_favorita.url }}" alt="Captura favorita" class="historial-captura-img" />
-                </div>
-            {% endif %}
-
-            <div class="historial-footer-card">
-                <div class="historial-acciones-interaccion">
-                    <button class="btn-interact-like {% if item.voto_usuario == 'like' %}activo-like{% endif %}" data-id="{{ item.id }}" data-tipo="like" title="Like">
-                        <div class="icon-container">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </div>
-                        <span class="interact-counter counter-like">{% if item.total_likes > 0 %}{{ item.total_likes }}{% endif %}</span>
-                    </button>
-
-                    <button class="btn-interact-dislike {% if item.voto_usuario == 'dislike' %}activo-dislike{% endif %}" data-id="{{ item.id }}" data-tipo="dislike" title="Desacuerdo">
-                        <div class="icon-container">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H9zM21 2h3v9h-3z"></path>
-                            </svg>
-                        </div>
-                        <span class="interact-counter counter-dislike">{% if item.total_dislikes > 0 %}{{ item.total_dislikes }}{% endif %}</span>
-                    </button>
-
-                    <button class="btn-interact-comentario" title="comentarios">
-                        <div class="icon-container">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                        </div>
-                        <span class="interact-counter counter-comentario">{% if item.comentarios.count > 0 %}{{ item.comentarios.count }}{% endif %}</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
+      <button
+        type="button"
+        class="btn-foto"
+        title="Subir foto"
+        onclick="document.getElementById('input-archivo-oculto').click()"
+      >
+        <i class="fa-regular fa-image"></i>
+      </button>
     </div>
-</div>
+  </div>
+
+  <!-- CONTENEDOR VARIANTE: FORO (Estructura expandible con animación) -->
+  <div id="variante-campos-foro" class="contenedor-animado-modo">
+    
+    <p class="foro-titulo-seccion">Nuevo Foro de Discusión</p>
+
+    <!-- 1. TÍTULO DEL DEBATE -->
+    <div class="campo-foro-grupo">
+      <input 
+        type="text" 
+        name="titulo_foro" 
+        id="input-titulo-foro"
+        placeholder="Escribe el título de tu debate o pregunta principal..." 
+        class="foro-control"
+      >
+    </div>
+
+    <!-- 2. SERIE DE LA QUE SE HABLARÁ (Buscador Dinámico Híbrido) -->
+    <div class="campo-foro-grupo campo-buscador-serie">
+      <div class="buscador-serie-wrapper">
+        <i class="fa-solid fa-magnifying-glass icono-buscador-foro"></i>
+        <input 
+          type="text" 
+          id="buscador-serie-foro" 
+          placeholder="Busca la serie de la que hablarás..." 
+          autocomplete="off"
+        >
+      </div>
+      
+      <input type="hidden" name="serie_id" id="foro-serie-id-oculto" value="">
+      <input type="hidden" name="serie_titulo_tmdb" id="foro-serie-titulo-tmdb" value="">
+      <input type="hidden" name="serie_poster_tmdb" id="foro-serie-poster-tmdb" value="">
+
+      <div id="resultados-series-flotante"></div>
+
+      <div id="serie-seleccionada-preview">
+        <img id="preview-serie-poster" src="" alt="Poster">
+        <span id="preview-serie-titulo"></span>
+        <button type="button" id="btn-remover-serie">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. CONTEXTO DEL DEBATE -->
+    <div class="campo-foro-grupo">
+      <textarea name="contexto_foro" id="textarea-contexto-foro" placeholder="Escribe aquí el contexto o cuerpo de tu debate (Opcional)..." rows="4" class="foro-control"></textarea>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR VARIANTE: ENCUESTA -->
+  <div id="variante-campos-encuesta" class="contenedor-animado-modo">
+    <p class="foro-titulo-seccion">Crear Nueva Encuesta</p>
+
+    <!-- 1. TÍTULO DE LA ENCUESTA -->
+    <div class="campo-foro-grupo">
+      <input 
+        type="text" 
+        name="titulo_encuesta" 
+        id="input-titulo-encuesta"
+        placeholder="¿Cuál es la pregunta de tu encuesta?..." 
+        class="foro-control"
+      >
+    </div>
+
+    <!-- 2. PEQUEÑO CONTEXTO -->
+    <div class="campo-foro-grupo">
+      <textarea 
+        name="contexto_encuesta" 
+        id="textarea-contexto-encuesta" 
+        placeholder="Añade un pequeño contexto explicativo (Máximo 2 líneas)..." 
+        rows="2" 
+        class="foro-control"
+      ></textarea>
+    </div>
+
+    <!-- 3. CONTENEDOR DE FILAS DE OPCIONES DINÁMICAS -->
+    <div id="contenedor-opciones-creacion">
+      <!-- Opción 1 Base -->
+      <div class="fila-opcion-input-dinamica" data-index="1">
+        <div class="input-opcion-hibrida-wrapper">
+          <i class="fa-solid fa-list-ul icono-opcion-decorativo"></i>
+          <input 
+            type="text" 
+            name="opcion_texto_1" 
+            placeholder="Opción 1: Escribe un texto o busca una serie..." 
+            class="foro-control input-opcion-campo"
+            autocomplete="off"
+          >
+          <input type="hidden" name="opcion_serie_id_1" class="input-opcion-serie-id" value="">
+        </div>
+        <div class="resultados-opcion-flotante" style="display: none;"></div>
+      </div>
+
+      <!-- Opción 2 Base -->
+      <div class="fila-opcion-input-dinamica" data-index="2">
+        <div class="input-opcion-hibrida-wrapper">
+          <i class="fa-solid fa-list-ul icono-opcion-decorativo"></i>
+          <input 
+            type="text" 
+            name="opcion_texto_2" 
+            placeholder="Opción 2: Escribe un texto o busca una serie..." 
+            class="foro-control input-opcion-campo"
+            autocomplete="off"
+          >
+          <input type="hidden" name="opcion_serie_id_2" class="input-opcion-serie-id" value="">
+        </div>
+        <div class="resultados-opcion-flotante" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- BOTÓN PARA INYECTAR MÁS OPCIONES -->
+    <div class="campo-foro-grupo" style="margin-top: 12px;">
+      <button type="button" id="btn-encuesta-mas-filas" class="interact-btn" style="border-radius: 8px; width: 100%; justify-content: center; padding: 10px;">
+        <i class="fa-solid fa-plus"></i> Añadir opción alternativa
+      </button>
+    </div>
+  </div>
+
+  <!-- BOTONES DE ACCIÓN INFERIORES -->
+  <div class="publicar-acciones">
+    <button type="button" class="accion-btn" data-modo="foro">
+      <i class="fa-solid fa-fire"></i> Foro
+    </button>
+    <button type="button" class="accion-btn activo" data-modo="serie">
+      <i class="fa-solid fa-tv"></i> Serie
+    </button>
+    <button type="button" class="accion-btn" data-modo="encuesta">
+      <i class="fa-solid fa-square-poll-horizontal"></i> Encuesta
+    </button>
+    <button type="button" class="accion-btn" data-modo="historia">
+      <i class="fa-solid fa-book-open"></i> Historia
+    </button>
+
+    <button type="submit" class="publicar-submit">Publicar</button>
+  </div>
+</form>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const formCaja = document.getElementById("form-publicar-comunidad");
+      const botonesAccion = document.querySelectorAll(".publicar-acciones .accion-btn");
+      const bloqueNormal = document.getElementById("bloque-publicar-normal");
+      const inputTipoTarjeta = document.getElementById("input-tipo-tarjeta");
+      const btnCerrarModo = document.getElementById("btn-cerrar-modo");
+      
+      const varianteForo = document.getElementById("variante-campos-foro");
+      const varianteEncuesta = document.getElementById("variante-campos-encuesta");
+
+      // Selectores dinámicos añadidos para Encuestas
+      const contenedorOpciones = document.getElementById("contenedor-opciones-creacion");
+      const btnMasFilas = document.getElementById("btn-encuesta-mas-filas");
+
+      // Función para resetear al estado de publicación normal
+      function volverAModoNormal() {
+          botonesAccion.forEach(b => b.classList.remove("activo"));
+          const btnSerie = Array.from(botonesAccion).find(b => b.getAttribute("data-modo") === "serie");
+          if (btnSerie) btnSerie.classList.add("activo");
+
+          inputTipoTarjeta.value = "publicacion";
+          btnCerrarModo.style.display = "none";
+
+          // Desactivar animaciones de los bloques especiales
+          varianteForo.classList.remove("abierto");
+          varianteEncuesta.classList.remove("abierto");
+
+          // Restaurar bloque superior con un pequeño retraso para sincronizar la animación
+          setTimeout(() => {
+              bloqueNormal.style.opacity = "1";
+              bloqueNormal.style.visibility = "visible";
+              bloqueNormal.style.display = "flex";
+          }, 150);
+      }
+
+      // Manejador del botón X (Cerrar)
+      if (btnCerrarModo) {
+          btnCerrarModo.addEventListener("click", volverAModoNormal);
+      }
+
+      // Control de pestañas y mutación de la caja
+      botonesAccion.forEach(btn => {
+          if (btn.hasAttribute("data-modo")) {
+              btn.addEventListener("click", function () {
+                  const modo = this.getAttribute("data-modo");
+
+                  if (modo === "serie" || modo === "historia") {
+                      volverAModoNormal();
+                      if (modo === "historia") {
+                          inputTipoTarjeta.value = "publicacion";
+                          botonesAccion.forEach(b => b.classList.remove("activo"));
+                          this.classList.add("activo");
+                      }
+                      return;
+                  }
+
+                  // Cambiar estado activo de botones
+                  botonesAccion.forEach(b => b.classList.remove("activo"));
+                  this.classList.add("activo");
+                  inputTipoTarjeta.value = modo;
+
+                  // 1. Desvanecer las letras y el bloque normal rápidamente
+                  bloqueNormal.style.opacity = "0";
+                  bloqueNormal.style.visibility = "hidden";
+                  
+                  setTimeout(() => {
+                      bloqueNormal.style.display = "none";
+
+                      // 2. Mostrar la X y expandir el contenedor correspondiente
+                      btnCerrarModo.style.display = "block";
+                      
+                      if (modo === "foro") {
+                          varianteEncuesta.classList.remove("abierto");
+                          varianteForo.classList.add("abierto");
+                          document.getElementById("input-titulo-foro").focus();
+                      } else if (modo === "encuesta") {
+                          varianteForo.classList.remove("abierto");
+                          varianteEncuesta.classList.add("abierto");
+                          document.getElementById("input-titulo-encuesta").focus();
+                      }
+                  }, 200);
+              });
+          }
+      });
+
+      // --- LÓGICA DEL BUSCADOR HÍBRIDO (CONEXIÓN DIRECTA CON DJANGO) ---
+      const buscadorInput = document.getElementById("buscador-serie-foro");
+      const resultadosContenedor = document.getElementById("resultados-series-flotante");
+      const idOcultoInput = document.getElementById("foro-serie-id-oculto");
+      const tituloTmdbInput = document.getElementById("foro-serie-titulo-tmdb");
+      const posterTmdbInput = document.getElementById("foro-serie-poster-tmdb");
+
+      const previewContenedor = document.getElementById("serie-seleccionada-preview");
+      const previewPoster = document.getElementById("preview-serie-poster");
+      const previewTitulo = document.getElementById("preview-serie-titulo");
+      const btnRemover = document.getElementById("btn-remover-serie");
+
+      let debounceTimer;
+
+      if (buscadorInput) {
+          buscadorInput.addEventListener("input", function() {
+              clearTimeout(debounceTimer);
+              const query = this.value.trim();
+
+              if (query.length < 2) {
+                  resultadosContenedor.style.display = "none";
+                  return;
+              }
+
+              debounceTimer = setTimeout(() => {
+                  fetch(`/comunidad/buscar-serie/?q=${encodeURIComponent(query)}`, {
+                      headers: { "X-Requested-With": "XMLHttpRequest" }
+                  })
+                  .then(res => res.json())
+                  .then(response => {
+                      if (response.status === "success" && response.data.length > 0) {
+                          resultadosContenedor.innerHTML = "";
+                          resultadosContenedor.style.display = "block";
+
+                          response.data.forEach(serie => {
+                              const item = document.createElement("div");
+                              item.style.display = "flex";
+                              item.style.alignItems = "center";
+                              item.style.gap = "10px";
+                              item.style.padding = "8px 12px";
+                              item.style.cursor = "pointer";
+                              item.style.borderBottom = "1px solid rgba(61,38,43,0.05)";
+                              item.style.transition = "background-color 0.2s";
+
+                              item.addEventListener("mouseenter", () => item.style.backgroundColor = "rgba(178, 94, 56, 0.08)");
+                              item.addEventListener("mouseleave", () => item.style.backgroundColor = "transparent");
+
+                              const imgUrl = serie.poster_path ? serie.poster_path : 'https://via.placeholder.com/35x50?text=No+Image';
+
+                              item.innerHTML = `
+                                  <img src="${imgUrl}" style="width: 30px; height: 42px; object-fit: cover; border-radius: 4px;">
+                                  <span style="font-size: 0.9rem; font-weight: 500; color: #3D262B;">${serie.titulo}</span>
+                              `;
+
+                              item.addEventListener("click", () => {
+                                  idOcultoInput.value = serie.id;
+                                  previewPoster.src = imgUrl;
+                                  previewTitulo.textContent = serie.titulo;
+
+                                  if (String(serie.id).startsWith("tmdb_")) {
+                                      tituloTmdbInput.value = serie.titulo;
+                                      posterTmdbInput.value = serie.poster_path;
+                                  } else {
+                                      tituloTmdbInput.value = "";
+                                      posterTmdbInput.value = "";
+                                  }
+                                  
+                                  previewContenedor.style.display = "flex";
+                                  resultadosContenedor.style.display = "none";
+                                  buscadorInput.value = ""; 
+                                  buscadorInput.parentElement.style.display = "none"; 
+                              });
+
+                              resultadosContenedor.appendChild(item);
+                          });
+                      } else {
+                          resultadosContenedor.style.display = "none";
+                      }
+                  })
+                  .catch(err => console.error("Error al buscar:", err));
+              }, 300);
+          });
+
+          document.addEventListener("click", function(e) {
+              if (!buscadorInput.contains(e.target) && !resultadosContenedor.contains(e.target)) {
+                  resultadosContenedor.style.display = "none";
+              }
+          });
+
+          if (btnRemover) {
+              btnRemover.addEventListener("click", () => {
+                  idOcultoInput.value = "";
+                  tituloTmdbInput.value = "";
+                  posterTmdbInput.value = "";
+                  previewContenedor.style.display = "none";
+                  buscadorInput.parentElement.style.display = "flex"; 
+                  buscadorInput.focus();
+              });
+          }
+      }
+
+      // --- INYECTAR FILAS EXTRA PARA LA ENCUESTA ---
+      if (btnMasFilas) {
+          btnMasFilas.addEventListener("click", function () {
+              const nuevoIndice = contenedorOpciones.querySelectorAll(".fila-opcion-input-dinamica").length + 1;
+              
+              const nuevaFila = document.createElement("div");
+              nuevaFila.className = "fila-opcion-input-dinamica";
+              nuevaFila.setAttribute("data-index", nuevoIndice);
+              nuevaFila.style.marginTop = "8px";
+              
+              nuevaFila.innerHTML = `
+                  <div class="input-opcion-hibrida-wrapper">
+                    <i class="fa-solid fa-list-ul icono-opcion-decorativo"></i>
+                    <input 
+                      type="text" 
+                      name="opcion_texto_${nuevoIndice}" 
+                      placeholder="Opción ${nuevoIndice}: Escribe un texto o busca una serie..." 
+                      class="foro-control input-opcion-campo"
+                      autocomplete="off"
+                    >
+                    <input type="hidden" name="opcion_serie_id_${nuevoIndice}" class="input-opcion-serie-id" value="">
+                  </div>
+                  <div class="resultados-opcion-flotante" style="display: none;"></div>
+              `;
+              
+              contenedorOpciones.appendChild(nuevaFila);
+              inicializarBuscadorOpcion(nuevaFila);
+          });
+      }
+
+      // --- ASIGNAR BUSCADOR HÍBRIDO INDIVIDUAL PARA CADA OPCIÓN DE ENCUESTA ---
+      function inicializarBuscadorOpcion(fila) {
+          const inputCampo = fila.querySelector(".input-opcion-campo");
+          const flotanteResultados = fila.querySelector(".resultados-opcion-flotante");
+          const hiddenSerieId = fila.querySelector(".input-opcion-serie-id");
+          let opcionTimer;
+
+          inputCampo.addEventListener("input", function () {
+              clearTimeout(opcionTimer);
+              const consulta = this.value.trim();
+
+              // Si el usuario borra o cambia el texto de forma manual, limpiamos cualquier id de serie previo
+              hiddenSerieId.value = "";
+
+              if (consulta.length < 2) {
+                  flotanteResultados.style.display = "none";
+                  return;
+              }
+
+              opcionTimer = setTimeout(() => {
+                  fetch(`/comunidad/buscar-serie/?q=${encodeURIComponent(consulta)}`, {
+                      headers: { "X-Requested-With": "XMLHttpRequest" }
+                  })
+                  .then(res => res.json())
+                  .then(response => {
+                      if (response.status === "success" && response.data.length > 0) {
+                          flotanteResultados.innerHTML = "";
+                          flotanteResultados.style.display = "block";
+
+                          response.data.forEach(serie => {
+                              const itemOpcion = document.createElement("div");
+                              itemOpcion.style.display = "flex";
+                              itemOpcion.style.alignItems = "center";
+                              itemOpcion.style.gap = "10px";
+                              itemOpcion.style.padding = "6px 10px";
+                              itemOpcion.style.cursor = "pointer";
+                              itemOpcion.style.borderBottom = "1px solid rgba(61,38,43,0.04)";
+
+                              const imgPoster = serie.poster_path ? serie.poster_path : 'https://via.placeholder.com/25x35?text=No';
+
+                              itemOpcion.innerHTML = `
+                                  <img src="${imgPoster}" style="width: 22px; height: 30px; object-fit: cover; border-radius: 3px;">
+                                  <span style="font-size: 0.85rem; font-weight: 500; color: #3D262B;">${serie.titulo}</span>
+                              `;
+
+                              itemOpcion.addEventListener("click", () => {
+                                  // Rellenamos el input con el título exacto de la serie y seteamos el ID oculto
+                                  inputCampo.value = serie.titulo;
+                                  hiddenSerieId.value = serie.id;
+                                  flotanteResultados.style.display = "none";
+                              });
+
+                              flotanteResultados.appendChild(itemOpcion);
+                          });
+                      } else {
+                          flotanteResultados.style.display = "none";
+                      }
+                  })
+                  .catch(err => console.error("Error buscando en opción:", err));
+              }, 300);
+          });
+
+          // Cerrar flotante al hacer clic fuera de la fila específica
+          document.addEventListener("click", function (e) {
+              if (!fila.contains(e.target)) {
+                  flotanteResultados.style.display = "none";
+              }
+          });
+      }
+
+      // Inicializar las dos filas de opciones base al cargar el DOM
+      contenedorOpciones.querySelectorAll(".fila-opcion-input-dinamica").forEach(fila => {
+          inicializarBuscadorOpcion(fila);
+      });
+
+      // Envío del formulario vía AJAX
+      const formPublicar = document.getElementById("form-publicar-comunidad");
+      if (formPublicar) {
+        formPublicar.addEventListener("submit", function (event) {
+          event.preventDefault(); 
+
+          const formData = new FormData(formPublicar);
+          const submitBtn = formPublicar.querySelector(".publicar-submit");
+
+          if (submitBtn) {
+              submitBtn.disabled = true;
+              submitBtn.textContent = "Publicando...";
+          }
+
+          const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+          fetch(formPublicar.action, {
+            method: "POST",
+            body: formData,
+            headers: { 
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRFToken": csrfToken
+            },
+          })
+            .then((response) => {
+              if (response.ok) {
+                formPublicar.reset();
+                volverAModoNormal();
+                location.reload(); 
+              } else {
+                alert("Hubo un error al procesar la publicación.");
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Publicar";
+                }
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              if (submitBtn) {
+                  submitBtn.disabled = false;
+                  submitBtn.textContent = "Publicar";
+              }
+            });
+        });
+      }
+  });
+</script>
