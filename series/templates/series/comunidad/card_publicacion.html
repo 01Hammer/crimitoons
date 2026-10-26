@@ -27,7 +27,7 @@
           {% if card.imagen|lower|slice:"-4:" == ".mp4" or card.imagen|lower|slice:"-5:" == ".webm" %}
             
             <div class="zona-click-reproductor" data-video-id="video-{{ card.id }}">
-                <video src="{{ card.imagen }}" loop playsinline muted controls class="post-multimedia-elemento" id="video-{{ card.id }}"></video>
+                <video src="{{ card.imagen }}" loop playsinline muted class="post-multimedia-elemento" id="video-{{ card.id }}"></video>
                 
                 <div class="indicador-video-centro" id="indicador-{{ card.id }}">
                     <i class="fa-solid fa-play"></i>
@@ -37,7 +37,7 @@
                     <button type="button" class="btn-video-volumen" data-video-id="video-{{ card.id }}" title="Activar sonido">
                         <i class="fa-solid fa-volume-xmark"></i>
                     </button>
-                    <!-- Mantenemos la etiqueta <a> para conservar los estilos CSS intactos -->
+                    <!-- Botón de descarga limpio y directo -->
                     <a href="{{ card.imagen }}" download="crimitoons-video-{{ card.id }}.mp4" class="btn-video-descargar btn-descargar-directo" title="Descargar video" target="_blank">
                         <i class="fa-solid fa-arrow-down"></i>
                         <div class="linea-base-descarga"></div>
@@ -69,7 +69,6 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Buscamos todas las zonas de reproducción de la página
     const zonasVideo = document.querySelectorAll(".zona-click-reproductor");
 
     zonasVideo.forEach(zona => {
@@ -82,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const btnVolumen = zona.querySelector(".btn-video-volumen i");
         const lineaProgreso = zona.querySelector(".progreso-tiempo-linea");
 
-        // 1. Reproducir / Pausar al hacer clic en la zona del video
+        // 1. Reproducir / Pausar al hacer clic en la zona del video (excluyendo controles superiores)
         zona.addEventListener("click", function (e) {
             if (e.target.closest(".controles-superiores-video")) return;
 
@@ -105,11 +104,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // 3. Control de Volumen (Silenciar / Activar sonido)
+        // 3. Control de Volumen independiente y seguro
         const btnVolumenContainer = zona.querySelector(".btn-video-volumen");
         if (btnVolumenContainer) {
             btnVolumenContainer.addEventListener("click", function (e) {
-                e.stopPropagation(); // Evita que se pause al hacer clic en el volumen
+                e.stopPropagation(); // Evita que se pause el video al cambiar el volumen
                 video.muted = !video.muted;
                 if (video.muted) {
                     btnVolumen.className = "fa-solid fa-volume-xmark";
@@ -126,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (lineaProgreso) lineaProgreso.style.width = "0%";
         });
 
-        // 5. Descarga directa del video mediante Blob (bien ubicada dentro del bucle)
+        // 5. Descarga directa por Blob sin romper eventos del reproductor
         const btnDescargar = zona.querySelector(".btn-descargar-directo");
         if (btnDescargar) {
             btnDescargar.addEventListener("click", async function (e) {
