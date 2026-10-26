@@ -5,9 +5,10 @@ from django.dispatch import receiver
 
 class Perfil(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
-    # Cambiamos ImageField por CharField o URLField con espacio de sobra para la URL de Supabase
-    foto_perfil = models.CharField(max_length=500, null=True, blank=True)
-    banner = models.CharField(max_length=500, null=True, blank=True)
+    # Usamos max_length=500 pero especificamos db_column o dejamos que Django lo maneje, 
+    # o usamos TextField que no tiene límite de caracteres en Postgres:
+    foto_perfil = models.TextField(null=True, blank=True)
+    banner = models.TextField(null=True, blank=True)
     bio = models.TextField(blank=True, null=True, max_length=500)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
