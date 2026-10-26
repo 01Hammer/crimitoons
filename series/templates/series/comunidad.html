@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{% static 'series/comunidad/layout_columnas.css' %}">
     <link rel="stylesheet" href="{% static 'series/comunidad/tarjetas_feed.css' %}">
     <link rel="stylesheet" href="{% static 'series/comunidad/reproductor_multimedia.css' %}">
-     <link rel="stylesheet" href="{% static 'series/comunidad/caja_publicar.css' %}">
+    <link rel="stylesheet" href="{% static 'series/comunidad/caja_publicar.css' %}">
     <link
       rel="stylesheet"
       href="{% static 'series/miperfil/menus_perfil.css' %}"
@@ -108,18 +108,18 @@
                 {% include 'series/comunidad/card_actividad.html' with item=card mostrar_usuario=True %}
             {% endif %}
 
-            {# TIPO 2: NATURAL (Publicación libre - Ahora sí con su condicional) #}
+            {# TIPO 2: NATURAL (Publicación libre) #}
             {% if card.tipo_tarjeta == 'natural' %}
                 {% include 'series/comunidad/card_publicacion.html' with item=card %}
             {% endif %}
 
-            {# TIPO 3: FORO (Debates con título, póster de serie y contexto) #}
+            {# TIPO 3: FORO #}
             {% if card.tipo_tarjeta == 'foro' %}
                 {% include 'series/comunidad/card_foro.html' with card=card %}
             {% endif %}
 
-            {# TIPO 4: ENCUESTA (Guardada temporalmente) #}
-            {% if card.tipo_tarjeta == 'foro' %}
+            {# TIPO 4: ENCUESTA #}
+            {% if card.tipo_tarjeta == 'encuesta' %}
                 {% include 'series/comunidad/card_encuesta.html' with card=card %}
             {% endif %}
             
@@ -137,7 +137,6 @@
                 <a href="#" class="foro-item">
                     <span class="foro-rank">{{ forloop.counter }}</span>
                     <div class="foro-item-info">
-                    <!-- BADGE DINÁMICO: Muestra la serie vinculada si existe; si no, la categoría -->
                     {% if foro.serie_vinculada %}
                         <span class="cat-tag">{{ foro.serie_vinculada.titulo|upper }}</span>
                     {% else %}
@@ -160,7 +159,8 @@
             </aside>
       </div>
     </main>
-        {% include 'series/includes/modal_comentarios.html' %}
+    
+    {% include 'series/includes/modal_comentarios.html' %}
 
   </body>
 
@@ -168,7 +168,7 @@
     document.addEventListener("DOMContentLoaded", function () {
       
         // ==========================================
-        // 1. CONTROL DEL DROPDOWN DE TRES PUNTOS (EDITAR/ELIMINAR) - TIPO 1
+        // 1. CONTROL DEL DROPDOWN DE TRES PUNTOS
         // ==========================================
         const dropdownsActividad = document.querySelectorAll('.historial-opciones-dropdown');
 
@@ -210,7 +210,7 @@
         });
 
         // ==========================================
-        // 2. LIKES Y DISLIKES PARA ACTIVIDAD (TIPO 1)
+        // 2. LIKES Y DISLIKES PARA ACTIVIDAD
         // ==========================================
         document.querySelectorAll('.historial-acciones-interaccion [data-tipo]').forEach(boton => {
             boton.addEventListener('click', async (e) => {
@@ -265,7 +265,7 @@
         });
 
         // ==========================================
-        // 3. MODAL DE COMENTARIOS PARA ACTIVIDAD (TIPO 1)
+        // 3. MODAL DE COMENTARIOS PARA ACTIVIDAD
         // ==========================================
         const modalOverlay = document.getElementById('comments-modal');
         let actividadActivaId = null;
@@ -401,26 +401,14 @@
         });
 
         // ==========================================
-        // 6. FUNCIONES AUXILIARES PARA COMENTARIOS
+        // 6. FUNCIONES AUXILIARES
         // ==========================================
-        window.conmutarCascada = function(id) {
-            console.log("Click en tarjeta para abrir respuestas:", id);
-        };
-        window.mostrarMenuOpciones = function(id) {
-            console.log("Click en 3 puntos:", id);
-        };
-        window.editarComentario = function(id) {
-            console.log("Editar:", id);
-        };
-        window.eliminarComentario = function(id) {
-            console.log("Eliminar:", id);
-        };
-        window.darLikeComentario = function(id) {
-            console.log("Dar like:", id);
-        };
-        window.enviarRespuesta = function(id) {
-            console.log("Enviar respuesta para:", id);
-        };
+        window.conmutarCascada = function(id) {};
+        window.mostrarMenuOpciones = function(id) {};
+        window.editarComentario = function(id) {};
+        window.eliminarComentario = function(id) {};
+        window.darLikeComentario = function(id) {};
+        window.enviarRespuesta = function(id) {};
 
         // ==========================================
         // 7. PINTAR LISTA DE COMENTARIOS
@@ -455,51 +443,18 @@
                                     <span class="modal-comment-username">${c.usuario}</span>
                                     <span class="modal-comment-divider">•</span>
                                     <span class="modal-comment-date">${c.fecha}</span>
-                                    <span class="modal-comment-divider"></span>
-
-                                    <div class="modal-comment-options-wrapper">
-                                        <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${c.id});">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <div class="comment-options-menu" id="options-menu-${c.id}">
-                                            <button onclick="event.stopPropagation(); editarComentario(${c.id});">Editar</button>
-                                            <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${c.id});">Eliminar</button>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
-
                             <div class="modal-comment-text">${c.texto}</div>
-
-                            <div class="modal-comment-actions">
-                                <button class="btn-comment-reply" onclick="event.stopPropagation(); conmutarCascada(${c.id});">
-                                    Responder
-                                </button>
-                                <button class="btn-comment-like" onclick="event.stopPropagation(); darLikeComentario(${c.id});" data-id="${c.id}">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-comment-replies-container" id="replies-${c.id}">
-                        <div class="modal-comment-replies-list" id="replies-list-${c.id}"></div>
-                        <div class="modal-comment-reply-box" onclick="event.stopPropagation();">
-                            <input type="text" placeholder="Escribe una respuesta..." class="modal-comment-reply-input" id="reply-input-${c.id}" />
-                            <button class="btn-modal-reply-submit" onclick="enviarRespuesta(${c.id})">Responder</button>
                         </div>
                     </div>
                 `;
                 modalCommentsList.appendChild(item);
             });
-
-            setTimeout(() => {
-                modalCommentsList.scrollTop = 0;
-            }, 50);
         }
 
         // ==========================================
-        // 8. ENVIAR UN COMENTARIO NUEVO
+        // 8. ENVIAR COMENTARIO NUEVO
         // ==========================================
         async function enviarComentario() {
             if (!modalOverlay) return;
@@ -512,107 +467,26 @@
             const texto = modalInput.value.trim();
             if (!texto) return;
 
-            if (!actividadActivaId) {
-                alert("Error interno: No se pudo identificar la tarjeta de actividad.");
-                return;
-            }
+            if (!actividadActivaId) return;
 
             const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]")?.value || getCookie("csrftoken");
-
             const formData = new FormData();
             formData.append("texto", texto);
 
             try {
                 const response = await fetch(`/actividad/${actividadActivaId}/comentar/`, {
                     method: "POST",
-                    headers: {
-                        "X-CSRFToken": csrftoken,
-                    },
+                    headers: { "X-CSRFToken": csrftoken },
                     body: formData,
                 });
                 const data = await response.json();
 
                 if (data.status === "success") {
                     modalInput.value = "";
-
-                    const emptyMsg = modalCommentsList.querySelector(".modal-comments-empty");
-                    if (emptyMsg) emptyMsg.remove();
-
-                    const item = document.createElement("div");
-                    item.classList.add("modal-comment-item");
-
-                    let fotoAvatar = "";
-                    if (data.comentario && data.comentario.usuario_foto && data.comentario.usuario_foto.trim() !== "") {
-                        fotoAvatar = data.comentario.usuario_foto.trim();
-                        if (!fotoAvatar.startsWith("/") && !fotoAvatar.startsWith("http")) {
-                            fotoAvatar = "/" + fotoAvatar;
-                        }
-                    } else {
-                        fotoAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-                    }
-
-                    item.innerHTML = `
-                        <div class="modal-comment-main-row">
-                            <div class="modal-comment-avatar-wrapper">
-                                <img src="${fotoAvatar}" alt="Avatar" class="modal-comment-user-avatar">
-                            </div>
-
-                            <div class="modal-comment-body">
-                                <div class="modal-comment-top-line">
-                                    <div class="modal-comment-user-info">
-                                        <span class="modal-comment-username">${data.comentario.usuario}</span>
-                                        <span class="modal-comment-divider">•</span>
-                                        <span class="modal-comment-date">${data.comentario.fecha}</span>
-                                        <span class="modal-comment-divider"></span>
-
-                                        <div class="modal-comment-options-wrapper">
-                                            <button class="btn-comment-options" onclick="event.stopPropagation(); mostrarMenuOpciones(${data.comentario.id});">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <div class="comment-options-menu" id="options-menu-${data.comentario.id}">
-                                                <button onclick="event.stopPropagation(); editarComentario(${data.comentario.id});">Editar</button>
-                                                <button class="delete-opt" onclick="event.stopPropagation(); eliminarComentario(${data.comentario.id});">Eliminar</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="modal-comment-text">${data.comentario.texto}</div>
-
-                                <div class="modal-comment-actions">
-                                    <button class="btn-comment-reply" onclick="event.stopPropagation(); conmutarCascada(${data.comentario.id});">
-                                        Responder
-                                    </button>
-                                    <button class="btn-comment-like" onclick="event.stopPropagation(); darLikeComentario(${data.comentario.id});" data-id="${data.comentario.id}">
-                                        <i class="far fa-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal-comment-replies-container" id="replies-${data.comentario.id}">
-                            <div class="modal-comment-replies-list" id="replies-list-${data.comentario.id}"></div>
-                            <div class="modal-comment-reply-box" onclick="event.stopPropagation();">
-                                <input type="text" placeholder="Escribe una respuesta..." class="modal-comment-reply-input" id="reply-input-${data.comentario.id}" />
-                                <button class="btn-modal-reply-submit" onclick="enviarRespuesta(${data.comentario.id})">Responder</button>
-                            </div>
-                        </div>
-                    `;
-
-                    modalCommentsList.prepend(item);
-                    modalCommentsList.scrollTop = 0;
-
-                    if (botonComentarioActivo) {
-                        const spanCounter = botonComentarioActivo.querySelector(".comment-count");
-                        if (spanCounter) {
-                            spanCounter.textContent = data.total_comentarios > 0 ? data.total_comentarios : "";
-                        }
-                    }
-                } else {
-                    alert(data.message || "Ocurrió un error al enviar el comentario.");
+                    location.reload(); 
                 }
             } catch (error) {
-                console.error("Error crítico al enviar el comentario:", error);
+                console.error("Error al enviar comentario:", error);
             }
         }
 
@@ -632,51 +506,4 @@
         }
     });
 </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Buscamos el formulario de la caja de publicación (usualmente es el primero o único con método POST)
-    const formPublicar = document.querySelector('form[action*="comunidad/crear"]');
-    
-    if (formPublicar) {
-        // 1. Aseguramos el atributo multimedia directamente en el HTML mediante JS
-        formPublicar.setAttribute('enctype', 'multipart/form-data');
-
-        // 2. Interceptamos el evento de envío antes de que lo procese cualquier otro script viejo
-        formPublicar.addEventListener('submit', async function (e) {
-            // Si el envío ya fue manejado por FormData, no hacemos nada extra
-            if (formPublicar.dataset.interceptado === 'true') return;
-            
-            e.preventDefault();
-            e.stopImmediatePropagation(); // Detiene cualquier otra función JS vieja que intente romper el envío de la foto
-
-            const datosMultimedia = new FormData(formPublicar);
-
-            try {
-                const response = await fetch(formPublicar.action || "/comunidad/crear/", {
-                    method: "POST",
-                    body: datosMultimedia, // Enviamos textos + archivos adjuntos
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-
-                if (!response.ok) throw new Error('Error en el servidor');
-
-                const data = await response.json();
-
-                if (data.status === 'success') {
-                    // Marcamos como interceptado con éxito y recargamos
-                    formPublicar.dataset.interceptado = 'true';
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Hubo un error al publicar');
-                }
-            } catch (error) {
-                console.error('Error al enviar la imagen a Cloudinary:', error);
-            }
-        });
-    }
-});
-</script>
+</html>
