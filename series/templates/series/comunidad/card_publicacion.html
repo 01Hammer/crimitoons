@@ -37,10 +37,11 @@
                     <button type="button" class="btn-video-volumen" data-video-id="video-{{ card.id }}" title="Activar sonido">
                         <i class="fa-solid fa-volume-xmark"></i>
                     </button>
-                    <a href="{{ card.imagen }}" download="crimitoons-video-{{ card.id }}" class="btn-video-descargar" title="Descargar video">
+                    <!-- Cambiamos el link normal por un botón con atributo de descarga -->
+                    <button type="button" class="btn-video-descargar btn-descargar-directo" data-url="{{ card.imagen }}" title="Descargar video">
                         <i class="fa-solid fa-arrow-down"></i>
                         <div class="linea-base-descarga"></div>
-                    </a>
+                    </button>
                 </div>
 
                 <div class="controles-inferiores-video">
@@ -126,4 +127,30 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+  // 5. Descarga directa del video
+        const btnDescargar = zona.querySelector(".btn-descargar-directo");
+        if (btnDescargar) {
+            btnDescargar.addEventListener("click", async function (e) {
+                e.stopPropagation(); // Evita pausar el video
+                const urlVideo = this.getAttribute("data-url");
+                try {
+                    const response = await fetch(urlVideo);
+                    const blob = await response.blob();
+                    const blobUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = blobUrl;
+                    a.download = `crimitoons-video-{{ card.id }}.mp4`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(blobUrl);
+                    a.remove();
+                } catch (err) {
+                    console.error("Error al descargar el video:", err);
+                    // Fallback por si falla el fetch: abre la URL directamente
+                    window.open(urlVideo, '_blank');
+                }
+            });
+        }
 </script>
