@@ -65,3 +65,65 @@
   </article>
 </div>
 {% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Buscamos todas las zonas de reproducción de la página
+    const zonasVideo = document.querySelectorAll(".zona-click-reproductor");
+
+    zonasVideo.forEach(zona => {
+        const videoId = zona.getAttribute("data-video-id");
+        const video = document.getElementById(videoId);
+        if (!video) return;
+
+        const indicadorCentro = zona.querySelector(".indicador-video-centro i");
+        const contenedorIndicador = zona.querySelector(".indicador-video-centro");
+        const btnVolumen = zona.querySelector(".btn-video-volumen i");
+        const lineaProgreso = zona.querySelector(".progreso-tiempo-linea");
+
+        // 1. Reproducir / Pausar al hacer clic en la zona del video
+        zona.addEventListener("click", function (e) {
+            if (e.target.closest(".controles-superiores-video")) return;
+
+            if (video.paused) {
+                video.play();
+                if (indicadorCentro) indicadorCentro.className = "fa-solid fa-pause";
+                if (contenedorIndicador) contenedorIndicador.classList.add("en-reproduccion");
+            } else {
+                video.pause();
+                if (indicadorCentro) indicadorCentro.className = "fa-solid fa-play";
+                if (contenedorIndicador) contenedorIndicador.classList.remove("en-reproduccion");
+            }
+        });
+
+        // 2. Actualizar barra de tiempo en tiempo real
+        video.addEventListener("timeupdate", function () {
+            if (video.duration && lineaProgreso) {
+                const porcentaje = (video.currentTime / video.duration) * 100;
+                lineaProgreso.style.width = porcentaje + "%";
+            }
+        });
+
+        // 3. Control de Volumen (Silenciar / Activar sonido)
+        const btnVolumenContainer = zona.querySelector(".btn-video-volumen");
+        if (btnVolumenContainer) {
+            btnVolumenContainer.addEventListener("click", function (e) {
+                e.stopPropagation(); // Evita que se pause al hacer clic en el volumen
+                video.muted = !video.muted;
+                if (video.muted) {
+                    btnVolumen.className = "fa-solid fa-volume-xmark";
+                } else {
+                    btnVolumen.className = "fa-solid fa-volume-high";
+                }
+            });
+        }
+
+        // 4. Reiniciar estado visual cuando el video termina
+        video.addEventListener("ended", function () {
+            if (indicadorCentro) indicadorCentro.className = "fa-solid fa-play";
+            if (contenedorIndicador) contenedorIndicador.classList.remove("en-reproduccion");
+            if (lineaProgreso) lineaProgreso.style.width = "0%";
+        });
+    });
+});
+</script>
