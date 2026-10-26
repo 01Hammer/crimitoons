@@ -934,23 +934,23 @@ def cerrar_sesion(request):
 def editar_perfil(request):
     perfil = request.user.perfil
     if request.method == "POST":
-        form = ActualizarPerfilForm(request.POST, request.FILES, instance=perfil)
+        form = ActualizarPerfilForm(request.POST, instance=perfil)
         if form.is_valid():
-            # Guardamos primero los campos de texto del formulario (como la bio)
-            perfil_obj = form.save(commit=False)
+            form.save()  # Guarda la biografía limpia
             
-            # --- MANEJADOR MANUAL DE SUPABASE (Le ganamos al formulario) ---
+            # Subimos y asignamos la foto de perfil directamente al objeto perfil
             if 'foto_perfil' in request.FILES:
                 url_foto = subir_a_supabase(request.FILES['foto_perfil'], folder="perfiles")
                 if url_foto:
-                    perfil_obj.foto_perfil = url_foto  # Asignamos la URL en texto plano
+                    perfil.foto_perfil = url_foto
                     
+            # Subimos y asignamos el banner directamente al objeto perfil
             if 'banner' in request.FILES:
                 url_banner = subir_a_supabase(request.FILES['banner'], folder="banners")
                 if url_banner:
-                    perfil_obj.banner = url_banner  # Asignamos la URL en texto plano
+                    perfil.banner = url_banner
                     
-            perfil_obj.save()
+            perfil.save()  # Guardado final con las URLs de Supabase intactas
             return redirect("ver_perfil", username=request.user.username)
     else:
         form = ActualizarPerfilForm(instance=perfil)
