@@ -210,12 +210,13 @@
                   const csrfInput = formCaja.querySelector('[name=csrfmiddlewaretoken]');
                   const csrfToken = csrfInput ? csrfInput.value : '';
 
+                  // Ya no necesitamos buscar el token manualmente para los headers, FormData lo lleva solo
                   fetch(formCaja.action, {
                       method: "POST",
                       body: formData,
                       headers: { 
-                          "X-Requested-With": "XMLHttpRequest",
-                          "X-CSRFToken": csrfToken
+                          "X-Requested-With": "XMLHttpRequest"
+                          // Quitamos X-CSRFToken de aquí porque FormData ya lo envía en el body
                       },
                   })
                   .then(async (response) => {
