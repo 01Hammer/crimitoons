@@ -111,7 +111,6 @@
 </form>
 
 <script>
-  // Usamos un identificador global único para evitar que el script se enganche dos veces
   if (window.cajaPublicarInicializada) {
       console.warn("Script de publicación ya inicializado previamente.");
   } else {
@@ -132,14 +131,14 @@
               const btnSerie = Array.from(botonesAccion).find(b => b.getAttribute("data-modo") === "serie");
               if (btnSerie) btnSerie.classList.add("activo");
 
-              inputTipoTarjeta.value = "publicacion";
-              if(btnCerrarModo) btnCerrarModo.style.display = "none";
+              if (inputTipoTarjeta) inputTipoTarjeta.value = "publicacion";
+              if (btnCerrarModo) btnCerrarModo.style.display = "none";
 
-              if(varianteForo) varianteForo.classList.remove("abierto");
-              if(varianteEncuesta) varianteEncuesta.classList.remove("abierto");
+              if (varianteForo) varianteForo.classList.remove("abierto");
+              if (varianteEncuesta) varianteEncuesta.classList.remove("abierto");
 
               setTimeout(() => {
-                  if(bloqueNormal) {
+                  if (bloqueNormal) {
                       bloqueNormal.style.opacity = "1";
                       bloqueNormal.style.visibility = "visible";
                       bloqueNormal.style.display = "flex";
@@ -159,7 +158,7 @@
                       if (modo === "serie" || modo === "historia") {
                           volverAModoNormal();
                           if (modo === "historia") {
-                              inputTipoTarjeta.value = "publicacion";
+                              if (inputTipoTarjeta) inputTipoTarjeta.value = "publicacion";
                               botonesAccion.forEach(b => b.classList.remove("activo"));
                               this.classList.add("activo");
                           }
@@ -168,37 +167,37 @@
 
                       botonesAccion.forEach(b => b.classList.remove("activo"));
                       this.classList.add("activo");
-                      inputTipoTarjeta.value = modo;
+                      if (inputTipoTarjeta) inputTipoTarjeta.value = modo;
 
-                      if(bloqueNormal) {
+                      if (bloqueNormal) {
                           bloqueNormal.style.opacity = "0";
                           bloqueNormal.style.visibility = "hidden";
                       }
                       
                       setTimeout(() => {
-                          if(bloqueNormal) bloqueNormal.style.display = "none";
-                          if(btnCerrarModo) btnCerrarModo.style.display = "block";
+                          if (bloqueNormal) bloqueNormal.style.display = "none";
+                          if (btnCerrarModo) btnCerrarModo.style.display = "block";
                           
                           if (modo === "foro") {
-                              if(varianteEncuesta) varianteEncuesta.classList.remove("abierto");
-                              if(varianteForo) varianteForo.classList.add("abierto");
+                              if (varianteEncuesta) varianteEncuesta.classList.remove("abierto");
+                              if (varianteForo) varianteForo.classList.add("abierto");
                           } else if (modo === "encuesta") {
-                              if(varianteForo) varianteForo.classList.remove("abierto");
-                              if(varianteEncuesta) varianteEncuesta.classList.add("abierto");
+                              if (varianteForo) varianteForo.classList.remove("abierto");
+                              if (varianteEncuesta) varianteEncuesta.classList.add("abierto");
                           }
                       }, 200);
                   });
               }
           });
 
-          // Envío protegido contra múltiples clics (Previene clonación)
+          // Envío protegido y blindado
           if (formCaja) {
               let estaEnviando = false;
 
               formCaja.addEventListener("submit", function (event) {
                   event.preventDefault(); 
 
-                  if (estaEnviando) return; // Si ya se está enviando, ignoramos clics extra
+                  if (estaEnviando) return;
                   estaEnviando = true;
 
                   const submitBtn = formCaja.querySelector(".publicar-submit");
@@ -208,7 +207,8 @@
                   }
 
                   const formData = new FormData(formCaja);
-                  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                  const csrfInput = formCaja.querySelector('[name=csrfmiddlewaretoken]');
+                  const csrfToken = csrfInput ? csrfInput.value : '';
 
                   fetch(formCaja.action, {
                       method: "POST",
@@ -218,13 +218,15 @@
                           "X-CSRFToken": csrfToken
                       },
                   })
-                  .then((response) => {
+                  .then(async (response) => {
                       if (response.ok) {
                           formCaja.reset();
                           volverAModoNormal();
                           window.location.reload(); 
                       } else {
-                          alert("Hubo un error al procesar la publicación.");
+                          const errorData = await response.text();
+                          console.error("Error del servidor:", errorData);
+                          alert("Hubo un error al procesar la publicación. Revisa la consola.");
                           estaEnviando = false;
                           if (submitBtn) {
                               submitBtn.disabled = false;
@@ -233,7 +235,7 @@
                       }
                   })
                   .catch((error) => {
-                      console.error("Error:", error);
+                      console.error("Error de red:", error);
                       estaEnviando = false;
                       if (submitBtn) {
                           submitBtn.disabled = false;
