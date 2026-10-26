@@ -5,9 +5,7 @@ from django.dispatch import receiver
 
 class Perfil(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
-    # Usamos max_length=500 pero especificamos db_column o dejamos que Django lo maneje, 
-    # o usamos TextField que no tiene límite de caracteres en Postgres:
-    foto_perfil = models.TextField(null=True, blank=True)
+    foto_perfil = models.TextField(null=True, blank=True) # O CharField con max_length grande
     banner = models.TextField(null=True, blank=True)
     bio = models.TextField(blank=True, null=True, max_length=500)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -15,6 +13,35 @@ class Perfil(models.Model):
 
     def __str__(self):
         return f"Perfil de {self.usuario.username}"
+
+    @property
+    def avatar_url(self):
+        """
+        Retorna la URL de la foto de perfil sin importar si es un enlace completo de Supabase 
+        o un archivo tradicional, evitando que falle en las plantillas.
+        """
+        if self.foto_perfil:
+            # Si ya es una URL completa (como la de Supabase), la devolvemos tal cual
+            if str(self.foto_perfil).startswith("http"):
+                return self.foto_perfil
+            # Por si quedó algún archivo viejo almacenado de forma local
+            try:
+                return self.foto_perfil.url
+            except Exception:
+                return str(self.foto_perfil)
+        return None  # O puedes poner aquí el enlace de una imagen por defecto genérica
+
+    @property
+    def banner_url(self):
+        """Retorna la URL del banner de forma segura."""
+        if self.banner:
+            if str(self.banner).startswith("http"):
+                return self.banner
+            try:
+                return self.banner.url
+            except Exception:
+                return str(self.banner)
+        return None
 
 # Señal para crear automáticamente un Perfil cuando se crea un Usuario
 @receiver(post_save, sender=User)
