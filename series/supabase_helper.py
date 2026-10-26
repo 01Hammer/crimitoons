@@ -1,4 +1,5 @@
 import os
+import uuid
 import requests
 
 def subir_a_supabase(archivo, folder="general"):
@@ -11,13 +12,17 @@ def subir_a_supabase(archivo, folder="general"):
 
     supabase_url = os.environ.get("SUPABASE_URL")
     supabase_key = os.environ.get("SUPABASE_KEY")
-    bucket_name = "media"  # El nombre del bucket público que creaste en Supabase
+    bucket_name = "media"  # El nombre del bucket público en Supabase
 
     if not supabase_url or not supabase_key:
-        raise ValueError("Las credenciales de Supabase (SUPABASE_URL o SUPABASE_KEY) no están configuradas en las variables de entorno.")
+        raise ValueError("Las credenciales de Supabase no están configuradas en las variables de entorno.")
 
-    # Generamos una ruta única para evitar que se sobrescriban archivos con el mismo nombre
-    nombre_archivo = f"{folder}/{archivo.name}"
+    # Extraemos la extensión original del archivo (ej: .jpg, .png)
+    ext = os.path.splitext(archivo.name)[1]
+    
+    # Generamos un nombre único usando UUID para evitar conflictos de duplicados (409)
+    nombre_unico = f"{uuid.uuid4().hex}{ext}"
+    nombre_archivo = f"{folder}/{nombre_unico}"
     
     # Endpoint de Supabase Storage para subir objetos
     url = f"{supabase_url}/storage/v1/object/{bucket_name}/{nombre_archivo}"
