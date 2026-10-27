@@ -483,7 +483,37 @@
 
                 if (data.status === "success") {
                     modalInput.value = "";
-                    location.reload(); 
+                    
+                    // Si el contenedor decía "No hay comentarios", lo limpiamos primero
+                    const emptyMsg = modalCommentsList.querySelector(".modal-comments-empty");
+                    if (emptyMsg) emptyMsg.remove();
+
+                    // Creamos el elemento del nuevo comentario y lo inyectamos al inicio
+                    const c = data.comentario;
+                    const item = document.createElement("div");
+                    item.classList.add("modal-comment-item");
+
+                    const fotoAvatar = c.usuario_foto ? c.usuario_foto : "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+                    item.innerHTML = `
+                        <div class="modal-comment-main-row">
+                            <div class="modal-comment-avatar-wrapper">
+                                <img src="${fotoAvatar}" alt="Avatar" class="modal-comment-user-avatar">
+                            </div>
+
+                            <div class="modal-comment-body">
+                                <div class="modal-comment-top-line">
+                                    <div class="modal-comment-user-info">
+                                        <span class="modal-comment-username">${c.usuario}</span>
+                                        <span class="modal-comment-divider">•</span>
+                                        <span class="modal-comment-date">${c.fecha}</span>
+                                    </div>
+                                </div>
+                                <div class="modal-comment-text">${c.texto}</div>
+                            </div>
+                        </div>
+                    `;
+                    modalCommentsList.prepend(item);
                 }
             } catch (error) {
                 console.error("Error al enviar comentario:", error);
