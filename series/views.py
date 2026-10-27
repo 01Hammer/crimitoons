@@ -1151,7 +1151,7 @@ def obtener_comentarios(request, actividad_id):
                     and hasattr(c.usuario.perfil, "foto_perfil")
                     and c.usuario.perfil.foto_perfil
                 ):
-                    usuario_foto = c.usuario.perfil.foto_perfil.url
+                    usuario_foto = c.usuario.perfil.foto_perfil
 
                 tiempo_transcurrido = timesince(c.created_at, timezone.now())
                 tiempo_limpio = tiempo_transcurrido.split(",")[0]
@@ -1196,7 +1196,7 @@ def agregar_comentario(request, actividad_id):
                 and hasattr(nuevo_comentario.usuario.perfil, "foto_perfil")
                 and nuevo_comentario.usuario.perfil.foto_perfil
             ):
-                usuario_foto = nuevo_comentario.usuario.perfil.foto_perfil.url
+                usuario_foto = nuevo_comentario.usuario.perfil.foto_perfil
 
             return JsonResponse(
                 {
