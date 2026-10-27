@@ -7,7 +7,7 @@
   padding: 0 16px;         
   box-sizing: border-box;
   display: flex;
-  justify-content: center; /* Centra la barra en pantallas muy grandes de PC */
+  justify-content: center;
 }
 
 .barra-navegacion {
@@ -15,7 +15,7 @@
   justify-content: space-between; 
   align-items: center;
   width: 100%;
-  max-width: 1350px;       /* DIMENSIÓN FIJA EN SU ENTORNO: Evita que se estire demasiado en monitores gigantes */
+  max-width: 1350px;       
   margin: 0;
   padding: 8px 24px;       
   min-height: 76px;
@@ -299,9 +299,10 @@ a.profile-dropdown.nav-acceso-sesion:hover {
   }
 }
 
-/* --- Vistas con banner (.page-with-banner) --- */
+/* --- Vistas con banner / trigger (.page-with-banner y .page-with-scroll-trigger) --- */
 
-body.page-with-banner .nav-barra-wrapper {
+body.page-with-banner .nav-barra-wrapper,
+body.page-with-scroll-trigger .nav-barra-wrapper {
   position: fixed;
   top: 0;
   left: 0;
@@ -312,19 +313,21 @@ body.page-with-banner .nav-barra-wrapper {
   z-index: 100000;
   transform: translateY(-100%);
   transition: transform 0.35s ease;
-  justify-content: center; /* Asegura que al flotar también mantenga el comportamiento centrado */
+  justify-content: center;
 }
 
-body.page-with-banner .nav-barra-wrapper.nav-active {
+body.page-with-banner .nav-barra-wrapper.nav-active,
+body.page-with-scroll-trigger .nav-barra-wrapper.nav-active {
   transform: translateY(0);
 }
 
-body.page-with-banner .barra-navegacion {
+body.page-with-banner .barra-navegacion,
+body.page-with-scroll-trigger .barra-navegacion {
   width: 100%;
-  max-width: 1350px; /* Mantiene la misma dimensión máxima para guardar proporción en el banner */
+  max-width: 1350px;
   margin: 0 auto;
   padding: 10px 36px;
-  border-radius: 0 0 24px 24px; /* Bordes redondeados sutiles abajo cuando despliega en detalle/perfil */
+  border-radius: 0; /* Sin bordes redondos inferiores para mantenerlo totalmente cuadrado */
   background: #f7f3e3;
 }
 
