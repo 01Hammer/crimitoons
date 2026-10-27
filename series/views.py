@@ -937,11 +937,14 @@ def editar_perfil(request):
         print("--- 1. ENTRÓ AL POST DE EDITAR PERFIL ---")
         print("FILES recibidos:", request.FILES)
         
-        form = ActualizarPerfilForm(request.POST, instance=perfil)
+        # ⚠️ AQUÍ FALTABA request.FILES
+        form = ActualizarPerfilForm(request.POST, request.FILES, instance=perfil)
+        
         if form.is_valid():
-            print("--- 2. EL FORMULARIO DE BIO ES VÁLIDO ---")
+            print("--- 2. EL FORMULARIO DE BIO IS VÁLIDO ---")
             perfil_obj = form.save(commit=False)
             
+            # Procesar foto de perfil si viene en los archivos
             if 'foto_perfil' in request.FILES:
                 print("--- 3. HAY FOTO DE PERFIL EN FILES, SUBIENDO A SUPABASE... ---")
                 url_foto = subir_a_supabase(request.FILES['foto_perfil'], folder="perfiles")
@@ -951,9 +954,20 @@ def editar_perfil(request):
                     print("--- 5. URL ASIGNADA A PERFIL_OBJ.FOTO_PERFIL ---")
             else:
                 print("--- 3B. NO HAY FOTO DE PERFIL EN FILES ---")
+
+            # 🛠️ AÑADIR LO MISMO PARA EL BANNER QUE FALTABA
+            if 'banner' in request.FILES:
+                print("--- 3C. HAY BANNER EN FILES, SUBIENDO A SUPABASE... ---")
+                url_banner = subir_a_supabase(request.FILES['banner'], folder="banners")
+                print("--- 4C. URL DE BANNER DEVUELTA POR SUPABASE ---", url_banner)
+                if url_banner:
+                    perfil_obj.banner = url_banner
+                    print("--- 5C. URL ASIGNADA A PERFIL_OBJ.BANNER ---")
+            else:
+                print("--- 3D. NO HAY BANNER EN FILES ---")
                     
             perfil_obj.save()
-            print("--- 6. PERFIL GUARDADO EN DB EXITOSAMENTE ---", perfil_obj.foto_perfil)
+            print("--- 6. PERFIL GUARDADO EN DB EXITOSAMENTE ---")
             return redirect("ver_perfil", username=request.user.username)
         else:
             print("--- ERROR: EL FORMULARIO NO ES VÁLIDO ---", form.errors)
