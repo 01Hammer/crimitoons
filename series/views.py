@@ -1570,6 +1570,44 @@ def obtener_comentarios_post(request, post_id):
             )
 
 
+def obtener_comentarios_post(request, post_id):
+    if request.method == "GET":
+        try:
+            post = ComunidadPost.objects.get(id=post_id)
+            # Nota: Si tu related_name en el modelo de comentarios de post tiene otro nombre, ajústalo aquí (ej: comentarios.all())
+            comentarios = post.comentarios.all().select_related("usuario").order_by("-created_at")
+
+            lista_comentarios = []
+            for c in comentarios:
+                usuario_foto = None
+                if (
+                    hasattr(c.usuario, "perfil")
+                    and hasattr(c.usuario.perfil, "foto_perfil")
+                    and c.usuario.perfil.foto_perfil
+                ):
+                    usuario_foto = c.usuario.perfil.foto_perfil
+
+                tiempo_transcurrido = timesince(c.created_at, timezone.now())
+                tiempo_limpio = tiempo_transcurrido.split(",")[0]
+                fecha_relativa = f"hace {tiempo_limpio}"
+
+                lista_comentarios.append(
+                    {
+                        "id": c.id,
+                        "usuario": c.usuario.username,
+                        "usuario_foto": usuario_foto,
+                        "texto": c.texto,
+                        "fecha": fecha_relativa,
+                    }
+                )
+
+            return JsonResponse({"status": "success", "comentarios": lista_comentarios})
+        except ComunidadPost.DoesNotExist:
+            return JsonResponse(
+                {"status": "error", "message": "Post no encontrado"}, status=404
+            )
+
+
 @login_required
 def agregar_comentario_post(request, post_id):
     if request.method == "POST":
@@ -1582,7 +1620,7 @@ def agregar_comentario_post(request, post_id):
 
         try:
             post = ComunidadPost.objects.get(id=post_id)
-            # Reemplaza 'ComentarioPost' por el modelo real que uses para los comentarios de los posts
+            # Reemplaza 'ComentarioPost' por el nombre real del modelo de comentarios para publicaciones si es diferente
             nuevo_comentario = ComentarioPost.objects.create(
                 post=post, usuario=request.user, texto=texto
             )
