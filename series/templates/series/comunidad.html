@@ -265,7 +265,7 @@
         });
 
         // ==========================================
-        // 3. MODAL DE COMENTARIOS PARA ACTIVIDAD
+        // 3. MODAL DE COMENTARIOS PARA ACTIVIDAD Y PUBLICACIONES
         // ==========================================
         const modalOverlay = document.getElementById('comments-modal');
         let actividadActivaId = null;
@@ -278,8 +278,9 @@
                 event.preventDefault();
                 if (!modalOverlay) return;
 
-                const tarjetaPadre = btnComentario.closest(".historial-card");
-                if (!tarjetaPadre) return;
+                // Detectar si es una tarjeta de historial o una publicación manual
+                const tarjetaHistorial = btnComentario.closest(".historial-card");
+                const tarjetaPublicacion = btnComentario.closest(".feed-card.tipo-publicacion");
 
                 const contenedorAcciones = btnComentario.closest(".historial-acciones-interaccion");
                 const btnVotoAsociado = contenedorAcciones?.querySelector("[data-id]");
@@ -289,19 +290,33 @@
                 actividadActivaId = actividadId; 
                 botonComentarioActivo = btnComentario;
 
-                const posterSrc = tarjetaPadre.querySelector('.historial-poster-img')?.getAttribute('src') || '';
-                const tituloSerie = tarjetaPadre.querySelector('.historial-serie-titulo')?.textContent || '';
-                const comentarioUsuario = tarjetaPadre.querySelector('.historial-comentario')?.textContent || '';
-                
-                const scoreElement = tarjetaPadre.querySelector(".historial-nota-inline");
-                const scoreText = scoreElement ? scoreElement.textContent.trim() : '';
+                let posterSrc = '';
+                let tituloSerie = '';
+                let comentarioUsuario = '';
+                let scoreText = '';
+                let estadoText = '';
+                let estadoClase = '';
 
-                const estadoElement = tarjetaPadre.querySelector(".status-badge");
-                const estadoText = estadoElement ? estadoElement.textContent.trim() : '';
-                const estadoClase = estadoText.toLowerCase().replace(/\s+/g, '-');
+                if (tarjetaHistorial) {
+                    posterSrc = tarjetaHistorial.querySelector('.historial-poster-img')?.getAttribute('src') || '';
+                    tituloSerie = tarjetaHistorial.querySelector('.historial-serie-titulo')?.textContent || '';
+                    comentarioUsuario = tarjetaHistorial.querySelector('.historial-comentario')?.textContent || '';
+                    
+                    const scoreElement = tarjetaHistorial.querySelector(".historial-nota-inline");
+                    scoreText = scoreElement ? scoreElement.textContent.trim() : '';
 
-                const btnLikeFuera = tarjetaPadre.querySelector('[data-tipo="like"]');
-                const btnDislikeFuera = tarjetaPadre.querySelector('[data-tipo="dislike"]');
+                    const estadoElement = tarjetaHistorial.querySelector(".status-badge");
+                    estadoText = estadoElement ? estadoElement.textContent.trim() : '';
+                    estadoClase = estadoText.toLowerCase().replace(/\s+/g, '-');
+                } else if (tarjetaPublicacion) {
+                    // Si es una publicación manual (post libre)
+                    posterSrc = tarjetaPublicacion.querySelector('.post-multimedia-elemento')?.getAttribute('src') || '';
+                    tituloSerie = tarjetaPublicacion.querySelector('.feed-usuario strong')?.textContent || 'Publicación';
+                    comentarioUsuario = tarjetaPublicacion.querySelector('.feed-texto')?.textContent || '';
+                }
+
+                const btnLikeFuera = btnVotoAsociado.closest('.historial-acciones-interaccion').querySelector('[data-tipo="like"]');
+                const btnDislikeFuera = btnVotoAsociado.closest('.historial-acciones-interaccion').querySelector('[data-tipo="dislike"]');
 
                 const likesCount = parseInt(btnLikeFuera?.querySelector(".interact-counter")?.textContent) || 0;
                 const dislikesCount = parseInt(btnDislikeFuera?.querySelector(".interact-counter")?.textContent) || 0;
@@ -322,7 +337,7 @@
                                 <div class="mini-card-right-column">
                                     <div class="mini-card-header-row">
                                         ${scoreText ? `<span class="modal-mini-score">${scoreText}</span>` : ""}
-                                        ${scoreText ? `<span class="modal-mini-status status-${estadoClase}">${estadoText}</span>` : ""}
+                                        ${estadoText ? `<span class="modal-mini-status status-${estadoClase}">${estadoText}</span>` : ""}
                                     </div>
                                     <div class="mini-card-actions-row">
                                         <button class="modal-mini-vote-btn btn-modal-like ${likeActivo}" aria-label="Like">
@@ -365,7 +380,6 @@
                 }
             }
         });
-
         // ==========================================
         // 4. CIERRE DEL MODAL
         // ==========================================
