@@ -35,6 +35,7 @@ urlpatterns = [
 
     path('encuestas/', views.feed_encuestas, name='feed_encuestas'),
 
+    # comentarios para publicaciones manuales de la comunidad
     path('post/<int:post_id>/comentarios/', views.obtener_comentarios_post, name='obtener_comentarios_post'),
     path('post/<int:post_id>/comentar/', views.agregar_comentario_post, name='agregar_comentario_post'),
 ]
