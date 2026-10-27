@@ -301,18 +301,25 @@ a.profile-dropdown.nav-acceso-sesion:hover {
 
 /* --- Vistas con banner / trigger (.page-with-banner y .page-with-scroll-trigger) --- */
 
+body.page-with-banner,
+body.page-with-scroll-trigger {
+  overflow-x: hidden;
+}
+
 body.page-with-banner .nav-barra-wrapper,
 body.page-with-scroll-trigger .nav-barra-wrapper {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  max-width: none;
+  max-width: 100vw;
   margin: 0;
-  padding: 0;
+  padding: 0 16px; /* Mantiene la misma caja de contención exacta de las vistas fijas */
+  box-sizing: border-box;
   z-index: 100000;
   transform: translateY(-100%);
   transition: transform 0.35s ease;
+  display: flex;
   justify-content: center;
 }
 
@@ -326,9 +333,10 @@ body.page-with-scroll-trigger .barra-navegacion {
   width: 100%;
   max-width: 1350px;
   margin: 0 auto;
-  padding: 10px 36px;
-  border-radius: 0; /* Sin bordes redondos inferiores para mantenerlo totalmente cuadrado */
+  padding: 8px 24px; /* Padding idéntico para que no haya microdesplazamiento de botones */
+  border-radius: 0 !important; /* Cuadrado perfecto abajo en todas las vistas con trigger */
   background: #f7f3e3;
+  box-sizing: border-box;
 }
 
 body.page-with-banner .profile-thumb-exterior-anchor {
