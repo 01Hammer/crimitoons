@@ -132,6 +132,24 @@
     gap: 14px;
 }
 
+.btn-video-fullscreen {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #ffffff;
+    opacity: 0.50;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.btn-video-fullscreen:hover { 
+    opacity: 1; 
+}
+
 .btn-video-descargar {
     color: #ffffff;
     text-decoration: none;
