@@ -1,4 +1,3 @@
-{% if card.tipo_tarjeta == 'natural' %}
 <div class="feed-item-bloque">
   <article class="feed-card tipo-publicacion" data-tipo="publicaciones">
     <div class="feed-header-interno">
@@ -23,7 +22,6 @@
 
       {% if card.imagen %}
         <div class="multimedia-contenedor-fijo">
-          {# CAMBIO CLAVE: Quitamos .url porque card.imagen ya es un texto/URL de Supabase #}
           {% if card.imagen|lower|slice:"-4:" == ".mp4" or card.imagen|lower|slice:"-5:" == ".webm" %}
             
             <div class="zona-click-reproductor" data-video-id="video-{{ card.id }}">
@@ -34,7 +32,6 @@
                 </div>
 
                 <div class="controles-superiores-video">
-                    <!-- Botón de Pantalla Completa minimalista y grisáceo -->
                     <button type="button" class="btn-video-fullscreen" data-video-id="video-{{ card.id }}" title="Pantalla completa">
                         <i class="fa-solid fa-expand"></i>
                     </button>
@@ -64,9 +61,9 @@
       {% endif %}
     </div>
 
+    <!-- Footer Interactivo unificado con el modal y acciones -->
     <div class="feed-footer">
       <div class="historial-acciones-interaccion">
-          <!-- Botón de Like -->
           <button class="btn-interact-like {% if card.voto_usuario == 'like' %}activo-like{% endif %}" data-id="{{ card.id }}" data-tipo="like" title="Like">
               <div class="icon-container">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -76,7 +73,6 @@
               <span class="interact-counter counter-like">{% if card.total_likes > 0 %}{{ card.total_likes }}{% endif %}</span>
           </button>
 
-          <!-- Botón de Dislike -->
           <button class="btn-interact-dislike {% if card.voto_usuario == 'dislike' %}activo-dislike{% endif %}" data-id="{{ card.id }}" data-tipo="dislike" title="Desacuerdo">
               <div class="icon-container">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -86,7 +82,6 @@
               <span class="interact-counter counter-dislike">{% if card.total_dislikes > 0 %}{{ card.total_dislikes }}{% endif %}</span>
           </button>
 
-          <!-- Botón de Comentarios (Abre el Modal) -->
           <button class="btn-interact-comentario" title="Comentarios">
               <div class="icon-container">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -97,6 +92,9 @@
           </button>
       </div>
     </div>
+  </article>
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const zonasVideo = document.querySelectorAll(".zona-click-reproductor");
@@ -113,7 +111,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const lineaProgreso = zona.querySelector(".progreso-tiempo-linea");
         const contenedorBarra = zona.querySelector(".barra-tiempo-indicador");
 
-        // 1. Reproducir / Pausar al hacer clic en la zona del video
         zona.addEventListener("click", function (e) {
             if (e.target.closest(".controles-superiores-video")) return;
 
@@ -128,7 +125,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // 2. Actualizar barra de tiempo en tiempo real
         video.addEventListener("timeupdate", function () {
             if (video.duration && lineaProgreso) {
                 const porcentaje = (video.currentTime / video.duration) * 100;
@@ -136,10 +132,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // 3. Barra de avance interactiva (hacer clic para saltar a un segundo específico)
         if (contenedorBarra) {
             contenedorBarra.addEventListener("click", function (e) {
-                e.stopPropagation(); // Evita pausar el video al hacer clic en la barra
+                e.stopPropagation();
                 const rect = contenedorBarra.getBoundingClientRect();
                 const posClick = (e.clientX - rect.left) / rect.width;
                 if (video.duration) {
@@ -148,7 +143,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // 4. Control de Volumen independiente y seguro
         const btnVolumenContainer = zona.querySelector(".btn-video-volumen");
         if (btnVolumenContainer) {
             btnVolumenContainer.addEventListener("click", function (e) {
@@ -162,7 +156,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // 5. Pantalla Completa (Full Screen)
         const btnFullscreenContainer = zona.querySelector(".btn-video-fullscreen");
         if (btnFullscreenContainer) {
             btnFullscreenContainer.addEventListener("click", function (e) {
@@ -170,9 +163,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!document.fullscreenElement) {
                     if (video.requestFullscreen) {
                         video.requestFullscreen();
-                    } else if (video.webkitRequestFullscreen) { /* Safari */
+                    } else if (video.webkitRequestFullscreen) {
                         video.webkitRequestFullscreen();
-                    } else if (video.msRequestFullscreen) { /* IE11 */
+                    } else if (video.msRequestFullscreen) {
                         video.msRequestFullscreen();
                     }
                 } else {
@@ -183,7 +176,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // Cambiar icono de fullscreen si cambia el estado de pantalla completa
         document.addEventListener("fullscreenchange", function () {
             if (document.fullscreenElement === video) {
                 if (btnFullscreen) btnFullscreen.className = "fa-solid fa-compress";
@@ -192,14 +184,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // 6. Reiniciar estado visual cuando el video termina
         video.addEventListener("ended", function () {
             if (indicadorCentro) indicadorCentro.className = "fa-solid fa-play";
             if (contenedorIndicador) contenedorIndicador.classList.remove("en-reproduccion");
             if (lineaProgreso) lineaProgreso.style.width = "0%";
         });
 
-        // 7. Descarga directa por Blob
         const btnDescargar = zona.querySelector(".btn-descargar-directo");
         if (btnDescargar) {
             btnDescargar.addEventListener("click", async function (e) {
@@ -222,7 +212,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     window.URL.revokeObjectURL(blobUrl);
                     tempLink.remove();
                 } catch (err) {
-                    console.error("Error en descarga directa por CORS, usando enlace directo:", err);
                     const fallbackLink = document.createElement("a");
                     fallbackLink.href = urlVideo;
                     fallbackLink.download = `crimitoons-video-{{ card.id }}.mp4`;
