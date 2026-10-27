@@ -278,17 +278,21 @@
                 event.preventDefault();
                 if (!modalOverlay) return;
 
-                // Detectar si es una tarjeta de historial o una publicación manual
-                const tarjetaHistorial = btnComentario.closest(".historial-card");
-                const tarjetaPublicacion = btnComentario.closest(".feed-card.tipo-publicacion");
-
+                // 🛠️ Búsqueda robusta del ID de la tarjeta (sea actividad o post manual)
                 const contenedorAcciones = btnComentario.closest(".historial-acciones-interaccion");
-                const btnVotoAsociado = contenedorAcciones?.querySelector("[data-id]");
-                const actividadId = btnVotoAsociado?.getAttribute("data-id");
-                if (!actividadId) return;
+                const btnVotoAsociado = contenedorAcciones?.querySelector("[data-id]") || btnComentario.closest("[data-id]");
+                const actividadId = btnVotoAsociado?.getAttribute("data-id") || btnComentario.getAttribute("data-id");
+
+                if (!actividadId) {
+                    console.error("No se pudo encontrar el ID de la tarjeta.");
+                    return;
+                }
 
                 actividadActivaId = actividadId; 
                 botonComentarioActivo = btnComentario;
+
+                const tarjetaHistorial = btnComentario.closest(".historial-card");
+                const tarjetaPublicacion = btnComentario.closest(".feed-card.tipo-publicacion");
 
                 let posterSrc = '';
                 let tituloSerie = '';
@@ -309,14 +313,13 @@
                     estadoText = estadoElement ? estadoElement.textContent.trim() : '';
                     estadoClase = estadoText.toLowerCase().replace(/\s+/g, '-');
                 } else if (tarjetaPublicacion) {
-                    // Si es una publicación manual (post libre)
                     posterSrc = tarjetaPublicacion.querySelector('.post-multimedia-elemento')?.getAttribute('src') || '';
                     tituloSerie = tarjetaPublicacion.querySelector('.feed-usuario strong')?.textContent || 'Publicación';
                     comentarioUsuario = tarjetaPublicacion.querySelector('.feed-texto')?.textContent || '';
                 }
 
-                const btnLikeFuera = btnVotoAsociado.closest('.historial-acciones-interaccion').querySelector('[data-tipo="like"]');
-                const btnDislikeFuera = btnVotoAsociado.closest('.historial-acciones-interaccion').querySelector('[data-tipo="dislike"]');
+                const btnLikeFuera = contenedorAcciones?.querySelector('[data-tipo="like"]');
+                const btnDislikeFuera = contenedorAcciones?.querySelector('[data-tipo="dislike"]');
 
                 const likesCount = parseInt(btnLikeFuera?.querySelector(".interact-counter")?.textContent) || 0;
                 const dislikesCount = parseInt(btnDislikeFuera?.querySelector(".interact-counter")?.textContent) || 0;
@@ -380,7 +383,8 @@
                 }
             }
         });
-        // ==========================================
+      
+      // ==========================================
         // 4. CIERRE DEL MODAL
         // ==========================================
         document.addEventListener("click", (e) => {
