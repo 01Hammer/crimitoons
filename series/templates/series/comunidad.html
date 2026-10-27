@@ -210,23 +210,27 @@
         });
 
         // ==========================================
-        // 2. LIKES Y DISLIKES PARA ACTIVIDAD
+        // 2. LIKES Y DISLIKES UNIFICADOS (ACTIVIDAD Y POST)
         // ==========================================
-        document.querySelectorAll('.historial-acciones-interaccion [data-tipo]').forEach(boton => {
+        document.querySelectorAll('.historial-acciones-interaccion [data-tipo], .feed-footer [data-tipo]').forEach(boton => {
             boton.addEventListener('click', async (e) => {
                 e.preventDefault();
 
-                const actividadId = boton.getAttribute('data-id');
+                const itemId = boton.getAttribute('data-id');
                 const tipoVoto = boton.getAttribute('data-tipo');
+                
+                // Detectar si es un post manual o una actividad
+                const tarjetaPublicacion = boton.closest('.feed-card.tipo-publicacion');
+                const endpointURL = tarjetaPublicacion ? `/post/${itemId}/votar/` : `/actividad/${itemId}/votar/`;
 
                 const formData = new FormData();
                 formData.append('tipo', tipoVoto);
 
                 try {
-                    const response = await fetch(`/actividad/${actividadId}/votar/`, {
+                    const response = await fetch(endpointURL, {
                         method: 'POST',
                         headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
+                            'X-CSRFToken': getCookie('csrftoken') || '{{ csrf_token }}',
                             'X-Requested-With': 'XMLHttpRequest'
                         },
                         body: formData
@@ -237,7 +241,7 @@
                     const data = await response.json();
 
                     if (data.status === 'success') {
-                        const contenedorVotos = boton.closest('.historial-acciones-interaccion');
+                        const contenedorVotos = boton.closest('.historial-acciones-interaccion') || boton.closest('.feed-footer');
                         if (contenedorVotos) {
                             const btnLike = contenedorVotos.querySelector('[data-tipo="like"]');
                             const btnDislike = contenedorVotos.querySelector('[data-tipo="dislike"]');
@@ -278,8 +282,10 @@
                 event.preventDefault();
                 if (!modalOverlay) return;
 
-                // 🛠️ Búsqueda robusta del ID de la tarjeta (sea actividad o post manual)
-                const contenedorAcciones = btnComentario.closest(".historial-acciones-interaccion");
+                const tarjetaHistorial = btnComentario.closest(".historial-card");
+                const tarjetaPublicacion = btnComentario.closest(".feed-card.tipo-publicacion");
+
+                const contenedorAcciones = btnComentario.closest(".historial-acciones-interaccion") || btnComentario.closest(".feed-footer");
                 const btnVotoAsociado = contenedorAcciones?.querySelector("[data-id]") || btnComentario.closest("[data-id]");
                 const actividadId = btnVotoAsociado?.getAttribute("data-id") || btnComentario.getAttribute("data-id");
 
@@ -291,8 +297,9 @@
                 actividadActivaId = actividadId; 
                 botonComentarioActivo = btnComentario;
 
-                const tarjetaHistorial = btnComentario.closest(".historial-card");
-                const tarjetaPublicacion = btnComentario.closest(".feed-card.tipo-publicacion");
+                // 🔑 Identificar si es post manual o actividad automática
+                const esPostManual = tarjetaPublicacion ? true : false;
+                modalOverlay.setAttribute("data-tipo-modelo", esPostManual ? "post" : "actividad");
 
                 let posterSrc = '';
                 let tituloSerie = '';
@@ -369,8 +376,11 @@
                 modalOverlay.classList.add("show");
                 modalOverlay.classList.add("active");
 
+                // 🌐 Ruta dinámica para cargar comentarios
+                const endpointURL = esPostManual ? `/post/${actividadId}/comentarios/` : `/actividad/${actividadId}/comentarios/`;
+
                 try {
-                    const response = await fetch(`/actividad/${actividadId}/comentarios/`);
+                    const response = await fetch(endpointURL);
                     const data = await response.json();
                     if (data.status === "success") {
                         renderizarComentarios(data.comentarios);
@@ -384,7 +394,7 @@
             }
         });
       
-      // ==========================================
+        // ==========================================
         // 4. CIERRE DEL MODAL
         // ==========================================
         document.addEventListener("click", (e) => {
@@ -472,7 +482,7 @@
         }
 
         // ==========================================
-        // 8. ENVIAR COMENTARIO NUEVO
+        // 8. ENVIAR COMENTARIO NUEVO (DINÁMICO)
         // ==========================================
         async function enviarComentario() {
             if (!modalOverlay) return;
@@ -484,15 +494,18 @@
 
             const texto = modalInput.value.trim();
             if (!texto) return;
-
             if (!actividadActivaId) return;
+
+            // Determinar endpoint según el modelo activo
+            const tipoModelo = modalOverlay.getAttribute("data-tipo-modelo") || "actividad";
+            const endpointURL = tipoModelo === "post" ? `/post/${actividadActivaId}/comentar/` : `/actividad/${actividadActivaId}/comentar/`;
 
             const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]")?.value || getCookie("csrftoken");
             const formData = new FormData();
             formData.append("texto", texto);
 
             try {
-                const response = await fetch(`/actividad/${actividadActivaId}/comentar/`, {
+                const response = await fetch(endpointURL, {
                     method: "POST",
                     headers: { "X-CSRFToken": csrftoken },
                     body: formData,
@@ -502,11 +515,9 @@
                 if (data.status === "success") {
                     modalInput.value = "";
                     
-                    // Si el contenedor decía "No hay comentarios", lo limpiamos primero
                     const emptyMsg = modalCommentsList.querySelector(".modal-comments-empty");
                     if (emptyMsg) emptyMsg.remove();
 
-                    // Creamos el elemento del nuevo comentario y lo inyectamos al inicio
                     const c = data.comentario;
                     const item = document.createElement("div");
                     item.classList.add("modal-comment-item");
