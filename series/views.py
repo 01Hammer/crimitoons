@@ -1581,9 +1581,12 @@ def agregar_comentario_post(request, post_id):
 
         try:
             post = ComunidadPost.objects.get(id=post_id)
-            # Usamos el modelo real 'RespuestaComunidad' definido en tus modelos
+            
+            # 🛠️ Creamos la respuesta asegurándonos de pasar los campos obligatorios
             nuevo_comentario = RespuestaComunidad.objects.create(
-                post=post, usuario=request.user, texto=texto
+                post=post, 
+                usuario=request.user, 
+                texto=texto
             )
 
             usuario_foto = None
@@ -1606,4 +1609,10 @@ def agregar_comentario_post(request, post_id):
         except ComunidadPost.DoesNotExist:
             return JsonResponse(
                 {"status": "error", "message": "Post no encontrado"}, status=404
+            )
+        except Exception as e:
+            # 🔍 Esto imprimirá el error real en los logs de Render si algo más falla
+            print("--- ERROR AL CREAR RESPUESTA COMUNIDAD ---", str(e))
+            return JsonResponse(
+                {"status": "error", "message": str(e)}, status=500
             )
