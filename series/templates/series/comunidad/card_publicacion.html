@@ -34,9 +34,15 @@
                 </div>
 
                 <div class="controles-superiores-video">
+                    <!-- Botón de Pantalla Completa (a la izquierda del volumen) -->
+                    <button type="button" class="btn-video-fullscreen" data-video-id="video-{{ card.id }}" title="Pantalla completa">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+
                     <button type="button" class="btn-video-volumen" data-video-id="video-{{ card.id }}" title="Activar sonido">
                         <i class="fa-solid fa-volume-xmark"></i>
                     </button>
+                    
                     <!-- Botón de descarga limpio y directo -->
                     <a href="{{ card.imagen }}" download="crimitoons-video-{{ card.id }}.mp4" class="btn-video-descargar btn-descargar-directo" title="Descargar video" target="_blank">
                         <i class="fa-solid fa-arrow-down"></i>
@@ -45,7 +51,7 @@
                 </div>
 
                 <div class="controles-inferiores-video">
-                    <div class="barra-tiempo-indicador">
+                    <div class="barra-tiempo-indicador" id="barra-tiempo-{{ card.id }}">
                         <div class="progreso-tiempo-linea" id="progreso-{{ card.id }}"></div>
                     </div>
                 </div>
@@ -79,9 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const indicadorCentro = zona.querySelector(".indicador-video-centro i");
         const contenedorIndicador = zona.querySelector(".indicador-video-centro");
         const btnVolumen = zona.querySelector(".btn-video-volumen i");
+        const btnFullscreen = zona.querySelector(".btn-video-fullscreen i");
         const lineaProgreso = zona.querySelector(".progreso-tiempo-linea");
+        const contenedorBarra = zona.querySelector(".barra-tiempo-indicador");
 
-        // 1. Reproducir / Pausar al hacer clic en la zona del video (excluyendo controles superiores)
+        // 1. Reproducir / Pausar al hacer clic en la zona del video
         zona.addEventListener("click", function (e) {
             if (e.target.closest(".controles-superiores-video")) return;
 
@@ -104,11 +112,23 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // 3. Control de Volumen independiente y seguro
+        // 3. Barra de avance interactiva (hacer clic para saltar a un segundo específico)
+        if (contenedorBarra) {
+            contenedorBarra.addEventListener("click", function (e) {
+                e.stopPropagation(); // Evita pausar el video al hacer clic en la barra
+                const rect = contenedorBarra.getBoundingClientRect();
+                const posClick = (e.clientX - rect.left) / rect.width;
+                if (video.duration) {
+                    video.currentTime = posClick * video.duration;
+                }
+            });
+        }
+
+        // 4. Control de Volumen independiente y seguro
         const btnVolumenContainer = zona.querySelector(".btn-video-volumen");
         if (btnVolumenContainer) {
             btnVolumenContainer.addEventListener("click", function (e) {
-                e.stopPropagation(); // Evita que se pause el video al cambiar el volumen
+                e.stopPropagation(); 
                 video.muted = !video.muted;
                 if (video.muted) {
                     btnVolumen.className = "fa-solid fa-volume-xmark";
@@ -118,14 +138,44 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // 4. Reiniciar estado visual cuando el video termina
+        // 5. Pantalla Completa (Full Screen)
+        const btnFullscreenContainer = zona.querySelector(".btn-video-fullscreen");
+        if (btnFullscreenContainer) {
+            btnFullscreenContainer.addEventListener("click", function (e) {
+                e.stopPropagation();
+                if (!document.fullscreenElement) {
+                    if (video.requestFullscreen) {
+                        video.requestFullscreen();
+                    } else if (video.webkitRequestFullscreen) { /* Safari */
+                        video.webkitRequestFullscreen();
+                    } else if (video.msRequestFullscreen) { /* IE11 */
+                        video.msRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            });
+        }
+
+        // Cambiar icono de fullscreen si cambia el estado de pantalla completa
+        document.addEventListener("fullscreenchange", function () {
+            if (document.fullscreenElement === video) {
+                if (btnFullscreen) btnFullscreen.className = "fa-solid fa-compress";
+            } else {
+                if (btnFullscreen) btnFullscreen.className = "fa-solid fa-expand";
+            }
+        });
+
+        // 6. Reiniciar estado visual cuando el video termina
         video.addEventListener("ended", function () {
             if (indicadorCentro) indicadorCentro.className = "fa-solid fa-play";
             if (contenedorIndicador) contenedorIndicador.classList.remove("en-reproduccion");
             if (lineaProgreso) lineaProgreso.style.width = "0%";
         });
 
-        // 5. Descarga directa por Blob sin romper eventos del reproductor
+        // 7. Descarga directa por Blob
         const btnDescargar = zona.querySelector(".btn-descargar-directo");
         if (btnDescargar) {
             btnDescargar.addEventListener("click", async function (e) {
