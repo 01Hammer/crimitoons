@@ -1526,3 +1526,89 @@ def anadir_opcion_encuesta(request, encuesta_id):
         },
         'mostrar_posters_global': encuesta.mostrar_posters
     })
+
+# ============================================================
+# 6. COMENTARIOS PARA POSTS DE COMUNIDAD (COMUNIDADPOST)
+# ============================================================
+
+def obtener_comentarios_post(request, post_id):
+    if request.method == "GET":
+        try:
+            post = ComunidadPost.objects.get(id=post_id)
+            # Nota: Asegúrate de que tu modelo ComunidadPost tenga un related_name='comentarios' 
+            # o usa post.comentariospost_set.all() según cómo lo hayas nombrado.
+            comentarios = post.comentarios.all().select_related("usuario").order_by("-created_at")
+
+            lista_comentarios = []
+            for c in comentarios:
+                usuario_foto = None
+                if (
+                    hasattr(c.usuario, "perfil")
+                    and hasattr(c.usuario.perfil, "foto_perfil")
+                    and c.usuario.perfil.foto_perfil
+                ):
+                    usuario_foto = c.usuario.perfil.foto_perfil
+
+                tiempo_transcurrido = timesince(c.created_at, timezone.now())
+                tiempo_limpio = tiempo_transcurrido.split(",")[0]
+                fecha_relativa = f"hace {tiempo_limpio}"
+
+                lista_comentarios.append(
+                    {
+                        "id": c.id,
+                        "usuario": c.usuario.username,
+                        "usuario_foto": usuario_foto,
+                        "texto": c.texto,
+                        "fecha": fecha_relativa,
+                    }
+                )
+
+            return JsonResponse({"status": "success", "comentarios": lista_comentarios})
+        except ComunidadPost.DoesNotExist:
+            return JsonResponse(
+                {"status": "error", "message": "Post no encontrado"}, status=404
+            )
+
+
+@login_required
+def agregar_comentario_post(request, post_id):
+    if request.method == "POST":
+        texto = request.POST.get("texto", "").strip()
+        if not texto:
+            return JsonResponse(
+                {"status": "error", "message": "El comentario no puede estar vacío"},
+                status=400,
+            )
+
+        try:
+            post = ComunidadPost.objects.get(id=post_id)
+            # Reemplaza 'ComentarioPost' por el modelo real que uses para los comentarios de los posts
+            nuevo_comentario = ComentarioPost.objects.create(
+                post=post, usuario=request.user, texto=texto
+            )
+
+            usuario_foto = None
+            if (
+                hasattr(nuevo_comentario.usuario, "perfil")
+                and hasattr(nuevo_comentario.usuario.perfil, "foto_perfil")
+                and nuevo_comentario.usuario.perfil.foto_perfil
+            ):
+                usuario_foto = nuevo_comentario.usuario.perfil.foto_perfil
+
+            return JsonResponse(
+                {
+                    "status": "success",
+                    "comentario": {
+                        "id": nuevo_comentario.id,
+                        "usuario": nuevo_comentario.usuario.username,
+                        "usuario_foto": usuario_foto,
+                        "texto": nuevo_comentario.texto,
+                        "fecha": f"hace {timesince(nuevo_comentario.created_at, timezone.now()).split(',')[0]}",
+                    },
+                    "total_comentarios": post.comentarios.count(),
+                }
+            )
+        except ComunidadPost.DoesNotExist:
+            return JsonResponse(
+                {"status": "error", "message": "Post no encontrado"}, status=404
+            )
