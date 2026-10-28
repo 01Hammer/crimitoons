@@ -1574,15 +1574,12 @@ def agregar_comentario_post(request, post_id):
     if request.method == "POST":
         texto = request.POST.get("texto", "").strip()
         if not texto:
-            return JsonResponse(
-                {"status": "error", "message": "El comentario no puede estar vacío"},
-                status=400,
-            )
+            return JsonResponse({"status": "error", "message": "Vacío"}, status=400)
 
         try:
             post = ComunidadPost.objects.get(id=post_id)
             
-            # 🛠️ Creamos la respuesta asegurándonos de pasar los campos obligatorios
+            # Intentamos crear el registro
             nuevo_comentario = RespuestaComunidad.objects.create(
                 post=post, 
                 usuario=request.user, 
@@ -1593,26 +1590,25 @@ def agregar_comentario_post(request, post_id):
             if hasattr(nuevo_comentario.usuario, "perfil") and nuevo_comentario.usuario.perfil.foto_perfil:
                 usuario_foto = nuevo_comentario.usuario.perfil.foto_perfil
 
-            return JsonResponse(
-                {
-                    "status": "success",
-                    "comentario": {
-                        "id": nuevo_comentario.id,
-                        "usuario": nuevo_comentario.usuario.username,
-                        "usuario_foto": usuario_foto,
-                        "texto": nuevo_comentario.texto,
-                        "fecha": f"hace {timesince(nuevo_comentario.created_at, timezone.now()).split(',')[0]}",
-                    },
-                    "total_comentarios": post.respuestas.count(),
-                }
-            )
-        except ComunidadPost.DoesNotExist:
-            return JsonResponse(
-                {"status": "error", "message": "Post no encontrado"}, status=404
-            )
+            return JsonResponse({
+                "status": "success",
+                "comentario": {
+                    "id": nuevo_comentario.id,
+                    "usuario": nuevo_comentario.usuario.username,
+                    "usuario_foto": usuario_foto,
+                    "texto": nuevo_comentario.texto,
+                    "fecha": f"hace {timesince(nuevo_comentario.created_at, timezone.now()).split(',')[0]}",
+                },
+                "total_comentarios": post.respuestas.count(),
+            })
         except Exception as e:
-            # 🔍 Esto imprimirá el error real en los logs de Render si algo más falla
-            print("--- ERROR AL CREAR RESPUESTA COMUNIDAD ---", str(e))
-            return JsonResponse(
-                {"status": "error", "message": str(e)}, status=500
-            )
+            import traceback
+            error_detallado = traceback.format_exc()
+            print("--- EXCEPCIÓN DETALLADA EN COMENTAR POST ---")
+            print(error_detallado)
+            # 💡 AQUÍ ESTÁ EL TRUCO: Devolvemos el error real en el JSON para verlo en la consola
+            return JsonResponse({
+                "status": "error", 
+                "message": str(e), 
+                "traceback": error_detallado
+            }, status=500)
