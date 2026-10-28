@@ -19,7 +19,7 @@ from .models import (
     ComentarioActividad,
     ComunidadPost,
     Encuesta,
-    OpcionEncuesta.
+    OpcionEncuesta,
     RespuestaComunidad
 )
 from .forms import RegistroForm, LoginForm, ActualizarPerfilForm
