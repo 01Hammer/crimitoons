@@ -19,7 +19,8 @@ from .models import (
     ComentarioActividad,
     ComunidadPost,
     Encuesta,
-    OpcionEncuesta
+    OpcionEncuesta.
+    RespuestaComunidad
 )
 from .forms import RegistroForm, LoginForm, ActualizarPerfilForm
 from .supabase_helper import subir_a_supabase
